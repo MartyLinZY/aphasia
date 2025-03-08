@@ -1,0 +1,43 @@
+classDiagram
+    class Question
+    <<abstract>> Question
+    Question : +evalRule QuestionEvalRule?
+    Question "1" *-- "1" QuestionEvalRule
+    Question : +defaultQuestionName()* String
+    Question : +buildAnswerAreaWidget()* Widget
+
+    class AudioQuestion
+    AudioQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+    AudioQuestion : +questionTypeName()$ String
+    AudioQuestion : +defaultQuestionName() String
+    AudioQuestion : +buildAnswerAreaWidget() Widget
+    Question <|-- AudioQuestion
+
+    class ChoiceQuestion
+    ChoiceQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+    ChoiceQuestion : +questionTypeName()$ String
+    ChoiceQuestion : +defaultQuestionName() String
+    ChoiceQuestion : +buildAnswerAreaWidget() Widget
+    Question <|-- ChoiceQuestion
+
+    class CommandQuestion
+    CommandQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+    CommandQuestion : +questionTypeName()$ String
+    CommandQuestion : +defaultQuestionName() String
+    CommandQuestion : +buildAnswerAreaWidget() Widget
+    Question <|-- CommandQuestion
+
+    class WritingQuestion
+    WritingQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+    WritingQuestion : +questionTypeName()$ String
+    WritingQuestion : +defaultQuestionName() String
+    WritingQuestion : +buildAnswerAreaWidget() Widget
+    Question <|-- WritingQuestion
+
+    class ItemFindingQuestion
+    ItemFindingQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+    ItemFindingQuestion : +questionTypeName()$ String
+    ItemFindingQuestion : +defaultQuestionName() String
+    ItemFindingQuestion : +buildAnswerAreaWidget() Widget
+    Question <|-- ItemFindingQuestion
+

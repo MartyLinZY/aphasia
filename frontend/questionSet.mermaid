@@ -1,0 +1,140 @@
+classDiagram
+    class QuestionCategory
+    QuestionCategory : +description String
+    QuestionCategory : +subCategories List~QuestionSubCategory~
+    QuestionSubCategory "1..n" *-- "1" QuestionCategory
+    QuestionCategory : +rules List~ExamCategoryEvalRule~
+    ExamCategoryEvalRule "1" *-- "1" QuestionCategory
+    QuestionCategory : +toJson() Map<String, dynamic>
+    QuestionCategory : +addSubCategoryLocally() void
+
+    class ExamQuestionSet
+    ExamQuestionSet : -_id String?
+    ExamQuestionSet : +name String
+    ExamQuestionSet : +description String
+    ExamQuestionSet : +recovery bool
+    ExamQuestionSet : +published bool
+    ExamQuestionSet : +categories List~QuestionCategory~
+    QuestionCategory "1..n" *-- "1" ExamQuestionSet
+    ExamQuestionSet : +diagnosisRules List~DiagnosisRule~
+    DiagnosisRule "1..n" *-- "1" ExamQuestionSet
+    ExamQuestionSet : +rules List~ExamEvalRule~
+    ExamEvalRule "1" *-- "1" ExamQuestionSet
+    ExamQuestionSet : +id String?
+    ExamQuestionSet : +toJson() Map<String, dynamic>
+    ExamQuestionSet : +copy() ExamQuestionSet
+    ExamQuestionSet : +getById(String id)$ ExamQuestionSet
+    ExamQuestionSet : +getByDoctorUserId(String userId, bool getRecoveery)$ List<ExamQuestionSet>
+    ExamQuestionSet : +createExam(String name, String description, bool isRecovery)$ ExamQuestionSet
+    ExamQuestionSet : +updateName(String newName) dynamic
+    ExamQuestionSet : +addCategory(String description) dynamic
+    ExamQuestionSet : +moveCategoryUp(int categoryIndex) dynamic
+    ExamQuestionSet : +publish() dynamic
+    ExamQuestionSet : +addDiagnosisRule(DiagnosisRule newRule) dynamic
+    ExamQuestionSet : +addSubCategoryEvalRule(int categoryIndex, int subCategoryIndex, ExamSubCategoryEvalRule newRule) dynamic
+    ExamQuestionSet : +checkSettingBeforePublish() void
+
+
+    class QuestionSubCategory
+    QuestionSubCategory : +description String
+    QuestionSubCategory : +questions List~Question~
+    Question "1..n" *-- "1" QuestionSubCategory
+    QuestionSubCategory : +terminateRules List~TerminateRule~
+    TerminateRule "1..n" *-- "1" QuestionSubCategory
+    QuestionSubCategory : +evalRules List~ExamSubCategoryEvalRule~
+    ExamSubCategoryEvalRule "1" *-- "1" QuestionSubCategory
+    QuestionSubCategory : +copy() QuestionSubCategory
+    QuestionSubCategory : +toJson() Map<String, dynamic>
+    QuestionSubCategory : +checkIfTerminate(SubCategoryResult result, int questionIndex) bool
+
+
+    class ExamEvalRule
+    <<abstract>> ExamEvalRule
+    ExamEvalRule : +categoryIndices List~int~
+    ExamEvalRule : +resultDimensionName String
+    ExamEvalRule : +typeName String
+    ExamEvalRule : +evaluate(ExamResult result)* ExamResult
+    ExamEvalRule : +displayName()* String
+    ExamEvalRule : +toJson()* Map<String, dynamic>
+
+    class ExamEvalByCategoryScoreSum
+    ExamEvalByCategoryScoreSum : +ruleDisplayName()$ String
+    ExamEvalByCategoryScoreSum : +evaluate(ExamResult result)* ExamResult
+    ExamEvalByCategoryScoreSum : +toJson() Map<String, dynamic>
+    ExamEvalByCategoryScoreSum : +displayName() String
+    ExamEvalRule <|-- ExamEvalByCategoryScoreSum
+
+    class ExamCategoryEvalRule
+    <<abstract>> ExamCategoryEvalRule
+    ExamCategoryEvalRule : +typeName String
+    ExamCategoryEvalRule : +toJson()* Map<String, dynamic>
+    ExamCategoryEvalRule : +copy() ExamCategoryEvalRule
+    ExamCategoryEvalRule : +displayName()* String
+    ExamCategoryEvalRule : +evaluate(CategoryResult result)* CategoryResult
+
+    class EvalBySubCategoryScoreSum
+    EvalBySubCategoryScoreSum : +evaluate(CategoryResult result)* CategoryResult
+    EvalBySubCategoryScoreSum : +toJson() Map<String, dynamic>
+    EvalBySubCategoryScoreSum : +displayName() String
+    ExamCategoryEvalRule <|-- EvalBySubCategoryScoreSum
+
+    class ExamSubCategoryEvalRule
+    <<abstract>> ExamSubCategoryEvalRule
+    ExamSubCategoryEvalRule : +typeName String
+    ExamSubCategoryEvalRule : +toJson()* Map<String, dynamic>
+    ExamSubCategoryEvalRule : +displayName()* String
+    ExamSubCategoryEvalRule : +copy() ExamSubCategoryEvalRule
+    ExamSubCategoryEvalRule : +evaluate(SubCategoryResult result)* SubCategoryResult
+
+    class EvalSubCategoryByQuestionScoreSum
+    EvalSubCategoryByQuestionScoreSum : +toJson() Map<String, dynamic>
+    EvalSubCategoryByQuestionScoreSum : +evaluate(SubCategoryResult result)* SubCategoryResult
+    EvalSubCategoryByQuestionScoreSum : +displayName() String
+    ExamSubCategoryEvalRule <|-- EvalSubCategoryByQuestionScoreSum
+
+    class TerminateRule
+    <<abstract>> TerminateRule
+    TerminateRule : +reason String
+    TerminateRule : +equivalentScore double
+    TerminateRule : +typeName String
+    TerminateRule : +copy() TerminateRule
+    TerminateRule : +checkIfNeedTerminate(QuestionSubCategory category, SubCategoryResult result, int questionIndex)* bool
+    ExamSubCategoryEvalRule <|.. TerminateRule
+
+    class ContinuousWrongAnswerTerminate
+    ContinuousWrongAnswerTerminate : +errorCountThreshold int
+    ContinuousWrongAnswerTerminate : +ruleDisplayName()$ String
+    ContinuousWrongAnswerTerminate : +toJson() Map<String, dynamic>
+    ContinuousWrongAnswerTerminate : +evaluate(SubCategoryResult result)* SubCategoryResult
+    ContinuousWrongAnswerTerminate : +displayName() String
+    ContinuousWrongAnswerTerminate : +checkIfNeedTerminate() bool
+    TerminateRule <|-- ContinuousWrongAnswerTerminate
+
+    class DiagnosisRule
+    <<abstract>> DiagnosisRule
+    DiagnosisRule : +typeName String
+    DiagnosisRule : +categoryIndices List~int~
+    DiagnosisRule : +toJson()* Map<String, dynamic>
+    DiagnosisRule : +displayName()* String
+    DiagnosisRule : +copy() DiagnosisRule
+    DiagnosisRule : +addCategory(int categoryIndex) void
+    DiagnosisRule : +removeCategory(int categoryIndex) int
+    DiagnosisRule : +checkAndDiagnose(ExamResult result)* bool
+
+    class ScoreRange
+    ScoreRange : +min double
+    ScoreRange : +max double
+    ScoreRange : +toJson() Map<String, dynamic>
+
+    class DiagnoseByScoreRange
+    DiagnoseByScoreRange : +ranges List~ScoreRange~
+    ScoreRange "1..n" *-- "1" DiagnoseByScoreRange
+    DiagnoseByScoreRange : +aphasiaType String
+    DiagnoseByScoreRange : +ruleDisplayName()$ String
+    DiagnoseByScoreRange : +toJson() Map<String, dynamic>
+    DiagnoseByScoreRange : +copy() DiagnoseByScoreRange
+    DiagnoseByScoreRange : +displayName() String
+    DiagnoseByScoreRange : +addRange(int categoryIndex, ScoreRange range) void
+    DiagnoseByScoreRange : +removeCategory(int categoryIndex) int
+    DiagnoseByScoreRange : +checkAndDiagnose(ExamResult result)* bool
+    DiagnosisRule <|-- DiagnoseByScoreRange

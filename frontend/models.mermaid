@@ -1,0 +1,2119 @@
+classDiagram
+class DoctorExamDraftsPage
+DoctorExamDraftsPage : +createState() State<DoctorExamDraftsPage>
+StatefulWidget <|-- DoctorExamDraftsPage
+
+class _DoctorExamDraftsPageState
+_DoctorExamDraftsPageState : +build() Widget
+State <|-- _DoctorExamDraftsPageState
+
+class DoctorRecoveryManagementPage
+DoctorRecoveryManagementPage : +createState() State<DoctorRecoveryManagementPage>
+StatefulWidget <|-- DoctorRecoveryManagementPage
+
+class _DoctorRecoveryManagementPageState
+_DoctorRecoveryManagementPageState : +initState() void
+_DoctorRecoveryManagementPageState : +build() Widget
+State <|-- _DoctorRecoveryManagementPageState
+
+class ExamEntryPatientPage
+ExamEntryPatientPage : +build() Widget
+StatelessWidget <|-- ExamEntryPatientPage
+
+class ExamEntryDoctorPage
+ExamEntryDoctorPage : +build() Widget
+StatelessWidget <|-- ExamEntryDoctorPage
+
+class EntryCards
+EntryCards : +build() Widget
+StatelessWidget <|-- EntryCards
+
+class GlobalStatesProviders
+GlobalStatesProviders : -_child Widget
+GlobalStatesProviders o-- Widget
+GlobalStatesProviders : +build() Widget
+StatelessWidget <|-- GlobalStatesProviders
+
+class HomePage
+HomePage : +createState() State<StatefulWidget>
+StatefulWidget <|-- HomePage
+
+class _HomePageState
+_HomePageState : +selectedNavIndex int
+_HomePageState : +build() Widget
+State <|-- _HomePageState
+UseCommonStyles <|-- _HomePageState
+
+class PatientStarredRecoveryPage
+PatientStarredRecoveryPage : +createState() State<PatientStarredRecoveryPage>
+StatefulWidget <|-- PatientStarredRecoveryPage
+
+class _PatientStarredRecoveryPageState
+_PatientStarredRecoveryPageState : +build() Widget
+State <|-- _PatientStarredRecoveryPageState
+
+class RecoveryEntryPatientPage
+RecoveryEntryPatientPage : +build() Widget
+StatelessWidget <|-- RecoveryEntryPatientPage
+
+class RecoveryEntryDoctorPage
+RecoveryEntryDoctorPage : +build() Widget
+StatelessWidget <|-- RecoveryEntryDoctorPage
+
+class _EntryCards
+_EntryCards : +build() Widget
+StatelessWidget <|-- _EntryCards
+
+class UserInfo
+UserInfo : -_role int?
+UserInfo : -_name String?
+UserInfo : -_phoneOrEmail String?
+UserInfo : +role int?
+UserInfo : +name String?
+UserInfo : +phoneOrEmail String?
+ChangeNotifier <|-- UserInfo
+
+class ClickAction
+<<enumeration>> ClickAction
+ClickAction : +index int
+ClickAction : +values$ List~ClickAction~
+ClickAction : +touch$ ClickAction
+ClickAction o-- ClickAction
+ClickAction : +turnOver$ ClickAction
+ClickAction o-- ClickAction
+ClickAction : +take$ ClickAction
+ClickAction o-- ClickAction
+Enum <|.. ClickAction
+
+class PutDownAction
+<<enumeration>> PutDownAction
+PutDownAction : +index int
+PutDownAction : +values$ List~PutDownAction~
+PutDownAction : +putDown$ PutDownAction
+PutDownAction o-- PutDownAction
+PutDownAction : +cover$ PutDownAction
+PutDownAction o-- PutDownAction
+PutDownAction : +switchPlace$ PutDownAction
+PutDownAction o-- PutDownAction
+Enum <|.. PutDownAction
+
+class ClassProperties
+<<enumeration>> ClassProperties
+ClassProperties : +index int
+ClassProperties : +values$ List~ClassProperties~
+ClassProperties : +constructor$ ClassProperties
+ClassProperties o-- ClassProperties
+ClassProperties : +typeName$ ClassProperties
+ClassProperties o-- ClassProperties
+ClassProperties : +displayName$ ClassProperties
+ClassProperties o-- ClassProperties
+Enum <|.. ClassProperties
+
+class QuestionSetType
+<<enumeration>> QuestionSetType
+QuestionSetType : +index int
+QuestionSetType : +values$ List~QuestionSetType~
+QuestionSetType : +exam$ QuestionSetType
+QuestionSetType o-- QuestionSetType
+QuestionSetType : +recovery$ QuestionSetType
+QuestionSetType o-- QuestionSetType
+Enum <|.. QuestionSetType
+
+class PlatformType
+<<enumeration>> PlatformType
+PlatformType : +index int
+PlatformType : +values$ List~PlatformType~
+PlatformType : +web$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +iOS$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +android$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +windows$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +linux$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +macOS$ PlatformType
+PlatformType o-- PlatformType
+PlatformType : +fuchsia$ PlatformType
+PlatformType o-- PlatformType
+Enum <|.. PlatformType
+
+class HttpRequestException
+HttpRequestException : +message String?
+HttpRequestException : +response Response?
+HttpRequestException o-- Response
+HttpRequestException : +streamedResponse StreamedResponse?
+HttpRequestException o-- StreamedResponse
+HttpRequestException : +statusCode int
+HttpRequestException : +toString() String
+Exception <|.. HttpRequestException
+
+class ExamNotFoundException
+ExamNotFoundException : +examId String
+ExamNotFoundException : +toString() String
+Exception <|.. ExamNotFoundException
+
+class InCompleteExamException
+InCompleteExamException : +needCategory bool
+InCompleteExamException : +needDiagnosisRule bool
+InCompleteExamException : +needEvalRule bool
+InCompleteExamException : +categoryIndex int?
+InCompleteExamException : +needSubCategory bool
+InCompleteExamException : +needCateEvalRule bool
+InCompleteExamException : +subCategoryIndex int?
+InCompleteExamException : +needQuestion bool
+InCompleteExamException : +needSubCateEvalRule bool
+InCompleteExamException : +message String
+Exception <|.. InCompleteExamException
+
+class EditPublishedQuestionSetException
+EditPublishedQuestionSetException : +promptMessage$ String
+EditPublishedQuestionSetException : +getPromptMessage() String
+Exception <|.. EditPublishedQuestionSetException
+
+class IncompleteModelException
+IncompleteModelException : +modelType Type
+IncompleteModelException : +modelObj Object
+Exception <|.. IncompleteModelException
+
+class UnexpectedError
+UnexpectedError : +msg String
+UnexpectedError : +toString() String
+Error <|-- UnexpectedError
+
+class AudioRecorderMixin
+<<abstract>> AudioRecorderMixin
+AudioRecorderMixin : +recordFile() dynamic
+AudioRecorderMixin : +recordStream() dynamic
+AudioRecorderMixin : +downloadWebData() void
+AudioRecorderMixin : -_getPath() dynamic
+
+class AudioRecorderMixin
+<<abstract>> AudioRecorderMixin
+AudioRecorderMixin : +recordFile() dynamic
+AudioRecorderMixin : +recordStream() dynamic
+AudioRecorderMixin : +downloadWebData() void
+
+class FuzzyEvalSetting
+<<abstract>> FuzzyEvalSetting
+FuzzyEvalSetting : +enableFuzzyEvaluation bool
+FuzzyEvalSetting : +enableFuzzy() void
+FuzzyEvalSetting : +disableFuzzy() void
+
+class RuleKeyword
+<<abstract>> RuleKeyword
+RuleKeyword : +keyword String
+
+class KeywordList
+<<abstract>> KeywordList
+KeywordList : +keywords List~String~
+
+class AnswerOrder
+<<abstract>> AnswerOrder
+AnswerOrder : +enforceOrder bool
+
+class LongAnswer
+<<abstract>> LongAnswer
+LongAnswer : +answerText String
+
+class CommonStyles
+CommonStyles : +widgetsElevation double
+CommonStyles : +listTileCommonHeight double
+CommonStyles : +theme ThemeData
+CommonStyles o-- ThemeData
+CommonStyles : +titleStyle TextStyle?
+CommonStyles o-- TextStyle
+CommonStyles : +bodyStyle TextStyle?
+CommonStyles o-- TextStyle
+CommonStyles : +hintTextStyle TextStyle?
+CommonStyles o-- TextStyle
+CommonStyles : +errorColor Color?
+CommonStyles o-- Color
+CommonStyles : +onErrorColor Color?
+CommonStyles o-- Color
+CommonStyles : +onPrimaryColor Color?
+CommonStyles o-- Color
+CommonStyles : +primaryColor Color?
+CommonStyles o-- Color
+CommonStyles : +focusListTileColor Color?
+CommonStyles o-- Color
+CommonStyles : +isMedium bool
+CommonStyles : +isLarge bool
+CommonStyles : +isSmall bool
+
+class TextFieldCommonValidators
+TextFieldCommonValidators : +notEmptyValidator() String? Function(String?)
+TextFieldCommonValidators : +needChineseValidator() String?
+TextFieldCommonValidators : +needIntValidator() String?
+TextFieldCommonValidators : +needGreaterThanOrEqualIntValidator() String? Function(String?)
+TextFieldCommonValidators : +needDoubleValidator() String?
+TextFieldCommonValidators : +needGreaterThanOrEqualDoubleValidator() String? Function(String?)
+TextFieldCommonValidators : +needSmallerThanOrEqualDoubleValidator() String? Function(String?)
+
+class ResettableState
+<<abstract>> ResettableState
+ResettableState : +resetState()* void
+
+class FieldSetting
+FieldSetting : +key GlobalKey~FormFieldState~dynamic~~
+FieldSetting o-- GlobalKey~FormFieldState~dynamic~~
+FieldSetting : +ctrl TextEditingController
+FieldSetting o-- TextEditingController
+FieldSetting : +validator String? FunctionString?
+FieldSetting o-- String FunctionString
+FieldSetting : +reset void Function
+FieldSetting o-- void Function
+FieldSetting : +applyToModel void Function
+FieldSetting o-- void Function
+
+class RequireLogin
+<<abstract>> RequireLogin
+RequireLogin : +checkLoginStatus() bool
+
+class UseCommonStyles
+<<abstract>> UseCommonStyles
+UseCommonStyles : +commonStyles CommonStyles?
+UseCommonStyles o-- CommonStyles
+UseCommonStyles : +initStyles() CommonStyles
+
+class AudioPlayerSetting
+<<abstract>> AudioPlayerSetting
+AudioPlayerSetting : +setStateProxy void Functionvoid Function
+AudioPlayerSetting o-- void Functionvoid Function
+AudioPlayerSetting : +player AudioPlayer
+AudioPlayerSetting o-- AudioPlayer
+AudioPlayerSetting : +audioDuration Duration?
+AudioPlayerSetting : +playPosition Duration?
+AudioPlayerSetting : -_durationSubscription StreamSubscription~dynamic~?
+AudioPlayerSetting o-- StreamSubscription~dynamic~
+AudioPlayerSetting : -_positionSubscription StreamSubscription~dynamic~?
+AudioPlayerSetting o-- StreamSubscription~dynamic~
+AudioPlayerSetting : -_playerCompleteSubscription StreamSubscription~dynamic~?
+AudioPlayerSetting o-- StreamSubscription~dynamic~
+AudioPlayerSetting : +isPlaying bool
+AudioPlayerSetting : +isPaused bool
+AudioPlayerSetting : +isPlayerDisposed bool
+AudioPlayerSetting : +durationText String
+AudioPlayerSetting : +positionText String
+AudioPlayerSetting : +play() dynamic
+AudioPlayerSetting : +pause() dynamic
+AudioPlayerSetting : +stop() dynamic
+AudioPlayerSetting : +setupPlayer() void
+AudioPlayerSetting : +initPlayStateSubscription() void
+AudioPlayerSetting : +disposePlayStateSubscription() void
+AudioPlayerSetting : +buildPlayer() Widget
+
+class 
+<<abstract>> 
+
+class StateWithTextFields
+<<abstract>> StateWithTextFields
+StateWithTextFields : +fieldsSetting Map~String, FieldSetting~
+StateWithTextFields : +initFieldSettings()* void
+StateWithTextFields : +applyFieldsChangesToModel() bool
+StateWithTextFields : +resetAllFields() void
+StateWithTextFields : +validateAllFields() bool
+
+class QuestionImage
+<<abstract>> QuestionImage
+QuestionImage : +imageDisplayCounter CountDown?
+QuestionImage o-- CountDown
+QuestionImage : +imageDisplayed bool
+QuestionImage : +initQuestionImage() void
+QuestionImage : +startQuestionImageFadeCountDown() void
+
+class QuestionText
+<<abstract>> QuestionText
+QuestionText : +isQuestionTextDisplayed bool
+QuestionText : +initQuestionText() void
+
+class QuestionAnswerArea
+<<abstract>> QuestionAnswerArea
+QuestionAnswerArea : +player WrappedAudioPlayer?
+QuestionAnswerArea o-- WrappedAudioPlayer
+QuestionAnswerArea : +timeLimitCountDown CountDown?
+QuestionAnswerArea o-- CountDown
+QuestionAnswerArea : +imageDisplayCounter CountDown?
+QuestionAnswerArea o-- CountDown
+QuestionAnswerArea : +imageDisplayed bool
+QuestionAnswerArea : +isQuestionTextDisplayed bool
+QuestionAnswerArea : +hintingRule HintRule?
+QuestionAnswerArea o-- HintRule
+QuestionAnswerArea : +evaluating bool
+QuestionAnswerArea : +displayImageUrl String?
+QuestionAnswerArea : +displayText String?
+QuestionAnswerArea : +hinting bool
+QuestionAnswerArea : +setImageDisplayed() void
+QuestionAnswerArea : +displayImageWithFadeCountDown() void
+QuestionAnswerArea : +setQuestionTextDisplayed() void
+QuestionAnswerArea : +initQuestionStem() void
+QuestionAnswerArea : +trySetAnswerTime() void
+QuestionAnswerArea : +tryStartTimeLimitCounter() void
+QuestionAnswerArea : +finishAnswer()* void
+QuestionAnswerArea : +doCommonFinishStep() void
+QuestionAnswerArea : +setState()* void
+QuestionAnswerArea : +doEvalQuestion() dynamic
+QuestionAnswerArea : +triggerHint() void
+QuestionAnswerArea : +setHintStates() void
+QuestionAnswerArea : +resetAnswerStateAfterHint() void
+QuestionAnswerArea : +disposePlayerAndCounters() void
+
+class QuestionCategory
+QuestionCategory : +description String
+QuestionCategory : +subCategories List~QuestionSubCategory~
+QuestionCategory : +rules List~ExamCategoryEvalRule~
+QuestionCategory : +toJson() Map<String, dynamic>
+QuestionCategory : +addSubCategoryLocally() void
+
+class ExamQuestionSet
+ExamQuestionSet : -_id String?
+ExamQuestionSet : +name String
+ExamQuestionSet : +description String
+ExamQuestionSet : +recovery bool
+ExamQuestionSet : +published bool
+ExamQuestionSet : +categories List~QuestionCategory~
+ExamQuestionSet : +diagnosisRules List~DiagnosisRule~
+ExamQuestionSet : +rules List~ExamEvalRule~
+ExamQuestionSet : +id String?
+ExamQuestionSet : +toJson() Map<String, dynamic>
+ExamQuestionSet : +copy() ExamQuestionSet
+ExamQuestionSet : +getById()$ dynamic
+ExamQuestionSet : +getByDoctorUserId()$ dynamic
+ExamQuestionSet : +createExam()$ dynamic
+ExamQuestionSet : +addCategoryLocally() void
+ExamQuestionSet : -_checkPublished() void
+ExamQuestionSet : -_checkCategoryIndex() void
+ExamQuestionSet : +updateName() dynamic
+ExamQuestionSet : +updateDescription() dynamic
+ExamQuestionSet : +addCategory() dynamic
+ExamQuestionSet : +deleteCategory() dynamic
+ExamQuestionSet : +updateCategory() dynamic
+ExamQuestionSet : +moveCategoryUp() dynamic
+ExamQuestionSet : +moveCategoryDown() dynamic
+ExamQuestionSet : -_checkSubCategoryIndex() void
+ExamQuestionSet : +addSubCategory() dynamic
+ExamQuestionSet : +updateSubCategory() dynamic
+ExamQuestionSet : +deleteSubCategory() dynamic
+ExamQuestionSet : +moveSubCategoryUp() dynamic
+ExamQuestionSet : +moveSubCategoryDown() dynamic
+ExamQuestionSet : -_checkQuestionIndex() dynamic
+ExamQuestionSet : +addQuestion() dynamic
+ExamQuestionSet : +updateQuestion() dynamic
+ExamQuestionSet : +deleteQuestion() dynamic
+ExamQuestionSet : +moveQuestionUp() dynamic
+ExamQuestionSet : +moveQuestionDown() dynamic
+ExamQuestionSet : -_setPublished() void
+ExamQuestionSet : +publish() dynamic
+ExamQuestionSet : -_checkDiagnosisRuleIndex() void
+ExamQuestionSet : +addDiagnosisRule() dynamic
+ExamQuestionSet : +deleteDiagnosisRule() dynamic
+ExamQuestionSet : +updateDiagnosisRule() dynamic
+ExamQuestionSet : -_checkCategoryEvalRuleIndex() dynamic
+ExamQuestionSet : +addCategoryEvalRule() dynamic
+ExamQuestionSet : +updateCategoryEvalRule() dynamic
+ExamQuestionSet : +deleteCategoryEvalRule() dynamic
+ExamQuestionSet : -_checkSubCategoryEvalRuleIndex() dynamic
+ExamQuestionSet : +addSubCategoryEvalRule() dynamic
+ExamQuestionSet : +updateSubCategoryEvalRule() dynamic
+ExamQuestionSet : +deleteSubCategoryEvalRule() dynamic
+ExamQuestionSet : -_checkSubCategoryTerminateRuleIndex() dynamic
+ExamQuestionSet : +addSubCategoryTerminateRule() dynamic
+ExamQuestionSet : +updateSubCategoryTerminateRule() dynamic
+ExamQuestionSet : +deleteSubCategoryTerminateRule() dynamic
+ExamQuestionSet : +checkSettingBeforePublish() void
+ExamQuestionSet : -_passOrThrowIncompleteException() void
+
+class QuestionSubCategory
+QuestionSubCategory : +description String
+QuestionSubCategory : +questions List~Question~
+QuestionSubCategory : +terminateRules List~TerminateRule~
+QuestionSubCategory : +evalRules List~ExamSubCategoryEvalRule~
+QuestionSubCategory : +copy() QuestionSubCategory
+QuestionSubCategory : +toJson() Map<String, dynamic>
+QuestionSubCategory : +checkIfTerminate() bool
+
+class Question
+<<abstract>> Question
+Question : -_id String?
+Question : +alias String?
+Question : +questionText String?
+Question : +audioUrl String?
+Question : +imageUrl String?
+Question : +omitImageAfterSeconds int
+Question : +maxOmitTime$ int
+Question : +typeName String
+Question : +evalRule QuestionEvalRule?
+Question o-- QuestionEvalRule
+Question : +id String?
+Question : +updateQuestion()$ dynamic
+Question : +toJson()* Map<String, dynamic>
+Question : +copy() Question
+Question : +defaultQuestionName()* String
+Question : +buildAnswerAreaWidget()* Widget
+
+class AudioQuestion
+AudioQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+AudioQuestion : +questionTypeName()$ String
+AudioQuestion : +toJson() Map<String, dynamic>
+AudioQuestion : +defaultQuestionName() String
+AudioQuestion : +buildAnswerAreaWidget() Widget
+Question <|-- AudioQuestion
+
+class ChoiceQuestion
+ChoiceQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+ChoiceQuestion : +questionTypeName()$ String
+ChoiceQuestion : +toJson() Map<String, dynamic>
+ChoiceQuestion : +defaultQuestionName() String
+ChoiceQuestion : +buildAnswerAreaWidget() Widget
+Question <|-- ChoiceQuestion
+
+class CommandQuestion
+CommandQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+CommandQuestion : +questionTypeName()$ String
+CommandQuestion : +toJson() Map<String, dynamic>
+CommandQuestion : +defaultQuestionName() String
+CommandQuestion : +buildAnswerAreaWidget() Widget
+Question <|-- CommandQuestion
+
+class WritingQuestion
+WritingQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+WritingQuestion : +questionTypeName()$ String
+WritingQuestion : +toJson() Map<String, dynamic>
+WritingQuestion : +defaultQuestionName() String
+WritingQuestion : +buildAnswerAreaWidget() Widget
+Question <|-- WritingQuestion
+
+class ItemFindingQuestion
+ItemFindingQuestion : +availableEvalRuleTypes()$ Map<Type, dynamic>
+ItemFindingQuestion : +questionTypeName()$ String
+ItemFindingQuestion : +toJson() Map<String, dynamic>
+ItemFindingQuestion : +defaultQuestionName() String
+ItemFindingQuestion : +buildAnswerAreaWidget() Widget
+Question <|-- ItemFindingQuestion
+
+class ExamResult
+ExamResult : +id String?
+ExamResult : +resultText String?
+ExamResult : +finalScore double?
+ExamResult : +startTime DateTime?
+ExamResult : +finishTime DateTime?
+ExamResult : +isRecovery bool
+ExamResult : +examName String
+ExamResult : +categoryResults List~CategoryResult~
+ExamResult : +toJson() Map<String, dynamic>
+ExamResult : +getByUid()$ dynamic
+ExamResult : +createExamResult()$ dynamic
+ExamResult : +saveExamResult()$ dynamic
+
+class CategoryResult
+CategoryResult : +name String?
+CategoryResult : +finalScore double?
+CategoryResult : +subResults List~SubCategoryResult~
+CategoryResult : +toJson() Map<String, dynamic>
+
+class SubCategoryResult
+SubCategoryResult : +name String?
+SubCategoryResult : +finalScore double?
+SubCategoryResult : +terminateReason String?
+SubCategoryResult : +questionResults List~QuestionResult~
+SubCategoryResult : +addQuestionResult() void
+SubCategoryResult : +toJson() Map<String, dynamic>
+
+class QuestionResult
+<<abstract>> QuestionResult
+QuestionResult : +sourceQuestion Question
+QuestionResult o-- Question
+QuestionResult : +finalScore double?
+QuestionResult : +answerTime int?
+QuestionResult : +isHinted bool
+QuestionResult : +extraResults Map~String, String~
+QuestionResult : +typeName String
+QuestionResult : +toJson()* Map<String, dynamic>
+
+class AudioQuestionResult
+AudioQuestionResult : +audioContent String
+AudioQuestionResult : +rawPcm16Data List~int~?
+AudioQuestionResult : +toJson() Map<String, dynamic>
+QuestionResult <|-- AudioQuestionResult
+
+class CommandQuestionResult
+CommandQuestionResult : +actions List~CommandActions~
+CommandQuestionResult : +toJson() Map<String, dynamic>
+QuestionResult <|-- CommandQuestionResult
+
+class ChoiceQuestionResult
+ChoiceQuestionResult : +choiceSelected List~int~
+ChoiceQuestionResult : +toJson() Map<String, dynamic>
+QuestionResult <|-- ChoiceQuestionResult
+
+class WritingQuestionResult
+WritingQuestionResult : +handWriteImageData Uint8List?
+WritingQuestionResult o-- Uint8List
+WritingQuestionResult : +toJson() Map<String, dynamic>
+QuestionResult <|-- WritingQuestionResult
+
+class ItemFindingQuestionResult
+ItemFindingQuestionResult : +clickCoordinate List~double~?
+ItemFindingQuestionResult : +toJson() Map<String, dynamic>
+QuestionResult <|-- ItemFindingQuestionResult
+
+class DiagnosisRule
+<<abstract>> DiagnosisRule
+DiagnosisRule : +typeName String
+DiagnosisRule : +categoryIndices List~int~
+DiagnosisRule : +toJson()* Map<String, dynamic>
+DiagnosisRule : +displayName()* String
+DiagnosisRule : +copy() DiagnosisRule
+DiagnosisRule : +addCategory() void
+DiagnosisRule : +removeCategory() int
+DiagnosisRule : +checkAndDiagnose()* bool
+
+class ScoreRange
+ScoreRange : +min double
+ScoreRange : +max double
+ScoreRange : +toJson() Map<String, dynamic>
+
+class DiagnoseByScoreRange
+DiagnoseByScoreRange : +ranges List~ScoreRange~
+DiagnoseByScoreRange : +aphasiaType String
+DiagnoseByScoreRange : +ruleDisplayName()$ String
+DiagnoseByScoreRange : +toJson() Map<String, dynamic>
+DiagnoseByScoreRange : +copy() DiagnoseByScoreRange
+DiagnoseByScoreRange : +displayName() String
+DiagnoseByScoreRange : +addRange() void
+DiagnoseByScoreRange : +removeCategory() int
+DiagnoseByScoreRange : +checkAndDiagnose() bool
+DiagnosisRule <|-- DiagnoseByScoreRange
+
+class ExamEvalRule
+<<abstract>> ExamEvalRule
+ExamEvalRule : +categoryIndices List~int~
+ExamEvalRule : +resultDimensionName String
+ExamEvalRule : +typeName String
+ExamEvalRule : +evaluate()* ExamResult
+ExamEvalRule : +displayName()* String
+ExamEvalRule : +toJson()* Map<String, dynamic>
+
+class ExamEvalByCategoryScoreSum
+ExamEvalByCategoryScoreSum : +ruleDisplayName()$ String
+ExamEvalByCategoryScoreSum : +evaluate() ExamResult
+ExamEvalByCategoryScoreSum : +toJson() Map<String, dynamic>
+ExamEvalByCategoryScoreSum : +displayName() String
+ExamEvalRule <|-- ExamEvalByCategoryScoreSum
+
+class ExamCategoryEvalRule
+<<abstract>> ExamCategoryEvalRule
+ExamCategoryEvalRule : +typeName String
+ExamCategoryEvalRule : +toJson()* Map<String, dynamic>
+ExamCategoryEvalRule : +copy() ExamCategoryEvalRule
+ExamCategoryEvalRule : +displayName()* String
+ExamCategoryEvalRule : +evaluate()* CategoryResult
+
+class EvalBySubCategoryScoreSum
+EvalBySubCategoryScoreSum : +evaluate() CategoryResult
+EvalBySubCategoryScoreSum : +toJson() Map<String, dynamic>
+EvalBySubCategoryScoreSum : +displayName() String
+ExamCategoryEvalRule <|-- EvalBySubCategoryScoreSum
+
+class ExamSubCategoryEvalRule
+<<abstract>> ExamSubCategoryEvalRule
+ExamSubCategoryEvalRule : +typeName String
+ExamSubCategoryEvalRule : +toJson()* Map<String, dynamic>
+ExamSubCategoryEvalRule : +displayName()* String
+ExamSubCategoryEvalRule : +copy() ExamSubCategoryEvalRule
+ExamSubCategoryEvalRule : +evaluate()* SubCategoryResult
+
+class EvalSubCategoryByQuestionScoreSum
+EvalSubCategoryByQuestionScoreSum : +toJson() Map<String, dynamic>
+EvalSubCategoryByQuestionScoreSum : +evaluate() SubCategoryResult
+EvalSubCategoryByQuestionScoreSum : +displayName() String
+ExamSubCategoryEvalRule <|-- EvalSubCategoryByQuestionScoreSum
+
+class TerminateRule
+<<abstract>> TerminateRule
+TerminateRule : +reason String
+TerminateRule : +equivalentScore double
+TerminateRule : +typeName String
+TerminateRule : +copy() TerminateRule
+TerminateRule : +checkIfNeedTerminate()* bool
+ExamSubCategoryEvalRule <|.. TerminateRule
+
+class ContinuousWrongAnswerTerminate
+ContinuousWrongAnswerTerminate : +errorCountThreshold int
+ContinuousWrongAnswerTerminate : +ruleDisplayName()$ String
+ContinuousWrongAnswerTerminate : +toJson() Map<String, dynamic>
+ContinuousWrongAnswerTerminate : +evaluate() SubCategoryResult
+ContinuousWrongAnswerTerminate : +displayName() String
+ContinuousWrongAnswerTerminate : +checkIfNeedTerminate() bool
+TerminateRule <|-- ContinuousWrongAnswerTerminate
+
+class HintRule
+HintRule : +hintText String?
+HintRule : +hintAudioUrl String?
+HintRule : +hintImageUrl String?
+HintRule : +hintImageAssetPath String?
+HintRule : +scoreLowBound double
+HintRule : +scoreHighBound double
+HintRule : +adjustValue double
+HintRule : +scoreAdjustType int
+HintRule : +toJson() Map<String, dynamic>
+HintRule : +checkSetting() String?
+HintRule : +checkIfMatch() bool
+
+class EvalCondition
+EvalCondition : +score double
+EvalCondition : +ranges List~Map~String, dynamic~~
+EvalCondition : +isHinted bool
+EvalCondition : +length int
+EvalCondition : +toJson() Map<String, dynamic>
+EvalCondition : +addRange() void
+EvalCondition : +removeRange() Map<String, dynamic>
+EvalCondition : +checkIfMatch() bool
+
+class QuestionEvalRule
+<<abstract>> QuestionEvalRule
+QuestionEvalRule : +fullScore double
+QuestionEvalRule : +timeLimit int
+QuestionEvalRule : -_defaultScore double
+QuestionEvalRule : +conditions List~EvalCondition~
+QuestionEvalRule : +hintRules List~HintRule~
+QuestionEvalRule : +typeName String
+QuestionEvalRule : +defaultScore double
+QuestionEvalRule : +toJson()* Map<String, dynamic>
+QuestionEvalRule : +evaluate()* dynamic
+QuestionEvalRule : +setScoreByConditions() void
+QuestionEvalRule : +getMatchHintRule() HintRule?
+QuestionEvalRule : +getScoreConditionName()* String
+QuestionEvalRule : +checkSetting() String?
+QuestionEvalRule : +addEvalCondition() void
+QuestionEvalRule : +updateEvalCondition() void
+QuestionEvalRule : +deleteEvalCondition() void
+QuestionEvalRule : +moveUpEvalCondition() void
+QuestionEvalRule : +moveDownEvalCondition() void
+QuestionEvalRule : +addHintRule() void
+QuestionEvalRule : +deleteHintRule() void
+QuestionEvalRule : +updateHintRule() void
+QuestionEvalRule : +moveUpHintRule() void
+QuestionEvalRule : +moveDownHintRule() void
+
+class EvalAudioQuestionByKeywordsMatchesCount
+EvalAudioQuestionByKeywordsMatchesCount : +ruleDisplayName()$ String
+EvalAudioQuestionByKeywordsMatchesCount : +toJson() Map<String, dynamic>
+EvalAudioQuestionByKeywordsMatchesCount : +evaluate() dynamic
+EvalAudioQuestionByKeywordsMatchesCount : +checkSetting() String?
+EvalAudioQuestionByKeywordsMatchesCount : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionByKeywordsMatchesCount
+FuzzyEvalSetting <|-- EvalAudioQuestionByKeywordsMatchesCount
+KeywordList <|-- EvalAudioQuestionByKeywordsMatchesCount
+AnswerOrder <|-- EvalAudioQuestionByKeywordsMatchesCount
+
+class EvalAudioQuestionByKeywordMatch
+EvalAudioQuestionByKeywordMatch : +ruleDisplayName()$ String
+EvalAudioQuestionByKeywordMatch : +toJson() Map<String, dynamic>
+EvalAudioQuestionByKeywordMatch : +evaluate() dynamic
+EvalAudioQuestionByKeywordMatch : +checkSetting() String?
+EvalAudioQuestionByKeywordMatch : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionByKeywordMatch
+FuzzyEvalSetting <|-- EvalAudioQuestionByKeywordMatch
+RuleKeyword <|-- EvalAudioQuestionByKeywordMatch
+
+class EvalAudioQuestionByPronunciation
+EvalAudioQuestionByPronunciation : +ruleDisplayName()$ String
+EvalAudioQuestionByPronunciation : +toJson() Map<String, dynamic>
+EvalAudioQuestionByPronunciation : +evaluate() dynamic
+EvalAudioQuestionByPronunciation : +checkSetting() String?
+EvalAudioQuestionByPronunciation : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionByPronunciation
+FuzzyEvalSetting <|-- EvalAudioQuestionByPronunciation
+RuleKeyword <|-- EvalAudioQuestionByPronunciation
+
+class EvalAudioQuestionByFluency
+EvalAudioQuestionByFluency : +ruleDisplayName()$ String
+EvalAudioQuestionByFluency : +evaluate() dynamic
+EvalAudioQuestionByFluency : +toJson() Map<String, dynamic>
+EvalAudioQuestionByFluency : +checkSetting() String?
+EvalAudioQuestionByFluency : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionByFluency
+
+class EvalAudioQuestionBySimilarity
+EvalAudioQuestionBySimilarity : +fullScoreThreshold double
+EvalAudioQuestionBySimilarity : +toJson() Map<String, dynamic>
+EvalAudioQuestionBySimilarity : +ruleDisplayName()$ String
+EvalAudioQuestionBySimilarity : +evaluate() dynamic
+EvalAudioQuestionBySimilarity : +checkSetting() String?
+EvalAudioQuestionBySimilarity : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionBySimilarity
+FuzzyEvalSetting <|-- EvalAudioQuestionBySimilarity
+LongAnswer <|-- EvalAudioQuestionBySimilarity
+
+class EvalAudioQuestionByWordType
+EvalAudioQuestionByWordType : +wordType int
+EvalAudioQuestionByWordType : +toJson() Map<String, dynamic>
+EvalAudioQuestionByWordType : +ruleDisplayName()$ String
+EvalAudioQuestionByWordType : +evaluate() dynamic
+EvalAudioQuestionByWordType : +checkSetting() String?
+EvalAudioQuestionByWordType : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalAudioQuestionByWordType
+
+class Choice
+Choice : +imageUrl String?
+Choice : +imageAssetPath String?
+Choice : +text String
+Choice : +imageUrlOrPath String?
+Choice : +toJson() Map<String, dynamic>
+
+class EvalChoiceQuestionByCorrectChoiceCount
+EvalChoiceQuestionByCorrectChoiceCount : +choices List~Choice~
+EvalChoiceQuestionByCorrectChoiceCount : +correctChoices List~int~
+EvalChoiceQuestionByCorrectChoiceCount : +ruleDisplayName()$ String
+EvalChoiceQuestionByCorrectChoiceCount : +toJson() Map<String, dynamic>
+EvalChoiceQuestionByCorrectChoiceCount : +evaluate() dynamic
+EvalChoiceQuestionByCorrectChoiceCount : +getScoreConditionName() String
+EvalChoiceQuestionByCorrectChoiceCount : -_checkChoiceIndex() void
+EvalChoiceQuestionByCorrectChoiceCount : -_updateCorrectChoiceAfterMove() void
+EvalChoiceQuestionByCorrectChoiceCount : +deleteChoice() Choice
+EvalChoiceQuestionByCorrectChoiceCount : +moveChoiceUp() void
+EvalChoiceQuestionByCorrectChoiceCount : +moveChoiceDown() void
+EvalChoiceQuestionByCorrectChoiceCount : +checkSetting() String?
+QuestionEvalRule <|-- EvalChoiceQuestionByCorrectChoiceCount
+AnswerOrder <|-- EvalChoiceQuestionByCorrectChoiceCount
+
+class ItemSlot
+ItemSlot : +itemName String?
+ItemSlot : +itemImageUrl String?
+ItemSlot : +itemImageAssetPath String?
+ItemSlot : +toJson() Map<String, dynamic>
+ItemSlot : +copy() ItemSlot
+ItemSlot : +setItem() void
+ItemSlot : +setItemWithBuiltInImage() void
+
+class CommandActions
+CommandActions : +sourceSlotIndex int
+CommandActions : +firstAction ClickAction
+CommandActions o-- ClickAction
+CommandActions : +targetSlotIndex int?
+CommandActions : +secondAction PutDownAction?
+CommandActions o-- PutDownAction
+CommandActions : +hashCode int
+CommandActions : +toJson() Map<String, dynamic>
+CommandActions : +setSecondAction() void
+CommandActions : +==() bool
+
+class EvalCommandQuestionByCorrectActionCount
+EvalCommandQuestionByCorrectActionCount : -_slotCount int
+EvalCommandQuestionByCorrectActionCount : +slots List~ItemSlot~
+EvalCommandQuestionByCorrectActionCount : +actions List~CommandActions~
+EvalCommandQuestionByCorrectActionCount : +invalidActionPunishment double
+EvalCommandQuestionByCorrectActionCount : +detailMode bool
+EvalCommandQuestionByCorrectActionCount : +commandText String?
+EvalCommandQuestionByCorrectActionCount : +slotCount int
+EvalCommandQuestionByCorrectActionCount : +ruleDisplayName()$ String
+EvalCommandQuestionByCorrectActionCount : +generateCommandTextFromActions() String
+EvalCommandQuestionByCorrectActionCount : +toJson() Map<String, dynamic>
+EvalCommandQuestionByCorrectActionCount : +evaluate() dynamic
+EvalCommandQuestionByCorrectActionCount : +checkSetting() String?
+EvalCommandQuestionByCorrectActionCount : +getScoreConditionName() String
+EvalCommandQuestionByCorrectActionCount : +getSlotsWithItem() Map<int, ItemSlot>
+EvalCommandQuestionByCorrectActionCount : +indexOfItemName() int
+EvalCommandQuestionByCorrectActionCount : +setItemSlot() void
+EvalCommandQuestionByCorrectActionCount : +updateActions() String
+QuestionEvalRule <|-- EvalCommandQuestionByCorrectActionCount
+
+class EvalWritingQuestionByCorrectKeywordCount
+EvalWritingQuestionByCorrectKeywordCount : +ruleDisplayName()$ String
+EvalWritingQuestionByCorrectKeywordCount : +toJson() Map<String, dynamic>
+EvalWritingQuestionByCorrectKeywordCount : +evaluate() dynamic
+EvalWritingQuestionByCorrectKeywordCount : +checkSetting() String?
+EvalWritingQuestionByCorrectKeywordCount : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalWritingQuestionByCorrectKeywordCount
+FuzzyEvalSetting <|-- EvalWritingQuestionByCorrectKeywordCount
+KeywordList <|-- EvalWritingQuestionByCorrectKeywordCount
+
+class EvalWritingQuestionByMatchRate
+EvalWritingQuestionByMatchRate : +ruleDisplayName()$ String
+EvalWritingQuestionByMatchRate : +toJson() Map<String, dynamic>
+EvalWritingQuestionByMatchRate : +evaluate() dynamic
+EvalWritingQuestionByMatchRate : +checkSetting() String?
+EvalWritingQuestionByMatchRate : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalWritingQuestionByMatchRate
+FuzzyEvalSetting <|-- EvalWritingQuestionByMatchRate
+RuleKeyword <|-- EvalWritingQuestionByMatchRate
+
+class EvalItemFoundQuestion
+EvalItemFoundQuestion : +imageUrl String?
+EvalItemFoundQuestion : +coordinates List~List~double~~
+EvalItemFoundQuestion : +ruleDisplayName()$ String
+EvalItemFoundQuestion : +toJson() Map<String, dynamic>
+EvalItemFoundQuestion : +evaluate() dynamic
+EvalItemFoundQuestion : +checkSetting() String?
+EvalItemFoundQuestion : +addPoint() void
+EvalItemFoundQuestion : +getScoreConditionName() String
+QuestionEvalRule <|-- EvalItemFoundQuestion
+
+class HttpConstants
+HttpConstants : +backendBaseUrl$ String
+HttpConstants : +backendBaseUrlWithoutProtocol$ String
+
+class AppSettings
+AppSettings : +testMode$ bool
+AppSettings : +notInTestModeErrMsg$ String
+AppSettings : +authorizeUrl$ String
+AppSettings : +appId$ String
+AppSettings : +clientSecrete$ String
+AppSettings : +apiKey$ String
+
+class SingleModelState
+SingleModelState : +model T?
+SingleModelState : +notifyAll() dynamic
+ChangeNotifier <|-- SingleModelState
+
+class ExamState
+ExamState : +exam ExamQuestionSet
+ExamState o-- ExamQuestionSet
+ExamState : +updateName() dynamic
+ExamState : +updateDescription() dynamic
+ExamState : +addDiagnosisRule() dynamic
+ExamState : +updateDiagnosisRule() dynamic
+ExamState : +deleteDiagnosisRule() dynamic
+ExamState : +updateCategory() dynamic
+ExamState : +deleteCategory() dynamic
+ExamState : +moveCategoryUp() dynamic
+ExamState : +moveCategoryDown() dynamic
+ExamState : +addCategoryEvalRule() dynamic
+ExamState : +updateCategoryEvalRule() dynamic
+ExamState : +deleteCategoryEvalRule() dynamic
+ExamState : +moveSubCategoryUp() dynamic
+ExamState : +moveSubCategoryDown() dynamic
+ExamState : +updateSubCategory() dynamic
+ExamState : +deleteSubCategory() dynamic
+ExamState : +addSubCategoryEvalRule() dynamic
+ExamState : +updateSubCategoryEvalRule() dynamic
+ExamState : +deleteSubCategoryEvalRule() dynamic
+ExamState : +addSubCategoryTerminateRule() dynamic
+ExamState : +updateSubCategoryTerminateRule() dynamic
+ExamState : +deleteSubCategoryTerminateRule() dynamic
+ExamState : +deleteQuestion() dynamic
+ExamState : +moveQuestionUp() dynamic
+ExamState : +moveQuestionDown() dynamic
+ExamState : +publish() dynamic
+ChangeNotifier <|-- ExamState
+
+class UserIdentity
+UserIdentity : -_identity String
+UserIdentity : -_uid String
+UserIdentity : -_token String
+UserIdentity : -_role int
+UserIdentity : +identity String
+UserIdentity : +uid String
+UserIdentity : +token String
+UserIdentity : +isPatient bool
+UserIdentity : +isDoctor bool
+UserIdentity : +authWithToken()$ dynamic
+UserIdentity : +login()$ dynamic
+UserIdentity : +logout()$ dynamic
+UserIdentity : +register()$ dynamic
+ChangeNotifier <|-- UserIdentity
+
+class CountDown
+CountDown : -_timer Timer?
+CountDown o-- Timer
+CountDown : -_currCount int
+CountDown : +maxCount int
+CountDown : +onCount void Functionint?
+CountDown o-- void Functionint
+CountDown : +onComplete void Function?
+CountDown o-- void Function
+CountDown : -_isComplete bool
+CountDown : +timePassed int
+CountDown : +isComplete bool
+CountDown : +start() void
+CountDown : +complete() void
+CountDown : +cancel() void
+CountDown : +buildCountWidget() Widget
+
+class Counter
+Counter : -_timer Timer?
+Counter o-- Timer
+Counter : -_currCount int
+Counter : +maxCount int
+Counter : +onCount void Functionint?
+Counter o-- void Functionint
+Counter : +onComplete void Functionint?
+Counter o-- void Functionint
+Counter : +timePassed int
+Counter : +start() void
+Counter : -_complete() void
+Counter : +cancel() void
+Counter : +buildCountWidget() Widget
+
+class HttpClientManager
+HttpClientManager : -_instance$ HttpClientManager
+HttpClientManager o-- HttpClientManager
+HttpClientManager : +testClient Client?
+HttpClientManager o-- Client
+HttpClientManager : -_testMode bool
+HttpClientManager : +enableTestMode() void
+HttpClientManager : +setTokenToHeaders() dynamic
+HttpClientManager : +saveToken() dynamic
+HttpClientManager : +get() dynamic
+HttpClientManager : +post() dynamic
+HttpClientManager : +delete() dynamic
+HttpClientManager : +patch() dynamic
+HttpClientManager : +multipartRequest() dynamic
+
+class _FakeResponse_0
+SmartFake <|-- _FakeResponse_0
+Response <|.. _FakeResponse_0
+
+class _FakeStreamedResponse_1
+SmartFake <|-- _FakeStreamedResponse_1
+StreamedResponse <|.. _FakeStreamedResponse_1
+
+class MockClient
+MockClient : +head() dynamic
+MockClient : +get() dynamic
+MockClient : +post() dynamic
+MockClient : +put() dynamic
+MockClient : +patch() dynamic
+MockClient : +delete() dynamic
+MockClient : +read() dynamic
+MockClient : +readBytes() dynamic
+MockClient : +send() dynamic
+MockClient : +close() void
+Mock <|-- MockClient
+Client <|.. MockClient
+
+class WrappedFile
+WrappedFile : +file PlatformFile
+WrappedFile o-- PlatformFile
+WrappedFile : +name String
+WrappedFile : +size int
+WrappedFile : +path String?
+WrappedFile : +bytes Uint8List?
+WrappedFile o-- Uint8List
+
+class WrappedSharedPref
+WrappedSharedPref : -_prefs dynamic
+WrappedSharedPref : +instance$ WrappedSharedPref?
+WrappedSharedPref o-- WrappedSharedPref
+WrappedSharedPref : +saveToken() dynamic
+WrappedSharedPref : +retrieveToken() dynamic
+WrappedSharedPref : +deleteToken() dynamic
+
+class WrappedAudioPlayer
+WrappedAudioPlayer : +player AudioPlayer
+WrappedAudioPlayer o-- AudioPlayer
+WrappedAudioPlayer : +audioDuration Duration?
+WrappedAudioPlayer : +playPosition Duration?
+WrappedAudioPlayer : -_durationSubscription StreamSubscription~dynamic~?
+WrappedAudioPlayer o-- StreamSubscription~dynamic~
+WrappedAudioPlayer : -_positionSubscription StreamSubscription~dynamic~?
+WrappedAudioPlayer o-- StreamSubscription~dynamic~
+WrappedAudioPlayer : -_playerCompleteSubscription StreamSubscription~dynamic~?
+WrappedAudioPlayer o-- StreamSubscription~dynamic~
+WrappedAudioPlayer : +onComplete void Function?
+WrappedAudioPlayer o-- void Function
+WrappedAudioPlayer : +isPlaying bool
+WrappedAudioPlayer : +isPaused bool
+WrappedAudioPlayer : +isPlayerDisposed bool
+WrappedAudioPlayer : +durationText String
+WrappedAudioPlayer : +positionText String
+WrappedAudioPlayer : +play() dynamic
+WrappedAudioPlayer : +pause() dynamic
+WrappedAudioPlayer : +stop() dynamic
+WrappedAudioPlayer : +dispose() dynamic
+WrappedAudioPlayer : +setup() void
+WrappedAudioPlayer : +initPlayStateSubscription() void
+WrappedAudioPlayer : +disposePlayStateSubscription() void
+WrappedAudioPlayer : +buildPlayer() Widget
+
+class WrappedAudioRecorder
+WrappedAudioRecorder : -_audioRecorder AudioRecorder
+WrappedAudioRecorder o-- AudioRecorder
+WrappedAudioRecorder : -_recordSub StreamSubscription~RecordState~?
+WrappedAudioRecorder o-- StreamSubscription~RecordState~
+WrappedAudioRecorder : -_amplitudeSub StreamSubscription~Amplitude~?
+WrappedAudioRecorder o-- StreamSubscription~Amplitude~
+WrappedAudioRecorder : -_recordState RecordState
+WrappedAudioRecorder o-- RecordState
+WrappedAudioRecorder : -_amplitude Amplitude?
+WrappedAudioRecorder o-- Amplitude
+WrappedAudioRecorder : +amplitudeUpdater void FunctionMap~String, dynamic~?
+WrappedAudioRecorder o-- void FunctionMap~String, dynamic~
+WrappedAudioRecorder : +onStop void FunctionList~int~
+WrappedAudioRecorder o-- void FunctionList~int~
+WrappedAudioRecorder : +isStopped bool
+WrappedAudioRecorder : +isRecording bool
+WrappedAudioRecorder : +isPaused bool
+WrappedAudioRecorder : -_initRecorder() void
+WrappedAudioRecorder : -_updateRecordState() void
+WrappedAudioRecorder : +requestPermission() dynamic
+WrappedAudioRecorder : +start() dynamic
+WrappedAudioRecorder : +disposeSubscription() void
+WrappedAudioRecorder : +stop() dynamic
+WrappedAudioRecorder : +dispose() dynamic
+WrappedAudioRecorder : +pause() dynamic
+WrappedAudioRecorder : +resume() dynamic
+WrappedAudioRecorder : -_isEncoderSupported() dynamic
+AudioRecorderMixin <|-- WrappedAudioRecorder
+
+class MyApp
+MyApp : +createState() State<MyApp>
+StatefulWidget <|-- MyApp
+
+class _MyAppState
+_MyAppState : +testExam ExamQuestionSet
+_MyAppState o-- ExamQuestionSet
+_MyAppState : +testState ExamState
+_MyAppState o-- ExamState
+_MyAppState : +testResult ExamResult
+_MyAppState o-- ExamResult
+_MyAppState : +loginFuture dynamic
+_MyAppState : +initState() void
+_MyAppState : +build() Widget
+State <|-- _MyAppState
+UseCommonStyles <|-- _MyAppState
+
+class AnswerResultPage
+AnswerResultPage : +commonStyles CommonStyles?
+AnswerResultPage o-- CommonStyles
+AnswerResultPage : +examResult ExamResult
+AnswerResultPage o-- ExamResult
+AnswerResultPage : +createState() State<AnswerResultPage>
+StatefulWidget <|-- AnswerResultPage
+
+class _AnswerResultPageState
+_AnswerResultPageState : +viewingIconWidth double
+_AnswerResultPageState : +expandIconWidth double
+_AnswerResultPageState : +listTilePaddingBase double
+_AnswerResultPageState : -_menuWidth double
+_AnswerResultPageState : +viewingItem dynamic
+_AnswerResultPageState : +categoryIndex int?
+_AnswerResultPageState : +subCategoryIndex int?
+_AnswerResultPageState : +questionIndex int?
+_AnswerResultPageState : +getTileWidth() double
+_AnswerResultPageState : +initState() void
+_AnswerResultPageState : +build() Widget
+_AnswerResultPageState : -_buildSummaryTile() Widget
+_AnswerResultPageState : -_buildQuestionTile() Widget
+_AnswerResultPageState : -_buildResultArea() Widget
+_AnswerResultPageState : -_buildExamResultArea() Widget
+_AnswerResultPageState : -_buildCateResArea() Widget
+_AnswerResultPageState : -_buildSubCateResArea() Widget
+_AnswerResultPageState : -_buildQuestionResArea() Widget
+State <|-- _AnswerResultPageState
+UseCommonStyles <|-- _AnswerResultPageState
+
+class Recorder
+Recorder : +onStop void FunctionString?
+Recorder o-- void FunctionString
+Recorder : +onStreamModeStop void FunctionList~int~?
+Recorder o-- void FunctionList~int~
+Recorder : +encoder AudioEncoder
+Recorder o-- AudioEncoder
+Recorder : +streamMode bool
+Recorder : +createState() State<Recorder>
+StatefulWidget <|-- Recorder
+
+class _RecorderState
+_RecorderState : -_recordDuration int
+_RecorderState : -_timer Timer?
+_RecorderState o-- Timer
+_RecorderState : -_audioRecorder AudioRecorder
+_RecorderState o-- AudioRecorder
+_RecorderState : -_recordSub StreamSubscription~RecordState~?
+_RecorderState o-- StreamSubscription~RecordState~
+_RecorderState : -_recordState RecordState
+_RecorderState o-- RecordState
+_RecorderState : -_amplitudeSub StreamSubscription~Amplitude~?
+_RecorderState o-- StreamSubscription~Amplitude~
+_RecorderState : -_amplitude Amplitude?
+_RecorderState o-- Amplitude
+_RecorderState : +initState() void
+_RecorderState : -_start() dynamic
+_RecorderState : -_stop() dynamic
+_RecorderState : -_pause() dynamic
+_RecorderState : -_resume() dynamic
+_RecorderState : -_updateRecordState() void
+_RecorderState : -_isEncoderSupported() dynamic
+_RecorderState : +build() Widget
+_RecorderState : +dispose() void
+_RecorderState : -_buildRecordStopControl() Widget
+_RecorderState : -_buildPauseResumeControl() Widget
+_RecorderState : -_buildText() Widget
+_RecorderState : -_buildTimer() Widget
+_RecorderState : -_formatNumber() String
+_RecorderState : -_startTimer() void
+State <|-- _RecorderState
+AudioRecorderMixin <|-- _RecorderState
+
+class CircleIconSwitchTextButton
+CircleIconSwitchTextButton : +state int
+CircleIconSwitchTextButton : +btnSetting List~Map~String, dynamic~~
+CircleIconSwitchTextButton : +btnSettingWith()$ Map<String, dynamic>
+CircleIconSwitchTextButton : +build() Widget
+StatelessWidget <|-- CircleIconSwitchTextButton
+
+class TextOrTextField
+TextOrTextField : +editing bool
+TextOrTextField : +controller TextEditingController
+TextOrTextField o-- TextEditingController
+TextOrTextField : +onQuitEditing void Function
+TextOrTextField o-- void Function
+TextOrTextField : +onEnterEditing void Function
+TextOrTextField o-- void Function
+TextOrTextField : +validator String FunctionString?
+TextOrTextField o-- String FunctionString
+TextOrTextField : +onChanged void FunctionString
+TextOrTextField o-- void FunctionString
+TextOrTextField : +build() Widget
+StatelessWidget <|-- TextOrTextField
+UseCommonStyles <|-- TextOrTextField
+
+class InnerShadowBox
+InnerShadowBox : +child Widget
+InnerShadowBox o-- Widget
+InnerShadowBox : +build() Widget
+StatelessWidget <|-- InnerShadowBox
+
+class SelectImagesDialog
+SelectImagesDialog : +imageAssetPath String?
+SelectImagesDialog : +imageUrl String?
+SelectImagesDialog : +commonStyles CommonStyles?
+SelectImagesDialog o-- CommonStyles
+SelectImagesDialog : +createState() State<SelectImagesDialog>
+StatefulWidget <|-- SelectImagesDialog
+
+class _SelectImagesDialogState
+_SelectImagesDialogState : +commonStyles CommonStyles?
+_SelectImagesDialogState o-- CommonStyles
+_SelectImagesDialogState : +imageUrl String?
+_SelectImagesDialogState : +imageAssetPath String?
+_SelectImagesDialogState : +initState() void
+_SelectImagesDialogState : +build() Widget
+State <|-- _SelectImagesDialogState
+
+class SelectExistingImageDialog
+SelectExistingImageDialog : +isBuiltIn bool
+SelectExistingImageDialog : +createState() State<SelectExistingImageDialog>
+StatefulWidget <|-- SelectExistingImageDialog
+
+class _SelectExistingImageDialogState
+_SelectExistingImageDialogState : +futureImages dynamic
+_SelectExistingImageDialogState : +selectedImage Map~String, dynamic~?
+_SelectExistingImageDialogState : +initState() void
+_SelectExistingImageDialogState : +build() Widget
+State <|-- _SelectExistingImageDialogState
+UseCommonStyles <|-- _SelectExistingImageDialogState
+
+class DoctorAllExamsListPage
+DoctorAllExamsListPage : +isRecovery bool
+DoctorAllExamsListPage : +commonStyles CommonStyles?
+DoctorAllExamsListPage o-- CommonStyles
+DoctorAllExamsListPage : +createState() State<DoctorAllExamsListPage>
+StatefulWidget <|-- DoctorAllExamsListPage
+
+class _DoctorAllExamsListPageState
+_DoctorAllExamsListPageState : +isRecovery bool?
+_DoctorAllExamsListPageState : +futureExams dynamic
+_DoctorAllExamsListPageState : +selectedExamIndex int?
+_DoctorAllExamsListPageState : +initState() void
+_DoctorAllExamsListPageState : +didChangeDependencies() void
+_DoctorAllExamsListPageState : +build() Widget
+_DoctorAllExamsListPageState : +refreshExam() dynamic
+State <|-- _DoctorAllExamsListPageState
+UseCommonStyles <|-- _DoctorAllExamsListPageState
+
+class ExamDetailCard
+ExamDetailCard : +exam ExamQuestionSet
+ExamDetailCard o-- ExamQuestionSet
+ExamDetailCard : +index int
+ExamDetailCard : -_parentState _DoctorAllExamsListPageState
+ExamDetailCard o-- _DoctorAllExamsListPageState
+ExamDetailCard : +commonStyles CommonStyles?
+ExamDetailCard o-- CommonStyles
+ExamDetailCard : +build() Widget
+StatelessWidget <|-- ExamDetailCard
+
+class DoctorExamsManagementPage
+DoctorExamsManagementPage : +commonStyles CommonStyles?
+DoctorExamsManagementPage o-- CommonStyles
+DoctorExamsManagementPage : +createState() State<DoctorExamsManagementPage>
+StatefulWidget <|-- DoctorExamsManagementPage
+
+class DoctorExamsManagementPageState
+DoctorExamsManagementPageState : +selectedIndex int
+DoctorExamsManagementPageState : +initState() void
+DoctorExamsManagementPageState : +didChangeDependencies() void
+DoctorExamsManagementPageState : +build() Widget
+State <|-- DoctorExamsManagementPageState
+UseCommonStyles <|-- DoctorExamsManagementPageState
+
+class DoctorExamEditInstructionPage
+DoctorExamEditInstructionPage : +recoveryMode bool
+DoctorExamEditInstructionPage : +createState() State<DoctorExamEditInstructionPage>
+StatefulWidget <|-- DoctorExamEditInstructionPage
+
+class _DoctorExamEditInstructionPageState
+_DoctorExamEditInstructionPageState : -_formKey GlobalKey~FormState~
+_DoctorExamEditInstructionPageState o-- GlobalKey~FormState~
+_DoctorExamEditInstructionPageState : +nameFieldCtrl TextEditingController
+_DoctorExamEditInstructionPageState o-- TextEditingController
+_DoctorExamEditInstructionPageState : +descFieldCtrl TextEditingController
+_DoctorExamEditInstructionPageState o-- TextEditingController
+_DoctorExamEditInstructionPageState : +templateExamIdField TextEditingController
+_DoctorExamEditInstructionPageState o-- TextEditingController
+_DoctorExamEditInstructionPageState : +currentStep int
+_DoctorExamEditInstructionPageState : +isRecovery bool
+_DoctorExamEditInstructionPageState : +initState() void
+_DoctorExamEditInstructionPageState : +build() Widget
+State <|-- _DoctorExamEditInstructionPageState
+UseCommonStyles <|-- _DoctorExamEditInstructionPageState
+
+class DoctorExamEditPage
+DoctorExamEditPage : +createState() State<DoctorExamEditPage>
+StatefulWidget <|-- DoctorExamEditPage
+
+class _DoctorExamEditPageState
+_DoctorExamEditPageState : -_menuWidth double
+_DoctorExamEditPageState : +listTileCommonHeight double
+_DoctorExamEditPageState : +listTilePaddingBase double
+_DoctorExamEditPageState : +tileLeadingWidth double
+_DoctorExamEditPageState : +tileContentWidth double
+_DoctorExamEditPageState : +editItem dynamic
+_DoctorExamEditPageState : +editCategoryIndex int?
+_DoctorExamEditPageState : +editSubCategoryIndex int?
+_DoctorExamEditPageState : +editQuestionIndex int?
+_DoctorExamEditPageState : +editingItem bool
+_DoctorExamEditPageState : +questionTileExpanded bool
+_DoctorExamEditPageState : +initState() void
+_DoctorExamEditPageState : +build() Widget
+_DoctorExamEditPageState : -_buildSettingTile() Widget
+_DoctorExamEditPageState : -_buildQuestionTile() Widget
+_DoctorExamEditPageState : -_buildItemName() Widget
+_DoctorExamEditPageState : -_buildNewItemButton() TextButton
+_DoctorExamEditPageState : -_buildActionArea() Widget
+State <|-- _DoctorExamEditPageState
+UseCommonStyles <|-- _DoctorExamEditPageState
+
+class ExamSettingEditSubPage
+ExamSettingEditSubPage : +exam ExamQuestionSet
+ExamSettingEditSubPage o-- ExamQuestionSet
+ExamSettingEditSubPage : -_parentState _DoctorExamEditPageState
+ExamSettingEditSubPage o-- _DoctorExamEditPageState
+ExamSettingEditSubPage : +createState() State<ExamSettingEditSubPage>
+StatefulWidget <|-- ExamSettingEditSubPage
+
+class _ExamSettingEditSubPageState
+_ExamSettingEditSubPageState : +exam ExamQuestionSet
+_ExamSettingEditSubPageState o-- ExamQuestionSet
+_ExamSettingEditSubPageState : +examNameCtrl TextEditingController
+_ExamSettingEditSubPageState o-- TextEditingController
+_ExamSettingEditSubPageState : +examDescCtrl TextEditingController
+_ExamSettingEditSubPageState o-- TextEditingController
+_ExamSettingEditSubPageState : +examNameValidator String? FunctionString?
+_ExamSettingEditSubPageState o-- String FunctionString
+_ExamSettingEditSubPageState : +examDescValidator String? FunctionString?
+_ExamSettingEditSubPageState o-- String FunctionString
+_ExamSettingEditSubPageState : +examNameFormKey GlobalKey~FormState~
+_ExamSettingEditSubPageState o-- GlobalKey~FormState~
+_ExamSettingEditSubPageState : +examDescFormKey GlobalKey~FormState~
+_ExamSettingEditSubPageState o-- GlobalKey~FormState~
+_ExamSettingEditSubPageState : +editingName bool
+_ExamSettingEditSubPageState : +editingDesc bool
+_ExamSettingEditSubPageState : +listTileCommonHeight double
+_ExamSettingEditSubPageState : +initState() void
+_ExamSettingEditSubPageState : +resetState() void
+_ExamSettingEditSubPageState : -_trySetNotEditing() void
+_ExamSettingEditSubPageState : +enterNameEdit() void
+_ExamSettingEditSubPageState : +quitNameEdit() void
+_ExamSettingEditSubPageState : +enterDescEdit() void
+_ExamSettingEditSubPageState : +quitDescEdit() void
+_ExamSettingEditSubPageState : -_showDiagnosisRuleSettingDialog() void
+_ExamSettingEditSubPageState : +build() Widget
+State <|-- _ExamSettingEditSubPageState
+UseCommonStyles <|-- _ExamSettingEditSubPageState
+
+class QuestionCategoryEditSubPage
+QuestionCategoryEditSubPage : +category QuestionCategory
+QuestionCategoryEditSubPage o-- QuestionCategory
+QuestionCategoryEditSubPage : +categoryIndex int
+QuestionCategoryEditSubPage : -_parentState _DoctorExamEditPageState
+QuestionCategoryEditSubPage o-- _DoctorExamEditPageState
+QuestionCategoryEditSubPage : +createState() State<QuestionCategoryEditSubPage>
+StatefulWidget <|-- QuestionCategoryEditSubPage
+
+class _QuestionCategoryEditSubPageState
+_QuestionCategoryEditSubPageState : +listTileCommonHeight double
+_QuestionCategoryEditSubPageState : +descController TextEditingController
+_QuestionCategoryEditSubPageState o-- TextEditingController
+_QuestionCategoryEditSubPageState : +currCategory QuestionCategory
+_QuestionCategoryEditSubPageState o-- QuestionCategory
+_QuestionCategoryEditSubPageState : +editingDesc bool
+_QuestionCategoryEditSubPageState : -_resetState() void
+_QuestionCategoryEditSubPageState : +initState() void
+_QuestionCategoryEditSubPageState : -_enableDescInput() void
+_QuestionCategoryEditSubPageState : -_disableDescInput() void
+_QuestionCategoryEditSubPageState : -_showCategoryRuleEditDialog() void
+_QuestionCategoryEditSubPageState : +build() Widget
+State <|-- _QuestionCategoryEditSubPageState
+UseCommonStyles <|-- _QuestionCategoryEditSubPageState
+
+class QuestionSubCategoryEditSubPage
+QuestionSubCategoryEditSubPage : +subCategory QuestionSubCategory
+QuestionSubCategoryEditSubPage o-- QuestionSubCategory
+QuestionSubCategoryEditSubPage : +categoryIndex int
+QuestionSubCategoryEditSubPage : +subCategoryIndex int
+QuestionSubCategoryEditSubPage : -_parentState _DoctorExamEditPageState
+QuestionSubCategoryEditSubPage o-- _DoctorExamEditPageState
+QuestionSubCategoryEditSubPage : +createState() State<QuestionSubCategoryEditSubPage>
+StatefulWidget <|-- QuestionSubCategoryEditSubPage
+
+class _QuestionSubCategoryEditSubPageState
+_QuestionSubCategoryEditSubPageState : +listTileCommonHeight double
+_QuestionSubCategoryEditSubPageState : +descController TextEditingController
+_QuestionSubCategoryEditSubPageState o-- TextEditingController
+_QuestionSubCategoryEditSubPageState : +currSubCategory QuestionSubCategory
+_QuestionSubCategoryEditSubPageState o-- QuestionSubCategory
+_QuestionSubCategoryEditSubPageState : +editingDesc bool
+_QuestionSubCategoryEditSubPageState : -_resetState() void
+_QuestionSubCategoryEditSubPageState : -_enableDescInput() void
+_QuestionSubCategoryEditSubPageState : -_disableDescInput() void
+_QuestionSubCategoryEditSubPageState : +initState() void
+_QuestionSubCategoryEditSubPageState : -_showSubCategoryRuleEditDialog() void
+_QuestionSubCategoryEditSubPageState : -_showSubCategoryTerminateRuleEditDialog() void
+_QuestionSubCategoryEditSubPageState : +build() Widget
+State <|-- _QuestionSubCategoryEditSubPageState
+UseCommonStyles <|-- _QuestionSubCategoryEditSubPageState
+
+class ExamDiagnosisRuleEditDialog
+ExamDiagnosisRuleEditDialog : +examState ExamState
+ExamDiagnosisRuleEditDialog o-- ExamState
+ExamDiagnosisRuleEditDialog : +ruleIndex int?
+ExamDiagnosisRuleEditDialog : +createState() State<ExamDiagnosisRuleEditDialog>
+StatefulWidget <|-- ExamDiagnosisRuleEditDialog
+
+class _ExamDiagnosisRuleEditDialogState
+_ExamDiagnosisRuleEditDialogState : +oldRule DiagnoseByScoreRange?
+_ExamDiagnosisRuleEditDialogState o-- DiagnoseByScoreRange
+_ExamDiagnosisRuleEditDialogState : +rule DiagnoseByScoreRange
+_ExamDiagnosisRuleEditDialogState o-- DiagnoseByScoreRange
+_ExamDiagnosisRuleEditDialogState : +categoriesSelected List~bool~
+_ExamDiagnosisRuleEditDialogState : -_formKey GlobalKey~FormState~
+_ExamDiagnosisRuleEditDialogState o-- GlobalKey~FormState~
+_ExamDiagnosisRuleEditDialogState : +editingAphasiaType bool
+_ExamDiagnosisRuleEditDialogState : +aphasiaTypeCtrl TextEditingController
+_ExamDiagnosisRuleEditDialogState o-- TextEditingController
+_ExamDiagnosisRuleEditDialogState : +scoreRangeControllers List~List~TextEditingController~~
+_ExamDiagnosisRuleEditDialogState : +resetState() void
+_ExamDiagnosisRuleEditDialogState : +quitEditAphasiaType() void
+_ExamDiagnosisRuleEditDialogState : +enterEditAphasiaType() void
+_ExamDiagnosisRuleEditDialogState : +selectCategory() void
+_ExamDiagnosisRuleEditDialogState : +deselectCategory() void
+_ExamDiagnosisRuleEditDialogState : +initState() void
+_ExamDiagnosisRuleEditDialogState : +aphasiaTypeValidator() String?
+_ExamDiagnosisRuleEditDialogState : +scoreRangeValidator() String?
+_ExamDiagnosisRuleEditDialogState : +minScoreValidator() String? Function(String?)
+_ExamDiagnosisRuleEditDialogState : +maxScoreValidator() String? Function(String?)
+_ExamDiagnosisRuleEditDialogState : +build() Widget
+State <|-- _ExamDiagnosisRuleEditDialogState
+UseCommonStyles <|-- _ExamDiagnosisRuleEditDialogState
+
+class SubCategoryEvalRuleEditDialog
+SubCategoryEvalRuleEditDialog : +categoryIndex int
+SubCategoryEvalRuleEditDialog : +subCategoryIndex int
+SubCategoryEvalRuleEditDialog : +ruleIndex int?
+SubCategoryEvalRuleEditDialog : +examState ExamState
+SubCategoryEvalRuleEditDialog o-- ExamState
+SubCategoryEvalRuleEditDialog : +createState() State<SubCategoryEvalRuleEditDialog>
+StatefulWidget <|-- SubCategoryEvalRuleEditDialog
+
+class _SubCategoryEvalRuleEditDialogState
+_SubCategoryEvalRuleEditDialogState : +selectedRuleType Type?
+_SubCategoryEvalRuleEditDialogState : +rule ExamSubCategoryEvalRule
+_SubCategoryEvalRuleEditDialogState o-- ExamSubCategoryEvalRule
+_SubCategoryEvalRuleEditDialogState : +initState() void
+_SubCategoryEvalRuleEditDialogState : +build() Widget
+State <|-- _SubCategoryEvalRuleEditDialogState
+UseCommonStyles <|-- _SubCategoryEvalRuleEditDialogState
+
+class SubCategoryTerminateRuleEditDialog
+SubCategoryTerminateRuleEditDialog : +categoryIndex int
+SubCategoryTerminateRuleEditDialog : +subCategoryIndex int
+SubCategoryTerminateRuleEditDialog : +ruleIndex int?
+SubCategoryTerminateRuleEditDialog : +examState ExamState
+SubCategoryTerminateRuleEditDialog o-- ExamState
+SubCategoryTerminateRuleEditDialog : +createState() State<SubCategoryTerminateRuleEditDialog>
+StatefulWidget <|-- SubCategoryTerminateRuleEditDialog
+
+class _SubCategoryTerminateRuleEditDialogState
+_SubCategoryTerminateRuleEditDialogState : +selectedRuleType Type?
+_SubCategoryTerminateRuleEditDialogState : +rule TerminateRule
+_SubCategoryTerminateRuleEditDialogState o-- TerminateRule
+_SubCategoryTerminateRuleEditDialogState : -_formKey GlobalKey~FormState~
+_SubCategoryTerminateRuleEditDialogState o-- GlobalKey~FormState~
+_SubCategoryTerminateRuleEditDialogState : +continuousWrongRuleThresholdCtrl TextEditingController
+_SubCategoryTerminateRuleEditDialogState o-- TextEditingController
+_SubCategoryTerminateRuleEditDialogState : +equivScoreCtrl TextEditingController
+_SubCategoryTerminateRuleEditDialogState o-- TextEditingController
+_SubCategoryTerminateRuleEditDialogState : +terminateReasonCtrl TextEditingController
+_SubCategoryTerminateRuleEditDialogState o-- TextEditingController
+_SubCategoryTerminateRuleEditDialogState : +initState() void
+_SubCategoryTerminateRuleEditDialogState : +build() Widget
+State <|-- _SubCategoryTerminateRuleEditDialogState
+UseCommonStyles <|-- _SubCategoryTerminateRuleEditDialogState
+
+class DoctorExamQuestionEditPage
+DoctorExamQuestionEditPage : +question Question?
+DoctorExamQuestionEditPage o-- Question
+DoctorExamQuestionEditPage : +createState() State<DoctorExamQuestionEditPage>
+StatefulWidget <|-- DoctorExamQuestionEditPage
+
+class _DoctorExamQuestionEditPageState
+_DoctorExamQuestionEditPageState : +widgetsElevation$ double
+_DoctorExamQuestionEditPageState : +listTileCommonHeight$ double
+_DoctorExamQuestionEditPageState : +questionIntroduction$ Map~Type, String~
+_DoctorExamQuestionEditPageState : +requesting bool
+_DoctorExamQuestionEditPageState : +steps List~Step~
+_DoctorExamQuestionEditPageState : +currStep int
+_DoctorExamQuestionEditPageState : -_formKey GlobalKey~FormState~
+_DoctorExamQuestionEditPageState o-- GlobalKey~FormState~
+_DoctorExamQuestionEditPageState : +audioQuestionBackup AudioQuestion?
+_DoctorExamQuestionEditPageState o-- AudioQuestion
+_DoctorExamQuestionEditPageState : +choiceQuestionBackup ChoiceQuestion?
+_DoctorExamQuestionEditPageState o-- ChoiceQuestion
+_DoctorExamQuestionEditPageState : +commandQuestionBackup CommandQuestion?
+_DoctorExamQuestionEditPageState o-- CommandQuestion
+_DoctorExamQuestionEditPageState : +writingQuestionBackup WritingQuestion?
+_DoctorExamQuestionEditPageState o-- WritingQuestion
+_DoctorExamQuestionEditPageState : +itemFindingQuestionBackup ItemFindingQuestion?
+_DoctorExamQuestionEditPageState o-- ItemFindingQuestion
+_DoctorExamQuestionEditPageState : +currQuestion Question
+_DoctorExamQuestionEditPageState o-- Question
+_DoctorExamQuestionEditPageState : -_aliasKey GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState o-- GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState : -_questionTextKey GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState o-- GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState : -_omitTimeKey GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState o-- GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionEditPageState : +aliasCtrl TextEditingController
+_DoctorExamQuestionEditPageState o-- TextEditingController
+_DoctorExamQuestionEditPageState : +questionTextCtrl TextEditingController
+_DoctorExamQuestionEditPageState o-- TextEditingController
+_DoctorExamQuestionEditPageState : +omitTimeCtrl TextEditingController
+_DoctorExamQuestionEditPageState o-- TextEditingController
+_DoctorExamQuestionEditPageState : +ruleFieldsSetting Map~String, Map~String, dynamic~~
+_DoctorExamQuestionEditPageState : +ruleDropdownMenuEntries List~DropdownMenuEntry~Type~~
+_DoctorExamQuestionEditPageState : +validateBasicInfoFields() bool
+_DoctorExamQuestionEditPageState : +applyBasicInfoFieldsToModel() bool
+_DoctorExamQuestionEditPageState : +resetBasicInfoFields() void
+_DoctorExamQuestionEditPageState : +keywordValidator() String?
+_DoctorExamQuestionEditPageState : +fullScoreValidator() String?
+_DoctorExamQuestionEditPageState : +defaultScoreValidator() String?
+_DoctorExamQuestionEditPageState : +timeLimitValidator() String?
+_DoctorExamQuestionEditPageState : +omitTimeValidator() String?
+_DoctorExamQuestionEditPageState : +aliasValidator() String?
+_DoctorExamQuestionEditPageState : +questionTextValidator() String?
+_DoctorExamQuestionEditPageState : +resetQuestionStates() void
+_DoctorExamQuestionEditPageState : -_buildEvalRuleDropdownMenuEntries() void
+_DoctorExamQuestionEditPageState : +validateAndApplyChangesBeforeStepChange() bool
+_DoctorExamQuestionEditPageState : +resetEvalRuleSettingState() void
+_DoctorExamQuestionEditPageState : +validateEvalRuleSetting() bool
+_DoctorExamQuestionEditPageState : +setEvalRuleSetting() bool
+_DoctorExamQuestionEditPageState : -_initEvalRuleSetting() void
+_DoctorExamQuestionEditPageState : +initState() void
+_DoctorExamQuestionEditPageState : +build() Widget
+_DoctorExamQuestionEditPageState : +createSteps() List<Step>
+_DoctorExamQuestionEditPageState : -_buildFirstStep() Step
+_DoctorExamQuestionEditPageState : -_buildSecondStep() Step
+_DoctorExamQuestionEditPageState : +getTextFieldWidth() double
+_DoctorExamQuestionEditPageState : -_buildAliasField() Widget
+_DoctorExamQuestionEditPageState : -_buildQuestionTextField() Widget
+_DoctorExamQuestionEditPageState : -_buildAudioSetting() Widget
+_DoctorExamQuestionEditPageState : -_buildImageSetting() Widget
+_DoctorExamQuestionEditPageState : -_buildThirdStep() Step
+_DoctorExamQuestionEditPageState : -_buildFourthStep() Step
+_DoctorExamQuestionEditPageState : -_buildFifthStep() Step
+_DoctorExamQuestionEditPageState : +wrappedByCardInner() Widget
+_DoctorExamQuestionEditPageState : -_actionBtnBuilder() Widget
+_DoctorExamQuestionEditPageState : +resetCurrentStepStates() void
+_DoctorExamQuestionEditPageState : -_stepIconBuilder() Widget?
+State <|-- _DoctorExamQuestionEditPageState
+UseCommonStyles <|-- _DoctorExamQuestionEditPageState
+TextFieldCommonValidators <|-- _DoctorExamQuestionEditPageState
+
+class AudioSettingDialog
+AudioSettingDialog : +uploadedAudioUrl String?
+AudioSettingDialog : +createState() State<AudioSettingDialog>
+StatefulWidget <|-- AudioSettingDialog
+
+class _AudioSettingDialogState
+_AudioSettingDialogState : +file WrappedFile?
+_AudioSettingDialogState o-- WrappedFile
+_AudioSettingDialogState : +uploadedAudioUrl String?
+_AudioSettingDialogState : +resetFileState() void
+_AudioSettingDialogState : +initState() void
+_AudioSettingDialogState : +setState() void
+_AudioSettingDialogState : +dispose() void
+_AudioSettingDialogState : +build() Widget
+_AudioSettingDialogState : -_buildAudioActions() dynamic
+_AudioSettingDialogState : -_buildAudioInfo() Widget
+_AudioSettingDialogState : -_buildPlayer() Widget
+State <|-- _AudioSettingDialogState
+UseCommonStyles <|-- _AudioSettingDialogState
+AudioPlayerSetting <|-- _AudioSettingDialogState
+
+class GenerateAudioFromTextDialog
+GenerateAudioFromTextDialog : +createState() State<GenerateAudioFromTextDialog>
+StatefulWidget <|-- GenerateAudioFromTextDialog
+
+class _GenerateAudioFromTextDialogState
+_GenerateAudioFromTextDialogState : +textCtrl TextEditingController
+_GenerateAudioFromTextDialogState o-- TextEditingController
+_GenerateAudioFromTextDialogState : +generating bool
+_GenerateAudioFromTextDialogState : +initState() void
+_GenerateAudioFromTextDialogState : +build() Widget
+State <|-- _GenerateAudioFromTextDialogState
+UseCommonStyles <|-- _GenerateAudioFromTextDialogState
+
+class HintRuleEditDialog
+HintRuleEditDialog : +question Question
+HintRuleEditDialog o-- Question
+HintRuleEditDialog : +hintRule HintRule?
+HintRuleEditDialog o-- HintRule
+HintRuleEditDialog : +createState() State<HintRuleEditDialog>
+StatefulWidget <|-- HintRuleEditDialog
+
+class _HintRuleEditDialogState
+_HintRuleEditDialogState : +currQuestion Question
+_HintRuleEditDialogState o-- Question
+_HintRuleEditDialogState : +hintRule HintRule
+_HintRuleEditDialogState o-- HintRule
+_HintRuleEditDialogState : +audioUrl String?
+_HintRuleEditDialogState : +imageUrl String?
+_HintRuleEditDialogState : +imageAssetPath String?
+_HintRuleEditDialogState : +hintTextValidator() String?
+_HintRuleEditDialogState : +adjustValueValidator() String?
+_HintRuleEditDialogState : +scoreLowBoundValidator() String?
+_HintRuleEditDialogState : +scoreHighBoundValidator() String?
+_HintRuleEditDialogState : +initFieldSettings() void
+_HintRuleEditDialogState : +applyFieldsChangesToModel() bool
+_HintRuleEditDialogState : +resetAllFields() void
+_HintRuleEditDialogState : +validateAllFields() bool
+_HintRuleEditDialogState : +resetState() void
+_HintRuleEditDialogState : +initState() void
+_HintRuleEditDialogState : +setState() void
+_HintRuleEditDialogState : +dispose() void
+_HintRuleEditDialogState : +build() Widget
+State <|-- _HintRuleEditDialogState
+UseCommonStyles <|-- _HintRuleEditDialogState
+AudioPlayerSetting <|-- _HintRuleEditDialogState
+TextFieldCommonValidators <|-- _HintRuleEditDialogState
+StateWithTextFields <|-- _HintRuleEditDialogState
+ResettableState <|.. _HintRuleEditDialogState
+
+class DoctorExamQuestionRuleEditSubPage
+DoctorExamQuestionRuleEditSubPage : +currQuestion Question
+DoctorExamQuestionRuleEditSubPage o-- Question
+DoctorExamQuestionRuleEditSubPage : +ruleSetting Map~String, Map~String, dynamic~~
+DoctorExamQuestionRuleEditSubPage : +createState() State<DoctorExamQuestionRuleEditSubPage>
+StatefulWidget <|-- DoctorExamQuestionRuleEditSubPage
+
+class _DoctorExamQuestionRuleEditSubPageState
+_DoctorExamQuestionRuleEditSubPageState : +listTileCommonHeight$ double
+_DoctorExamQuestionRuleEditSubPageState : +currQuestion Question
+_DoctorExamQuestionRuleEditSubPageState o-- Question
+_DoctorExamQuestionRuleEditSubPageState : +ruleFieldsSetting Map~String, Map~String, dynamic~~
+_DoctorExamQuestionRuleEditSubPageState : +keywordAdderCtrl TextEditingController
+_DoctorExamQuestionRuleEditSubPageState o-- TextEditingController
+_DoctorExamQuestionRuleEditSubPageState : +keywordAdderKey GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionRuleEditSubPageState o-- GlobalKey~FormFieldState~dynamic~~
+_DoctorExamQuestionRuleEditSubPageState : +resetState() void
+_DoctorExamQuestionRuleEditSubPageState : +initState() void
+_DoctorExamQuestionRuleEditSubPageState : +build() Widget
+_DoctorExamQuestionRuleEditSubPageState : -_buildEvalRuleSetting() Widget
+_DoctorExamQuestionRuleEditSubPageState : -_buildChoiceQuestionRuleSetting() void
+_DoctorExamQuestionRuleEditSubPageState : -_buildCommandQuestionRuleSetting() void
+_DoctorExamQuestionRuleEditSubPageState : -_buildItemSlots() Widget
+_DoctorExamQuestionRuleEditSubPageState : -_buildKeywordItem() Widget
+_DoctorExamQuestionRuleEditSubPageState : -_buildItemFoundQuestionRuleSetting() void
+_DoctorExamQuestionRuleEditSubPageState : -_buildScoreConditionSetting() void
+State <|-- _DoctorExamQuestionRuleEditSubPageState
+UseCommonStyles <|-- _DoctorExamQuestionRuleEditSubPageState
+
+class CommandQuestionActionRecordPage
+CommandQuestionActionRecordPage : +currRule EvalCommandQuestionByCorrectActionCount
+CommandQuestionActionRecordPage o-- EvalCommandQuestionByCorrectActionCount
+CommandQuestionActionRecordPage : +createState() State<CommandQuestionActionRecordPage>
+StatefulWidget <|-- CommandQuestionActionRecordPage
+
+class _CommandQuestionActionRecordPageState
+_CommandQuestionActionRecordPageState : +currRule EvalCommandQuestionByCorrectActionCount
+_CommandQuestionActionRecordPageState o-- EvalCommandQuestionByCorrectActionCount
+_CommandQuestionActionRecordPageState : +currSlots List~ItemSlot~
+_CommandQuestionActionRecordPageState : +slots List~StackableItemSlot~
+_CommandQuestionActionRecordPageState : +actions List~CommandActions~
+_CommandQuestionActionRecordPageState : +commandText String
+_CommandQuestionActionRecordPageState : +currAction CommandActions?
+_CommandQuestionActionRecordPageState o-- CommandActions
+_CommandQuestionActionRecordPageState : +resetStates() void
+_CommandQuestionActionRecordPageState : +initState() void
+_CommandQuestionActionRecordPageState : +build() Widget
+_CommandQuestionActionRecordPageState : -_buildItemSlots() Widget
+_CommandQuestionActionRecordPageState : -_buildSlotImages() Widget
+_CommandQuestionActionRecordPageState : -_buildSlotImagesWhenDragging() Widget
+_CommandQuestionActionRecordPageState : -_buildDragFeedback() Widget
+State <|-- _CommandQuestionActionRecordPageState
+UseCommonStyles <|-- _CommandQuestionActionRecordPageState
+
+class ItemFindingQuestionAreaSettingPage
+ItemFindingQuestionAreaSettingPage : +question ItemFindingQuestion
+ItemFindingQuestionAreaSettingPage o-- ItemFindingQuestion
+ItemFindingQuestionAreaSettingPage : +createState() State<ItemFindingQuestionAreaSettingPage>
+StatefulWidget <|-- ItemFindingQuestionAreaSettingPage
+
+class _ItemFindingQuestionAreaSettingPageState
+_ItemFindingQuestionAreaSettingPageState : +maxPointCount$ int
+_ItemFindingQuestionAreaSettingPageState : +currQuestion ItemFindingQuestion
+_ItemFindingQuestionAreaSettingPageState o-- ItemFindingQuestion
+_ItemFindingQuestionAreaSettingPageState : +pointCount int
+_ItemFindingQuestionAreaSettingPageState : +coordinates List~List~double~~
+_ItemFindingQuestionAreaSettingPageState : +convexHullFinished bool
+_ItemFindingQuestionAreaSettingPageState : +resetState() void
+_ItemFindingQuestionAreaSettingPageState : +clearState() void
+_ItemFindingQuestionAreaSettingPageState : +addCoordinate() void
+_ItemFindingQuestionAreaSettingPageState : +initState() void
+_ItemFindingQuestionAreaSettingPageState : +getImageFromProvider() dynamic
+_ItemFindingQuestionAreaSettingPageState : +build() Widget
+State <|-- _ItemFindingQuestionAreaSettingPageState
+UseCommonStyles <|-- _ItemFindingQuestionAreaSettingPageState
+
+class ChoiceSettingDialog
+ChoiceSettingDialog : +choice Choice?
+ChoiceSettingDialog o-- Choice
+ChoiceSettingDialog : +createState() State<ChoiceSettingDialog>
+StatefulWidget <|-- ChoiceSettingDialog
+
+class _ChoiceSettingDialogState
+_ChoiceSettingDialogState : +currChoice Choice?
+_ChoiceSettingDialogState o-- Choice
+_ChoiceSettingDialogState : -_formKey GlobalKey~FormState~
+_ChoiceSettingDialogState o-- GlobalKey~FormState~
+_ChoiceSettingDialogState : -_choiceNameKey GlobalKey~FormFieldState~dynamic~~
+_ChoiceSettingDialogState o-- GlobalKey~FormFieldState~dynamic~~
+_ChoiceSettingDialogState : +choiceNameCtrl TextEditingController
+_ChoiceSettingDialogState o-- TextEditingController
+_ChoiceSettingDialogState : +imageUrl String?
+_ChoiceSettingDialogState : +imageAssetPath String?
+_ChoiceSettingDialogState : +choiceNameValidator() String?
+_ChoiceSettingDialogState : +resetState() void
+_ChoiceSettingDialogState : +initState() void
+_ChoiceSettingDialogState : +build() Widget
+State <|-- _ChoiceSettingDialogState
+UseCommonStyles <|-- _ChoiceSettingDialogState
+
+class ItemSlotEditDialog
+ItemSlotEditDialog : +slot ItemSlot
+ItemSlotEditDialog o-- ItemSlot
+ItemSlotEditDialog : +slotIndex int
+ItemSlotEditDialog : +rule EvalCommandQuestionByCorrectActionCount
+ItemSlotEditDialog o-- EvalCommandQuestionByCorrectActionCount
+ItemSlotEditDialog : +createState() State<ItemSlotEditDialog>
+StatefulWidget <|-- ItemSlotEditDialog
+
+class _ItemSlotEditDialogState
+_ItemSlotEditDialogState : +currSlot ItemSlot?
+_ItemSlotEditDialogState o-- ItemSlot
+_ItemSlotEditDialogState : -_itemNameFieldKey GlobalKey~FormFieldState~dynamic~~
+_ItemSlotEditDialogState o-- GlobalKey~FormFieldState~dynamic~~
+_ItemSlotEditDialogState : +itemNameCtrl TextEditingController
+_ItemSlotEditDialogState o-- TextEditingController
+_ItemSlotEditDialogState : +imageUrl String?
+_ItemSlotEditDialogState : +imageAssetPath String?
+_ItemSlotEditDialogState : +resetState() void
+_ItemSlotEditDialogState : +itemNameValidator() String?
+_ItemSlotEditDialogState : +initState() void
+_ItemSlotEditDialogState : +build() Widget
+State <|-- _ItemSlotEditDialogState
+UseCommonStyles <|-- _ItemSlotEditDialogState
+
+class QuestionScoreConditionEditDialog
+QuestionScoreConditionEditDialog : +condition EvalCondition?
+QuestionScoreConditionEditDialog o-- EvalCondition
+QuestionScoreConditionEditDialog : +evalRule QuestionEvalRule
+QuestionScoreConditionEditDialog o-- QuestionEvalRule
+QuestionScoreConditionEditDialog : +scoreConditionName String
+QuestionScoreConditionEditDialog : +createState() State<QuestionScoreConditionEditDialog>
+StatefulWidget <|-- QuestionScoreConditionEditDialog
+
+class _QuestionScoreConditionEditDialogState
+_QuestionScoreConditionEditDialogState : +condition EvalCondition
+_QuestionScoreConditionEditDialogState o-- EvalCondition
+_QuestionScoreConditionEditDialogState : +currEvalRule QuestionEvalRule
+_QuestionScoreConditionEditDialogState o-- QuestionEvalRule
+_QuestionScoreConditionEditDialogState : +fieldsSetting Map~String, Map~String, dynamic~~
+_QuestionScoreConditionEditDialogState : +useTimeBound bool
+_QuestionScoreConditionEditDialogState : +isHinted bool
+_QuestionScoreConditionEditDialogState : +basicValidator() String?
+_QuestionScoreConditionEditDialogState : +scoreValidator() String?
+_QuestionScoreConditionEditDialogState : +mainLowBoundValidator() String?
+_QuestionScoreConditionEditDialogState : +mainHighBoundValidator() String?
+_QuestionScoreConditionEditDialogState : +timeLowBoundValidator() String?
+_QuestionScoreConditionEditDialogState : +timeHighBoundValidator() String?
+_QuestionScoreConditionEditDialogState : +applyFieldsDataToModel() bool
+_QuestionScoreConditionEditDialogState : +resetAllFields() void
+_QuestionScoreConditionEditDialogState : +validateAllFields() bool
+_QuestionScoreConditionEditDialogState : -_initFieldsSetting() void
+_QuestionScoreConditionEditDialogState : +resetState() void
+_QuestionScoreConditionEditDialogState : +initState() void
+_QuestionScoreConditionEditDialogState : +build() Widget
+State <|-- _QuestionScoreConditionEditDialogState
+UseCommonStyles <|-- _QuestionScoreConditionEditDialogState
+
+class AudioQuestionAnswerArea
+AudioQuestionAnswerArea : +question Question
+AudioQuestionAnswerArea o-- Question
+AudioQuestionAnswerArea : +commonStyles CommonStyles?
+AudioQuestionAnswerArea o-- CommonStyles
+AudioQuestionAnswerArea : +goToNextQuestion void FunctionQuestionResult
+AudioQuestionAnswerArea o-- void FunctionQuestionResult
+AudioQuestionAnswerArea : +createState() State<AudioQuestionAnswerArea>
+StatefulWidget <|-- AudioQuestionAnswerArea
+
+class _AudioQuestionAnswerAreaState
+_AudioQuestionAnswerAreaState : +recorder WrappedAudioRecorder
+_AudioQuestionAnswerAreaState o-- WrappedAudioRecorder
+_AudioQuestionAnswerAreaState : +oldAmplitude double
+_AudioQuestionAnswerAreaState : +player WrappedAudioPlayer
+_AudioQuestionAnswerAreaState o-- WrappedAudioPlayer
+_AudioQuestionAnswerAreaState : +timeLimitCountDown CountDown?
+_AudioQuestionAnswerAreaState o-- CountDown
+_AudioQuestionAnswerAreaState : +currQuestion AudioQuestion
+_AudioQuestionAnswerAreaState o-- AudioQuestion
+_AudioQuestionAnswerAreaState : +result AudioQuestionResult
+_AudioQuestionAnswerAreaState o-- AudioQuestionResult
+_AudioQuestionAnswerAreaState : +hintingRule HintRule?
+_AudioQuestionAnswerAreaState o-- HintRule
+_AudioQuestionAnswerAreaState : +evaluating bool
+_AudioQuestionAnswerAreaState : +displayImageUrl String?
+_AudioQuestionAnswerAreaState : +displayText String?
+_AudioQuestionAnswerAreaState : +hinting bool
+_AudioQuestionAnswerAreaState : +resetState() void
+_AudioQuestionAnswerAreaState : -_trySetAnswerTime() void
+_AudioQuestionAnswerAreaState : +initQuestionStem() void
+_AudioQuestionAnswerAreaState : -_startTimeLimitCounter() void
+_AudioQuestionAnswerAreaState : +finishAnswer() void
+_AudioQuestionAnswerAreaState : +doFinishAnswer() void
+_AudioQuestionAnswerAreaState : -_evalQuestion() void
+_AudioQuestionAnswerAreaState : -_triggerHint() void
+_AudioQuestionAnswerAreaState : -_setHintStates() dynamic
+_AudioQuestionAnswerAreaState : +initState() void
+_AudioQuestionAnswerAreaState : +setState() void
+_AudioQuestionAnswerAreaState : +dispose() void
+_AudioQuestionAnswerAreaState : +build() Widget
+State <|-- _AudioQuestionAnswerAreaState
+QuestionImage <|-- _AudioQuestionAnswerAreaState
+QuestionText <|-- _AudioQuestionAnswerAreaState
+ResettableState <|.. _AudioQuestionAnswerAreaState
+
+class ChoiceQuestionAnswerArea
+ChoiceQuestionAnswerArea : +question Question
+ChoiceQuestionAnswerArea o-- Question
+ChoiceQuestionAnswerArea : +commonStyles CommonStyles?
+ChoiceQuestionAnswerArea o-- CommonStyles
+ChoiceQuestionAnswerArea : +goToNextQuestion void FunctionQuestionResult
+ChoiceQuestionAnswerArea o-- void FunctionQuestionResult
+ChoiceQuestionAnswerArea : +createState() State<ChoiceQuestionAnswerArea>
+StatefulWidget <|-- ChoiceQuestionAnswerArea
+
+class _AudioQuestionAnswerAreaState
+_AudioQuestionAnswerAreaState : +currQuestion ChoiceQuestion
+_AudioQuestionAnswerAreaState o-- ChoiceQuestion
+_AudioQuestionAnswerAreaState : +result ChoiceQuestionResult
+_AudioQuestionAnswerAreaState o-- ChoiceQuestionResult
+_AudioQuestionAnswerAreaState : +choiceSelected List~int~
+_AudioQuestionAnswerAreaState : +resetState() void
+_AudioQuestionAnswerAreaState : +finishAnswer() void
+_AudioQuestionAnswerAreaState : +evalQuestion() void
+_AudioQuestionAnswerAreaState : +resetAnswerStateAfterHint() void
+_AudioQuestionAnswerAreaState : +initState() void
+_AudioQuestionAnswerAreaState : +setState() void
+_AudioQuestionAnswerAreaState : +dispose() void
+_AudioQuestionAnswerAreaState : +build() Widget
+_AudioQuestionAnswerAreaState : -_buildChoices() Widget
+State <|-- _AudioQuestionAnswerAreaState
+QuestionAnswerArea <|-- _AudioQuestionAnswerAreaState
+ResettableState <|.. _AudioQuestionAnswerAreaState
+
+class StackableItemSlot
+StackableItemSlot : +items List~ItemSlot~
+StackableItemSlot : -_checkSlot() bool
+StackableItemSlot : +pushItem() void
+StackableItemSlot : +popItem() ItemSlot?
+StackableItemSlot : +peekItem() ItemSlot?
+
+class CommandQuestionAnswerArea
+CommandQuestionAnswerArea : +question Question
+CommandQuestionAnswerArea o-- Question
+CommandQuestionAnswerArea : +commonStyles CommonStyles?
+CommandQuestionAnswerArea o-- CommonStyles
+CommandQuestionAnswerArea : +goToNextQuestion void FunctionQuestionResult
+CommandQuestionAnswerArea o-- void FunctionQuestionResult
+CommandQuestionAnswerArea : +createState() State<CommandQuestionAnswerArea>
+StatefulWidget <|-- CommandQuestionAnswerArea
+
+class _CommandQuestionAnswerAreaState
+_CommandQuestionAnswerAreaState : +currQuestion CommandQuestion
+_CommandQuestionAnswerAreaState o-- CommandQuestion
+_CommandQuestionAnswerAreaState : +result CommandQuestionResult
+_CommandQuestionAnswerAreaState o-- CommandQuestionResult
+_CommandQuestionAnswerAreaState : +slots List~StackableItemSlot~
+_CommandQuestionAnswerAreaState : +actionsDone List~CommandActions~
+_CommandQuestionAnswerAreaState : +currAction CommandActions?
+_CommandQuestionAnswerAreaState o-- CommandActions
+_CommandQuestionAnswerAreaState : +answerStart bool
+_CommandQuestionAnswerAreaState : +resetState() void
+_CommandQuestionAnswerAreaState : +finishAnswer() void
+_CommandQuestionAnswerAreaState : +evalQuestion() void
+_CommandQuestionAnswerAreaState : +resetAnswerStateAfterHint() void
+_CommandQuestionAnswerAreaState : +initState() void
+_CommandQuestionAnswerAreaState : +setState() void
+_CommandQuestionAnswerAreaState : +dispose() void
+_CommandQuestionAnswerAreaState : +build() Widget
+_CommandQuestionAnswerAreaState : -_buildItemSlots() Widget
+_CommandQuestionAnswerAreaState : -_buildSlotImages() Widget
+_CommandQuestionAnswerAreaState : -_buildSlotImagesWhenDragging() Widget
+_CommandQuestionAnswerAreaState : -_buildDragFeedback() Widget
+State <|-- _CommandQuestionAnswerAreaState
+QuestionAnswerArea <|-- _CommandQuestionAnswerAreaState
+ResettableState <|.. _CommandQuestionAnswerAreaState
+
+class DoExamPage
+DoExamPage : +exam ExamQuestionSet
+DoExamPage o-- ExamQuestionSet
+DoExamPage : +commonStyles CommonStyles?
+DoExamPage o-- CommonStyles
+DoExamPage : +result ExamResult
+DoExamPage o-- ExamResult
+DoExamPage : +createState() State<DoExamPage>
+StatefulWidget <|-- DoExamPage
+
+class _DoExamPageState
+_DoExamPageState : +exam ExamQuestionSet
+_DoExamPageState o-- ExamQuestionSet
+_DoExamPageState : +categoryIndex int
+_DoExamPageState : +subCategoryIndex int
+_DoExamPageState : +questionIndex int
+_DoExamPageState : +examResult ExamResult
+_DoExamPageState o-- ExamResult
+_DoExamPageState : +goToNextQuestion() void
+_DoExamPageState : -_evalExam() void
+_DoExamPageState : -_evalCategory() void
+_DoExamPageState : -_evalSubCategory() void
+_DoExamPageState : +initExamResult() void
+_DoExamPageState : +initState() void
+_DoExamPageState : +setState() void
+_DoExamPageState : +dispose() void
+_DoExamPageState : +build() Widget
+_DoExamPageState : -_buildAnswerArea() Widget
+State <|-- _DoExamPageState
+UseCommonStyles <|-- _DoExamPageState
+
+class ItemFindingQuestionAnswerArea
+ItemFindingQuestionAnswerArea : +question Question
+ItemFindingQuestionAnswerArea o-- Question
+ItemFindingQuestionAnswerArea : +commonStyles CommonStyles?
+ItemFindingQuestionAnswerArea o-- CommonStyles
+ItemFindingQuestionAnswerArea : +goToNextQuestion void FunctionQuestionResult
+ItemFindingQuestionAnswerArea o-- void FunctionQuestionResult
+ItemFindingQuestionAnswerArea : +createState() State<ItemFindingQuestionAnswerArea>
+StatefulWidget <|-- ItemFindingQuestionAnswerArea
+
+class _ItemFindingQuestionAnswerAreaState
+_ItemFindingQuestionAnswerAreaState : +currQuestion ItemFindingQuestion
+_ItemFindingQuestionAnswerAreaState o-- ItemFindingQuestion
+_ItemFindingQuestionAnswerAreaState : +result ItemFindingQuestionResult
+_ItemFindingQuestionAnswerAreaState o-- ItemFindingQuestionResult
+_ItemFindingQuestionAnswerAreaState : +answerStart bool
+_ItemFindingQuestionAnswerAreaState : +clickPosition List~double~?
+_ItemFindingQuestionAnswerAreaState : +resetState() void
+_ItemFindingQuestionAnswerAreaState : +initQuestionStem() void
+_ItemFindingQuestionAnswerAreaState : +finishAnswer() void
+_ItemFindingQuestionAnswerAreaState : +evalQuestion() void
+_ItemFindingQuestionAnswerAreaState : +initState() void
+_ItemFindingQuestionAnswerAreaState : +setState() void
+_ItemFindingQuestionAnswerAreaState : +dispose() void
+_ItemFindingQuestionAnswerAreaState : +build() Widget
+_ItemFindingQuestionAnswerAreaState : -_buildItemFindingArea() Widget
+State <|-- _ItemFindingQuestionAnswerAreaState
+QuestionAnswerArea <|-- _ItemFindingQuestionAnswerAreaState
+ResettableState <|.. _ItemFindingQuestionAnswerAreaState
+
+class WritingQuestionAnswerArea
+WritingQuestionAnswerArea : +question Question
+WritingQuestionAnswerArea o-- Question
+WritingQuestionAnswerArea : +commonStyles CommonStyles?
+WritingQuestionAnswerArea o-- CommonStyles
+WritingQuestionAnswerArea : +goToNextQuestion void FunctionQuestionResult
+WritingQuestionAnswerArea o-- void FunctionQuestionResult
+WritingQuestionAnswerArea : +createState() State<WritingQuestionAnswerArea>
+StatefulWidget <|-- WritingQuestionAnswerArea
+
+class _WritingQuestionAnswerAreaState
+_WritingQuestionAnswerAreaState : +currQuestion WritingQuestion
+_WritingQuestionAnswerAreaState o-- WritingQuestion
+_WritingQuestionAnswerAreaState : +result WritingQuestionResult
+_WritingQuestionAnswerAreaState o-- WritingQuestionResult
+_WritingQuestionAnswerAreaState : +answerStart bool
+_WritingQuestionAnswerAreaState : -_drawingController DrawingController
+_WritingQuestionAnswerAreaState o-- DrawingController
+_WritingQuestionAnswerAreaState : -_screenshotController ScreenshotController
+_WritingQuestionAnswerAreaState o-- ScreenshotController
+_WritingQuestionAnswerAreaState : +resetState() void
+_WritingQuestionAnswerAreaState : +finishAnswer() void
+_WritingQuestionAnswerAreaState : +evalQuestion() void
+_WritingQuestionAnswerAreaState : +initState() void
+_WritingQuestionAnswerAreaState : +setState() void
+_WritingQuestionAnswerAreaState : +dispose() void
+_WritingQuestionAnswerAreaState : +build() Widget
+_WritingQuestionAnswerAreaState : -_buildWritingArea() Widget
+State <|-- _WritingQuestionAnswerAreaState
+QuestionAnswerArea <|-- _WritingQuestionAnswerAreaState
+ResettableState <|.. _WritingQuestionAnswerAreaState
+
+class DoRecoveryPage
+DoRecoveryPage : +exam ExamQuestionSet
+DoRecoveryPage o-- ExamQuestionSet
+DoRecoveryPage : +commonStyles CommonStyles?
+DoRecoveryPage o-- CommonStyles
+DoRecoveryPage : +result ExamResult
+DoRecoveryPage o-- ExamResult
+DoRecoveryPage : +createState() State<DoRecoveryPage>
+StatefulWidget <|-- DoRecoveryPage
+
+class _DoRecoveryPageState
+_DoRecoveryPageState : +exam ExamQuestionSet
+_DoRecoveryPageState o-- ExamQuestionSet
+_DoRecoveryPageState : +categoryIndex int
+_DoRecoveryPageState : +subCategoryIndex int
+_DoRecoveryPageState : +questionIndex int
+_DoRecoveryPageState : +recoveryResult ExamResult
+_DoRecoveryPageState o-- ExamResult
+_DoRecoveryPageState : +showingResult bool
+_DoRecoveryPageState : +goToNextQuestion() void
+_DoRecoveryPageState : +showResultAndGotoNext() void
+_DoRecoveryPageState : -_evalExam() void
+_DoRecoveryPageState : -_evalCategory() void
+_DoRecoveryPageState : -_evalSubCategory() void
+_DoRecoveryPageState : +initExamResult() void
+_DoRecoveryPageState : +initState() void
+_DoRecoveryPageState : +setState() void
+_DoRecoveryPageState : +dispose() void
+_DoRecoveryPageState : +build() Widget
+_DoRecoveryPageState : -_buildAnswerArea() Widget
+State <|-- _DoRecoveryPageState
+UseCommonStyles <|-- _DoRecoveryPageState
+
+class LoginPage
+LoginPage : +isEntry bool
+LoginPage : +commonStyles CommonStyles?
+LoginPage o-- CommonStyles
+LoginPage : +build() Widget
+StatelessWidget <|-- LoginPage
+
+class LoginForm
+LoginForm : +isEntry bool
+LoginForm : +commonStyles CommonStyles?
+LoginForm o-- CommonStyles
+LoginForm : +createState() State<StatefulWidget>
+StatefulWidget <|-- LoginForm
+
+class _LoginFormState
+_LoginFormState : -_formKey GlobalKey~FormState~
+_LoginFormState o-- GlobalKey~FormState~
+_LoginFormState : +usernameController TextEditingController
+_LoginFormState o-- TextEditingController
+_LoginFormState : +validateCodeController TextEditingController
+_LoginFormState o-- TextEditingController
+_LoginFormState : +build() Widget
+State <|-- _LoginFormState
+UseCommonStyles <|-- _LoginFormState
+
+class ExamRecordHistoryPage
+ExamRecordHistoryPage : +recoveryMode bool
+ExamRecordHistoryPage : +commonStyles CommonStyles?
+ExamRecordHistoryPage o-- CommonStyles
+ExamRecordHistoryPage : +createState() State<ExamRecordHistoryPage>
+StatefulWidget <|-- ExamRecordHistoryPage
+
+class _ExamRecordHistoryPageState
+_ExamRecordHistoryPageState : +format DateFormat
+_ExamRecordHistoryPageState o-- DateFormat
+_ExamRecordHistoryPageState : +recoveryMode bool
+_ExamRecordHistoryPageState : +initialized bool
+_ExamRecordHistoryPageState : +futureExams dynamic
+_ExamRecordHistoryPageState : +initState() void
+_ExamRecordHistoryPageState : +build() Widget
+_ExamRecordHistoryPageState : +refreshResults() dynamic
+State <|-- _ExamRecordHistoryPageState
+UseCommonStyles <|-- _ExamRecordHistoryPageState
+
+class HistoryPage
+HistoryPage : +commonStyles CommonStyles?
+HistoryPage o-- CommonStyles
+HistoryPage : +createState() State<HistoryPage>
+StatefulWidget <|-- HistoryPage
+
+class _HistoryPageState
+_HistoryPageState : +selectedIndex int
+_HistoryPageState : +build() Widget
+State <|-- _HistoryPageState
+UseCommonStyles <|-- _HistoryPageState
+
+class HomePage
+HomePage : +commonStyles CommonStyles?
+HomePage o-- CommonStyles
+HomePage : +createState() State<StatefulWidget>
+StatefulWidget <|-- HomePage
+
+class _HomePageState
+_HomePageState : +selectedNavIndex int
+_HomePageState : +build() Widget
+State <|-- _HomePageState
+UseCommonStyles <|-- _HomePageState
+
+class SearchPage
+SearchPage : +commonStyles CommonStyles?
+SearchPage o-- CommonStyles
+SearchPage : +createState() State<SearchPage>
+StatefulWidget <|-- SearchPage
+
+class _SearchPageState
+_SearchPageState : +searchCtrl TextEditingController
+_SearchPageState o-- TextEditingController
+_SearchPageState : +commonStyles CommonStyles?
+_SearchPageState o-- CommonStyles
+_SearchPageState : +type QuestionSetType?
+_SearchPageState o-- QuestionSetType
+_SearchPageState : +resetState() void
+_SearchPageState : +initState() void
+_SearchPageState : +build() Widget
+State <|-- _SearchPageState
+ResettableState <|.. _SearchPageState
+
+class RegisterPage
+RegisterPage : +commonStyles CommonStyles?
+RegisterPage o-- CommonStyles
+RegisterPage : +createState() State<RegisterPage>
+StatefulWidget <|-- RegisterPage
+
+class _RegisterPageState
+_RegisterPageState : +registerInfo Map~String, String~
+_RegisterPageState : +isDoctor bool
+_RegisterPageState : +initFieldSettings() void
+_RegisterPageState : +initState() void
+_RegisterPageState : +build() Widget
+State <|-- _RegisterPageState
+StateWithTextFields <|-- _RegisterPageState
+TextFieldCommonValidators <|-- _RegisterPageState

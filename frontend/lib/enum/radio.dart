@@ -1,0 +1,4 @@
+enum QuestionSetType {
+  exam,
+  recovery
+}

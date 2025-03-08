@@ -1,0 +1,2398 @@
+@startuml
+set namespaceSeparator ::
+
+class "aphasia_recovery::deprecated::doctor_exam_drafts.dart::DoctorExamDraftsPage" {
+  +State<DoctorExamDraftsPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::deprecated::doctor_exam_drafts.dart::DoctorExamDraftsPage"
+
+class "aphasia_recovery::deprecated::doctor_exam_drafts.dart::_DoctorExamDraftsPageState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::deprecated::doctor_exam_drafts.dart::_DoctorExamDraftsPageState"
+
+class "aphasia_recovery::deprecated::doctor_recovery_management.dart::DoctorRecoveryManagementPage" {
+  +State<DoctorRecoveryManagementPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::deprecated::doctor_recovery_management.dart::DoctorRecoveryManagementPage"
+
+class "aphasia_recovery::deprecated::doctor_recovery_management.dart::_DoctorRecoveryManagementPageState" {
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::deprecated::doctor_recovery_management.dart::_DoctorRecoveryManagementPageState"
+
+class "aphasia_recovery::deprecated::exam_entry.dart::ExamEntryPatientPage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::exam_entry.dart::ExamEntryPatientPage"
+
+class "aphasia_recovery::deprecated::exam_entry.dart::ExamEntryDoctorPage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::exam_entry.dart::ExamEntryDoctorPage"
+
+class "aphasia_recovery::deprecated::exam_entry.dart::EntryCards" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::exam_entry.dart::EntryCards"
+
+class "aphasia_recovery::deprecated::global_states_provider.dart::GlobalStatesProviders" {
+  -Widget _child
+  +Widget build()
+}
+
+"aphasia_recovery::deprecated::global_states_provider.dart::GlobalStatesProviders" o-- "flutter::src::widgets::framework.dart::Widget"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::global_states_provider.dart::GlobalStatesProviders"
+
+class "aphasia_recovery::deprecated::home.dart::HomePage" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::deprecated::home.dart::HomePage"
+
+class "aphasia_recovery::deprecated::home.dart::_HomePageState" {
+  +int selectedNavIndex
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::deprecated::home.dart::_HomePageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::deprecated::home.dart::_HomePageState"
+
+class "aphasia_recovery::deprecated::patient_starred_recovery.dart::PatientStarredRecoveryPage" {
+  +State<PatientStarredRecoveryPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::deprecated::patient_starred_recovery.dart::PatientStarredRecoveryPage"
+
+class "aphasia_recovery::deprecated::patient_starred_recovery.dart::_PatientStarredRecoveryPageState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::deprecated::patient_starred_recovery.dart::_PatientStarredRecoveryPageState"
+
+class "aphasia_recovery::deprecated::recovery_entry.dart::RecoveryEntryPatientPage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::recovery_entry.dart::RecoveryEntryPatientPage"
+
+class "aphasia_recovery::deprecated::recovery_entry.dart::RecoveryEntryDoctorPage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::recovery_entry.dart::RecoveryEntryDoctorPage"
+
+class "aphasia_recovery::deprecated::recovery_entry.dart::_EntryCards" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::deprecated::recovery_entry.dart::_EntryCards"
+
+class "aphasia_recovery::deprecated::user_info.dart::UserInfo" {
+  -int? _role
+  -String? _name
+  -String? _phoneOrEmail
+  +int? role
+  +String? name
+  +String? phoneOrEmail
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "aphasia_recovery::deprecated::user_info.dart::UserInfo"
+
+class "aphasia_recovery::enum::command_actions.dart::ClickAction" {
+  +int index
+  {static} +List<ClickAction> values
+  {static} +ClickAction touch
+  {static} +ClickAction turnOver
+  {static} +ClickAction take
+}
+
+"aphasia_recovery::enum::command_actions.dart::ClickAction" o-- "aphasia_recovery::enum::command_actions.dart::ClickAction"
+"dart::core::Enum" <|-- "aphasia_recovery::enum::command_actions.dart::ClickAction"
+
+class "aphasia_recovery::enum::command_actions.dart::PutDownAction" {
+  +int index
+  {static} +List<PutDownAction> values
+  {static} +PutDownAction putDown
+  {static} +PutDownAction cover
+  {static} +PutDownAction switchPlace
+}
+
+"aphasia_recovery::enum::command_actions.dart::PutDownAction" o-- "aphasia_recovery::enum::command_actions.dart::PutDownAction"
+"dart::core::Enum" <|-- "aphasia_recovery::enum::command_actions.dart::PutDownAction"
+
+class "aphasia_recovery::enum::fake_reflection.dart::ClassProperties" {
+  +int index
+  {static} +List<ClassProperties> values
+  {static} +ClassProperties constructor
+  {static} +ClassProperties typeName
+  {static} +ClassProperties displayName
+}
+
+"aphasia_recovery::enum::fake_reflection.dart::ClassProperties" o-- "aphasia_recovery::enum::fake_reflection.dart::ClassProperties"
+"dart::core::Enum" <|-- "aphasia_recovery::enum::fake_reflection.dart::ClassProperties"
+
+class "aphasia_recovery::enum::radio.dart::QuestionSetType" {
+  +int index
+  {static} +List<QuestionSetType> values
+  {static} +QuestionSetType exam
+  {static} +QuestionSetType recovery
+}
+
+"aphasia_recovery::enum::radio.dart::QuestionSetType" o-- "aphasia_recovery::enum::radio.dart::QuestionSetType"
+"dart::core::Enum" <|-- "aphasia_recovery::enum::radio.dart::QuestionSetType"
+
+class "aphasia_recovery::enum::system.dart::PlatformType" {
+  +int index
+  {static} +List<PlatformType> values
+  {static} +PlatformType web
+  {static} +PlatformType iOS
+  {static} +PlatformType android
+  {static} +PlatformType windows
+  {static} +PlatformType linux
+  {static} +PlatformType macOS
+  {static} +PlatformType fuchsia
+}
+
+"aphasia_recovery::enum::system.dart::PlatformType" o-- "aphasia_recovery::enum::system.dart::PlatformType"
+"dart::core::Enum" <|-- "aphasia_recovery::enum::system.dart::PlatformType"
+
+class "aphasia_recovery::exceptions::http_exceptions.dart::HttpRequestException" {
+  +String? message
+  +Response? response
+  +StreamedResponse? streamedResponse
+  +int statusCode
+  +String toString()
+}
+
+"aphasia_recovery::exceptions::http_exceptions.dart::HttpRequestException" o-- "http::src::response.dart::Response"
+"aphasia_recovery::exceptions::http_exceptions.dart::HttpRequestException" o-- "http::src::streamed_response.dart::StreamedResponse"
+"dart::core::Exception" <|-- "aphasia_recovery::exceptions::http_exceptions.dart::HttpRequestException"
+
+class "aphasia_recovery::exceptions::http_exceptions.dart::ExamNotFoundException" {
+  +String examId
+  +String toString()
+}
+
+"dart::core::Exception" <|-- "aphasia_recovery::exceptions::http_exceptions.dart::ExamNotFoundException"
+
+class "aphasia_recovery::exceptions::local_exceptions.dart::InCompleteExamException" {
+  +bool needCategory
+  +bool needDiagnosisRule
+  +bool needEvalRule
+  +int? categoryIndex
+  +bool needSubCategory
+  +bool needCateEvalRule
+  +int? subCategoryIndex
+  +bool needQuestion
+  +bool needSubCateEvalRule
+  +String message
+}
+
+"dart::core::Exception" <|-- "aphasia_recovery::exceptions::local_exceptions.dart::InCompleteExamException"
+
+class "aphasia_recovery::exceptions::local_exceptions.dart::EditPublishedQuestionSetException" {
+  {static} +String promptMessage
+  +String getPromptMessage()
+}
+
+"dart::core::Exception" <|-- "aphasia_recovery::exceptions::local_exceptions.dart::EditPublishedQuestionSetException"
+
+class "aphasia_recovery::exceptions::local_exceptions.dart::IncompleteModelException" {
+  +Type modelType
+  +Object modelObj
+}
+
+"dart::core::Exception" <|-- "aphasia_recovery::exceptions::local_exceptions.dart::IncompleteModelException"
+
+class "aphasia_recovery::exceptions::local_exceptions.dart::UnexpectedError" {
+  +String msg
+  +String toString()
+}
+
+"dart::core::Error" <|-- "aphasia_recovery::exceptions::local_exceptions.dart::UnexpectedError"
+
+abstract class "aphasia_recovery::mixin::audio_record::platform::audio_recorder_io.dart::AudioRecorderMixin" {
+  +dynamic recordFile()
+  +dynamic recordStream()
+  +void downloadWebData()
+  -dynamic _getPath()
+}
+
+abstract class "aphasia_recovery::mixin::audio_record::platform::audio_recorder_web.dart::AudioRecorderMixin" {
+  +dynamic recordFile()
+  +dynamic recordStream()
+  +void downloadWebData()
+}
+
+abstract class "aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" {
+  +bool enableFuzzyEvaluation
+  +void enableFuzzy()
+  +void disableFuzzy()
+}
+
+abstract class "aphasia_recovery::mixin::eval_rule_mixin.dart::RuleKeyword" {
+  +String keyword
+}
+
+abstract class "aphasia_recovery::mixin::eval_rule_mixin.dart::KeywordList" {
+  +List<String> keywords
+}
+
+abstract class "aphasia_recovery::mixin::eval_rule_mixin.dart::AnswerOrder" {
+  +bool enforceOrder
+}
+
+abstract class "aphasia_recovery::mixin::eval_rule_mixin.dart::LongAnswer" {
+  +String answerText
+}
+
+class "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles" {
+  +double widgetsElevation
+  +double listTileCommonHeight
+  +ThemeData theme
+  +TextStyle? titleStyle
+  +TextStyle? bodyStyle
+  +TextStyle? hintTextStyle
+  +Color? errorColor
+  +Color? onErrorColor
+  +Color? onPrimaryColor
+  +Color? primaryColor
+  +Color? focusListTileColor
+  +bool isMedium
+  +bool isLarge
+  +bool isSmall
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles" o-- "flutter::src::material::theme_data.dart::ThemeData"
+"aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles" o-- "flutter::src::painting::text_style.dart::TextStyle"
+"aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles" o-- "dart::ui::Color"
+
+class "aphasia_recovery::mixin::widgets_mixin.dart::TextFieldCommonValidators" {
+  +String? Function(String?) notEmptyValidator()
+  +String? needChineseValidator()
+  +String? needIntValidator()
+  +String? Function(String?) needGreaterThanOrEqualIntValidator()
+  +String? needDoubleValidator()
+  +String? Function(String?) needGreaterThanOrEqualDoubleValidator()
+  +String? Function(String?) needSmallerThanOrEqualDoubleValidator()
+}
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" {
+  +void resetState()
+}
+
+class "aphasia_recovery::mixin::widgets_mixin.dart::FieldSetting" {
+  +GlobalKey<FormFieldState<dynamic>> key
+  +TextEditingController ctrl
+  +String? Function(String?) validator
+  +void Function() reset
+  +void Function() applyToModel
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::FieldSetting" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>>"
+"aphasia_recovery::mixin::widgets_mixin.dart::FieldSetting" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::mixin::widgets_mixin.dart::FieldSetting" o-- "null::String Function(String)"
+"aphasia_recovery::mixin::widgets_mixin.dart::FieldSetting" o-- "null::void Function()"
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::RequireLogin" {
+  +bool checkLoginStatus()
+}
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" {
+  +CommonStyles? commonStyles
+  +CommonStyles initStyles()
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" {
+  +void Function(void Function()) setStateProxy
+  +AudioPlayer player
+  +Duration? audioDuration
+  +Duration? playPosition
+  -StreamSubscription<dynamic>? _durationSubscription
+  -StreamSubscription<dynamic>? _positionSubscription
+  -StreamSubscription<dynamic>? _playerCompleteSubscription
+  +bool isPlaying
+  +bool isPaused
+  +bool isPlayerDisposed
+  +String durationText
+  +String positionText
+  +dynamic play()
+  +dynamic pause()
+  +dynamic stop()
+  +void setupPlayer()
+  +void initPlayStateSubscription()
+  +void disposePlayStateSubscription()
+  +Widget buildPlayer()
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" o-- "null::void Function(void Function())"
+"aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" o-- "audioplayers::src::audioplayer.dart::AudioPlayer"
+"aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" o-- "dart::async::StreamSubscription<dynamic>"
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::StateWithTextFields" {
+  +Map<String, FieldSetting> fieldsSetting
+  +void initFieldSettings()
+  +bool applyFieldsChangesToModel()
+  +void resetAllFields()
+  +bool validateAllFields()
+}
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::QuestionImage" {
+  +CountDown? imageDisplayCounter
+  +bool imageDisplayed
+  +void initQuestionImage()
+  +void startQuestionImageFadeCountDown()
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionImage" o-- "aphasia_recovery::utils::counter.dart::CountDown"
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::QuestionText" {
+  +bool isQuestionTextDisplayed
+  +void initQuestionText()
+}
+
+abstract class "aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" {
+  +WrappedAudioPlayer? player
+  +CountDown? timeLimitCountDown
+  +CountDown? imageDisplayCounter
+  +bool imageDisplayed
+  +bool isQuestionTextDisplayed
+  +HintRule? hintingRule
+  +bool evaluating
+  +String? displayImageUrl
+  +String? displayText
+  +bool hinting
+  +void setImageDisplayed()
+  +void displayImageWithFadeCountDown()
+  +void setQuestionTextDisplayed()
+  +void initQuestionStem()
+  +void trySetAnswerTime()
+  +void tryStartTimeLimitCounter()
+  +void finishAnswer()
+  +void doCommonFinishStep()
+  +void setState()
+  +dynamic doEvalQuestion()
+  +void triggerHint()
+  +void setHintStates()
+  +void resetAnswerStateAfterHint()
+  +void disposePlayerAndCounters()
+}
+
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" o-- "aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" o-- "aphasia_recovery::utils::counter.dart::CountDown"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" o-- "aphasia_recovery::models::rules.dart::HintRule"
+
+class "aphasia_recovery::models::exam::category.dart::QuestionCategory" {
+  +String description
+  +List<QuestionSubCategory> subCategories
+  +List<ExamCategoryEvalRule> rules
+  +Map<String, dynamic> toJson()
+  +void addSubCategoryLocally()
+}
+
+class "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet" {
+  -String? _id
+  +String name
+  +String description
+  +bool recovery
+  +bool published
+  +List<QuestionCategory> categories
+  +List<DiagnosisRule> diagnosisRules
+  +List<ExamEvalRule> rules
+  +String? id
+  +Map<String, dynamic> toJson()
+  +ExamQuestionSet copy()
+  {static} +dynamic getById()
+  {static} +dynamic getByDoctorUserId()
+  {static} +dynamic createExam()
+  +void addCategoryLocally()
+  -void _checkPublished()
+  -void _checkCategoryIndex()
+  +dynamic updateName()
+  +dynamic updateDescription()
+  +dynamic addCategory()
+  +dynamic deleteCategory()
+  +dynamic updateCategory()
+  +dynamic moveCategoryUp()
+  +dynamic moveCategoryDown()
+  -void _checkSubCategoryIndex()
+  +dynamic addSubCategory()
+  +dynamic updateSubCategory()
+  +dynamic deleteSubCategory()
+  +dynamic moveSubCategoryUp()
+  +dynamic moveSubCategoryDown()
+  -dynamic _checkQuestionIndex()
+  +dynamic addQuestion()
+  +dynamic updateQuestion()
+  +dynamic deleteQuestion()
+  +dynamic moveQuestionUp()
+  +dynamic moveQuestionDown()
+  -void _setPublished()
+  +dynamic publish()
+  -void _checkDiagnosisRuleIndex()
+  +dynamic addDiagnosisRule()
+  +dynamic deleteDiagnosisRule()
+  +dynamic updateDiagnosisRule()
+  -dynamic _checkCategoryEvalRuleIndex()
+  +dynamic addCategoryEvalRule()
+  +dynamic updateCategoryEvalRule()
+  +dynamic deleteCategoryEvalRule()
+  -dynamic _checkSubCategoryEvalRuleIndex()
+  +dynamic addSubCategoryEvalRule()
+  +dynamic updateSubCategoryEvalRule()
+  +dynamic deleteSubCategoryEvalRule()
+  -dynamic _checkSubCategoryTerminateRuleIndex()
+  +dynamic addSubCategoryTerminateRule()
+  +dynamic updateSubCategoryTerminateRule()
+  +dynamic deleteSubCategoryTerminateRule()
+  +void checkSettingBeforePublish()
+  -void _passOrThrowIncompleteException()
+}
+
+class "aphasia_recovery::models::exam::sub_category.dart::QuestionSubCategory" {
+  +String description
+  +List<Question> questions
+  +List<TerminateRule> terminateRules
+  +List<ExamSubCategoryEvalRule> evalRules
+  +QuestionSubCategory copy()
+  +Map<String, dynamic> toJson()
+  +bool checkIfTerminate()
+}
+
+abstract class "aphasia_recovery::models::question::question.dart::Question" {
+  -String? _id
+  +String? alias
+  +String? questionText
+  +String? audioUrl
+  +String? imageUrl
+  +int omitImageAfterSeconds
+  {static} +int maxOmitTime
+  +String typeName
+  +QuestionEvalRule? evalRule
+  +String? id
+  {static} +dynamic updateQuestion()
+  +Map<String, dynamic> toJson()
+  +Question copy()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" o-- "aphasia_recovery::models::rules.dart::QuestionEvalRule"
+
+class "aphasia_recovery::models::question::question.dart::AudioQuestion" {
+  {static} +Map<Type, dynamic> availableEvalRuleTypes()
+  {static} +String questionTypeName()
+  +Map<String, dynamic> toJson()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" <|-- "aphasia_recovery::models::question::question.dart::AudioQuestion"
+
+class "aphasia_recovery::models::question::question.dart::ChoiceQuestion" {
+  {static} +Map<Type, dynamic> availableEvalRuleTypes()
+  {static} +String questionTypeName()
+  +Map<String, dynamic> toJson()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" <|-- "aphasia_recovery::models::question::question.dart::ChoiceQuestion"
+
+class "aphasia_recovery::models::question::question.dart::CommandQuestion" {
+  {static} +Map<Type, dynamic> availableEvalRuleTypes()
+  {static} +String questionTypeName()
+  +Map<String, dynamic> toJson()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" <|-- "aphasia_recovery::models::question::question.dart::CommandQuestion"
+
+class "aphasia_recovery::models::question::question.dart::WritingQuestion" {
+  {static} +Map<Type, dynamic> availableEvalRuleTypes()
+  {static} +String questionTypeName()
+  +Map<String, dynamic> toJson()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" <|-- "aphasia_recovery::models::question::question.dart::WritingQuestion"
+
+class "aphasia_recovery::models::question::question.dart::ItemFindingQuestion" {
+  {static} +Map<Type, dynamic> availableEvalRuleTypes()
+  {static} +String questionTypeName()
+  +Map<String, dynamic> toJson()
+  +String defaultQuestionName()
+  +Widget buildAnswerAreaWidget()
+}
+
+"aphasia_recovery::models::question::question.dart::Question" <|-- "aphasia_recovery::models::question::question.dart::ItemFindingQuestion"
+
+class "aphasia_recovery::models::result::results.dart::ExamResult" {
+  +String? id
+  +String? resultText
+  +double? finalScore
+  +DateTime? startTime
+  +DateTime? finishTime
+  +bool isRecovery
+  +String examName
+  +List<CategoryResult> categoryResults
+  +Map<String, dynamic> toJson()
+  {static} +dynamic getByUid()
+  {static} +dynamic createExamResult()
+  {static} +dynamic saveExamResult()
+}
+
+class "aphasia_recovery::models::result::results.dart::CategoryResult" {
+  +String? name
+  +double? finalScore
+  +List<SubCategoryResult> subResults
+  +Map<String, dynamic> toJson()
+}
+
+class "aphasia_recovery::models::result::results.dart::SubCategoryResult" {
+  +String? name
+  +double? finalScore
+  +String? terminateReason
+  +List<QuestionResult> questionResults
+  +void addQuestionResult()
+  +Map<String, dynamic> toJson()
+}
+
+abstract class "aphasia_recovery::models::result::results.dart::QuestionResult" {
+  +Question sourceQuestion
+  +double? finalScore
+  +int? answerTime
+  +bool isHinted
+  +Map<String, String> extraResults
+  +String typeName
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::QuestionResult" o-- "aphasia_recovery::models::question::question.dart::Question"
+
+class "aphasia_recovery::models::result::results.dart::AudioQuestionResult" {
+  +String audioContent
+  +List<int>? rawPcm16Data
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::QuestionResult" <|-- "aphasia_recovery::models::result::results.dart::AudioQuestionResult"
+
+class "aphasia_recovery::models::result::results.dart::CommandQuestionResult" {
+  +List<CommandActions> actions
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::QuestionResult" <|-- "aphasia_recovery::models::result::results.dart::CommandQuestionResult"
+
+class "aphasia_recovery::models::result::results.dart::ChoiceQuestionResult" {
+  +List<int> choiceSelected
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::QuestionResult" <|-- "aphasia_recovery::models::result::results.dart::ChoiceQuestionResult"
+
+class "aphasia_recovery::models::result::results.dart::WritingQuestionResult" {
+  +Uint8List? handWriteImageData
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::WritingQuestionResult" o-- "dart::typed_data::Uint8List"
+"aphasia_recovery::models::result::results.dart::QuestionResult" <|-- "aphasia_recovery::models::result::results.dart::WritingQuestionResult"
+
+class "aphasia_recovery::models::result::results.dart::ItemFindingQuestionResult" {
+  +List<double>? clickCoordinate
+  +Map<String, dynamic> toJson()
+}
+
+"aphasia_recovery::models::result::results.dart::QuestionResult" <|-- "aphasia_recovery::models::result::results.dart::ItemFindingQuestionResult"
+
+abstract class "aphasia_recovery::models::rules.dart::DiagnosisRule" {
+  +String typeName
+  +List<int> categoryIndices
+  +Map<String, dynamic> toJson()
+  +String displayName()
+  +DiagnosisRule copy()
+  +void addCategory()
+  +int removeCategory()
+  +bool checkAndDiagnose()
+}
+
+class "aphasia_recovery::models::rules.dart::ScoreRange" {
+  +double min
+  +double max
+  +Map<String, dynamic> toJson()
+}
+
+class "aphasia_recovery::models::rules.dart::DiagnoseByScoreRange" {
+  +List<ScoreRange> ranges
+  +String aphasiaType
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +DiagnoseByScoreRange copy()
+  +String displayName()
+  +void addRange()
+  +int removeCategory()
+  +bool checkAndDiagnose()
+}
+
+"aphasia_recovery::models::rules.dart::DiagnosisRule" <|-- "aphasia_recovery::models::rules.dart::DiagnoseByScoreRange"
+
+abstract class "aphasia_recovery::models::rules.dart::ExamEvalRule" {
+  +List<int> categoryIndices
+  +String resultDimensionName
+  +String typeName
+  +ExamResult evaluate()
+  +String displayName()
+  +Map<String, dynamic> toJson()
+}
+
+class "aphasia_recovery::models::rules.dart::ExamEvalByCategoryScoreSum" {
+  {static} +String ruleDisplayName()
+  +ExamResult evaluate()
+  +Map<String, dynamic> toJson()
+  +String displayName()
+}
+
+"aphasia_recovery::models::rules.dart::ExamEvalRule" <|-- "aphasia_recovery::models::rules.dart::ExamEvalByCategoryScoreSum"
+
+abstract class "aphasia_recovery::models::rules.dart::ExamCategoryEvalRule" {
+  +String typeName
+  +Map<String, dynamic> toJson()
+  +ExamCategoryEvalRule copy()
+  +String displayName()
+  +CategoryResult evaluate()
+}
+
+class "aphasia_recovery::models::rules.dart::EvalBySubCategoryScoreSum" {
+  +CategoryResult evaluate()
+  +Map<String, dynamic> toJson()
+  +String displayName()
+}
+
+"aphasia_recovery::models::rules.dart::ExamCategoryEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalBySubCategoryScoreSum"
+
+abstract class "aphasia_recovery::models::rules.dart::ExamSubCategoryEvalRule" {
+  +String typeName
+  +Map<String, dynamic> toJson()
+  +String displayName()
+  +ExamSubCategoryEvalRule copy()
+  +SubCategoryResult evaluate()
+}
+
+class "aphasia_recovery::models::rules.dart::EvalSubCategoryByQuestionScoreSum" {
+  +Map<String, dynamic> toJson()
+  +SubCategoryResult evaluate()
+  +String displayName()
+}
+
+"aphasia_recovery::models::rules.dart::ExamSubCategoryEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalSubCategoryByQuestionScoreSum"
+
+abstract class "aphasia_recovery::models::rules.dart::TerminateRule" {
+  +String reason
+  +double equivalentScore
+  +String typeName
+  +TerminateRule copy()
+  +bool checkIfNeedTerminate()
+}
+
+"aphasia_recovery::models::rules.dart::ExamSubCategoryEvalRule" <|-- "aphasia_recovery::models::rules.dart::TerminateRule"
+
+class "aphasia_recovery::models::rules.dart::ContinuousWrongAnswerTerminate" {
+  +int errorCountThreshold
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +SubCategoryResult evaluate()
+  +String displayName()
+  +bool checkIfNeedTerminate()
+}
+
+"aphasia_recovery::models::rules.dart::TerminateRule" <|-- "aphasia_recovery::models::rules.dart::ContinuousWrongAnswerTerminate"
+
+class "aphasia_recovery::models::rules.dart::HintRule" {
+  +String? hintText
+  +String? hintAudioUrl
+  +String? hintImageUrl
+  +String? hintImageAssetPath
+  +double scoreLowBound
+  +double scoreHighBound
+  +double adjustValue
+  +int scoreAdjustType
+  +Map<String, dynamic> toJson()
+  +String? checkSetting()
+  +bool checkIfMatch()
+}
+
+class "aphasia_recovery::models::rules.dart::EvalCondition" {
+  +double score
+  +List<Map<String, dynamic>> ranges
+  +bool isHinted
+  +int length
+  +Map<String, dynamic> toJson()
+  +void addRange()
+  +Map<String, dynamic> removeRange()
+  +bool checkIfMatch()
+}
+
+abstract class "aphasia_recovery::models::rules.dart::QuestionEvalRule" {
+  +double fullScore
+  +int timeLimit
+  -double _defaultScore
+  +List<EvalCondition> conditions
+  +List<HintRule> hintRules
+  +String typeName
+  +double defaultScore
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +void setScoreByConditions()
+  +HintRule? getMatchHintRule()
+  +String getScoreConditionName()
+  +String? checkSetting()
+  +void addEvalCondition()
+  +void updateEvalCondition()
+  +void deleteEvalCondition()
+  +void moveUpEvalCondition()
+  +void moveDownEvalCondition()
+  +void addHintRule()
+  +void deleteHintRule()
+  +void updateHintRule()
+  +void moveUpHintRule()
+  +void moveDownHintRule()
+}
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordsMatchesCount" {
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordsMatchesCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordsMatchesCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::KeywordList" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordsMatchesCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::AnswerOrder" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordsMatchesCount"
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordMatch" {
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordMatch"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordMatch"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::RuleKeyword" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByKeywordMatch"
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionByPronunciation" {
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByPronunciation"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByPronunciation"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::RuleKeyword" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByPronunciation"
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionByFluency" {
+  {static} +String ruleDisplayName()
+  +dynamic evaluate()
+  +Map<String, dynamic> toJson()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByFluency"
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionBySimilarity" {
+  +double fullScoreThreshold
+  +Map<String, dynamic> toJson()
+  {static} +String ruleDisplayName()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionBySimilarity"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionBySimilarity"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::LongAnswer" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionBySimilarity"
+
+class "aphasia_recovery::models::rules.dart::EvalAudioQuestionByWordType" {
+  +int wordType
+  +Map<String, dynamic> toJson()
+  {static} +String ruleDisplayName()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalAudioQuestionByWordType"
+
+class "aphasia_recovery::models::rules.dart::Choice" {
+  +String? imageUrl
+  +String? imageAssetPath
+  +String text
+  +String? imageUrlOrPath
+  +Map<String, dynamic> toJson()
+}
+
+class "aphasia_recovery::models::rules.dart::EvalChoiceQuestionByCorrectChoiceCount" {
+  +List<Choice> choices
+  +List<int> correctChoices
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String getScoreConditionName()
+  -void _checkChoiceIndex()
+  -void _updateCorrectChoiceAfterMove()
+  +Choice deleteChoice()
+  +void moveChoiceUp()
+  +void moveChoiceDown()
+  +String? checkSetting()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalChoiceQuestionByCorrectChoiceCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::AnswerOrder" <|-- "aphasia_recovery::models::rules.dart::EvalChoiceQuestionByCorrectChoiceCount"
+
+class "aphasia_recovery::models::rules.dart::ItemSlot" {
+  +String? itemName
+  +String? itemImageUrl
+  +String? itemImageAssetPath
+  +Map<String, dynamic> toJson()
+  +ItemSlot copy()
+  +void setItem()
+  +void setItemWithBuiltInImage()
+}
+
+class "aphasia_recovery::models::rules.dart::CommandActions" {
+  +int sourceSlotIndex
+  +ClickAction firstAction
+  +int? targetSlotIndex
+  +PutDownAction? secondAction
+  +int hashCode
+  +Map<String, dynamic> toJson()
+  +void setSecondAction()
+  +bool ==()
+}
+
+"aphasia_recovery::models::rules.dart::CommandActions" o-- "aphasia_recovery::enum::command_actions.dart::ClickAction"
+"aphasia_recovery::models::rules.dart::CommandActions" o-- "aphasia_recovery::enum::command_actions.dart::PutDownAction"
+
+class "aphasia_recovery::models::rules.dart::EvalCommandQuestionByCorrectActionCount" {
+  -int _slotCount
+  +List<ItemSlot> slots
+  +List<CommandActions> actions
+  +double invalidActionPunishment
+  +bool detailMode
+  +String? commandText
+  +int slotCount
+  {static} +String ruleDisplayName()
+  +String generateCommandTextFromActions()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+  +Map<int, ItemSlot> getSlotsWithItem()
+  +int indexOfItemName()
+  +void setItemSlot()
+  +String updateActions()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalCommandQuestionByCorrectActionCount"
+
+class "aphasia_recovery::models::rules.dart::EvalWritingQuestionByCorrectKeywordCount" {
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByCorrectKeywordCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByCorrectKeywordCount"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::KeywordList" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByCorrectKeywordCount"
+
+class "aphasia_recovery::models::rules.dart::EvalWritingQuestionByMatchRate" {
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByMatchRate"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::FuzzyEvalSetting" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByMatchRate"
+"aphasia_recovery::mixin::eval_rule_mixin.dart::RuleKeyword" <|-- "aphasia_recovery::models::rules.dart::EvalWritingQuestionByMatchRate"
+
+class "aphasia_recovery::models::rules.dart::EvalItemFoundQuestion" {
+  +String? imageUrl
+  +List<List<double>> coordinates
+  {static} +String ruleDisplayName()
+  +Map<String, dynamic> toJson()
+  +dynamic evaluate()
+  +String? checkSetting()
+  +void addPoint()
+  +String getScoreConditionName()
+}
+
+"aphasia_recovery::models::rules.dart::QuestionEvalRule" <|-- "aphasia_recovery::models::rules.dart::EvalItemFoundQuestion"
+
+class "aphasia_recovery::settings.dart::HttpConstants" {
+  {static} +String backendBaseUrl
+  {static} +String backendBaseUrlWithoutProtocol
+}
+
+class "aphasia_recovery::settings.dart::AppSettings" {
+  {static} +bool testMode
+  {static} +String notInTestModeErrMsg
+  {static} +String authorizeUrl
+  {static} +String appId
+  {static} +String clientSecrete
+  {static} +String apiKey
+}
+
+class "aphasia_recovery::states::question_set_states.dart::SingleModelState" {
+  +T? model
+  +dynamic notifyAll()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "aphasia_recovery::states::question_set_states.dart::SingleModelState"
+
+class "aphasia_recovery::states::question_set_states.dart::ExamState" {
+  +ExamQuestionSet exam
+  +dynamic updateName()
+  +dynamic updateDescription()
+  +dynamic addDiagnosisRule()
+  +dynamic updateDiagnosisRule()
+  +dynamic deleteDiagnosisRule()
+  +dynamic updateCategory()
+  +dynamic deleteCategory()
+  +dynamic moveCategoryUp()
+  +dynamic moveCategoryDown()
+  +dynamic addCategoryEvalRule()
+  +dynamic updateCategoryEvalRule()
+  +dynamic deleteCategoryEvalRule()
+  +dynamic moveSubCategoryUp()
+  +dynamic moveSubCategoryDown()
+  +dynamic updateSubCategory()
+  +dynamic deleteSubCategory()
+  +dynamic addSubCategoryEvalRule()
+  +dynamic updateSubCategoryEvalRule()
+  +dynamic deleteSubCategoryEvalRule()
+  +dynamic addSubCategoryTerminateRule()
+  +dynamic updateSubCategoryTerminateRule()
+  +dynamic deleteSubCategoryTerminateRule()
+  +dynamic deleteQuestion()
+  +dynamic moveQuestionUp()
+  +dynamic moveQuestionDown()
+  +dynamic publish()
+}
+
+"aphasia_recovery::states::question_set_states.dart::ExamState" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "aphasia_recovery::states::question_set_states.dart::ExamState"
+
+class "aphasia_recovery::states::user_identity.dart::UserIdentity" {
+  -String _identity
+  -String _uid
+  -String _token
+  -int _role
+  +String identity
+  +String uid
+  +String token
+  +bool isPatient
+  +bool isDoctor
+  {static} +dynamic authWithToken()
+  {static} +dynamic login()
+  {static} +dynamic logout()
+  {static} +dynamic register()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "aphasia_recovery::states::user_identity.dart::UserIdentity"
+
+class "aphasia_recovery::utils::counter.dart::CountDown" {
+  -Timer? _timer
+  -int _currCount
+  +int maxCount
+  +void Function(int)? onCount
+  +void Function()? onComplete
+  -bool _isComplete
+  +int timePassed
+  +bool isComplete
+  +void start()
+  +void complete()
+  +void cancel()
+  +Widget buildCountWidget()
+}
+
+"aphasia_recovery::utils::counter.dart::CountDown" o-- "dart::async::Timer"
+"aphasia_recovery::utils::counter.dart::CountDown" o-- "null::void Function(int)"
+"aphasia_recovery::utils::counter.dart::CountDown" o-- "null::void Function()"
+
+class "aphasia_recovery::utils::counter.dart::Counter" {
+  -Timer? _timer
+  -int _currCount
+  +int maxCount
+  +void Function(int)? onCount
+  +void Function(int)? onComplete
+  +int timePassed
+  +void start()
+  -void _complete()
+  +void cancel()
+  +Widget buildCountWidget()
+}
+
+"aphasia_recovery::utils::counter.dart::Counter" o-- "dart::async::Timer"
+"aphasia_recovery::utils::counter.dart::Counter" o-- "null::void Function(int)"
+
+class "aphasia_recovery::utils::http::http_manager.dart::HttpClientManager" {
+  {static} -HttpClientManager _instance
+  +Client? testClient
+  -bool _testMode
+  +void enableTestMode()
+  +dynamic setTokenToHeaders()
+  +dynamic saveToken()
+  +dynamic get()
+  +dynamic post()
+  +dynamic delete()
+  +dynamic patch()
+  +dynamic multipartRequest()
+}
+
+"aphasia_recovery::utils::http::http_manager.dart::HttpClientManager" o-- "aphasia_recovery::utils::http::http_manager.dart::HttpClientManager"
+"aphasia_recovery::utils::http::http_manager.dart::HttpClientManager" o-- "http::src::client.dart::Client"
+
+class "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeResponse_0" {
+}
+
+"mockito::src::mock.dart::SmartFake" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeResponse_0"
+"http::src::response.dart::Response" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeResponse_0"
+
+class "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeStreamedResponse_1" {
+}
+
+"mockito::src::mock.dart::SmartFake" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeStreamedResponse_1"
+"http::src::streamed_response.dart::StreamedResponse" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::_FakeStreamedResponse_1"
+
+class "aphasia_recovery::utils::http::http_mock.mocks.dart::MockClient" {
+  +dynamic head()
+  +dynamic get()
+  +dynamic post()
+  +dynamic put()
+  +dynamic patch()
+  +dynamic delete()
+  +dynamic read()
+  +dynamic readBytes()
+  +dynamic send()
+  +void close()
+}
+
+"mockito::src::mock.dart::Mock" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::MockClient"
+"http::src::client.dart::Client" <|-- "aphasia_recovery::utils::http::http_mock.mocks.dart::MockClient"
+
+class "aphasia_recovery::utils::io::file.dart::WrappedFile" {
+  +PlatformFile file
+  +String name
+  +int size
+  +String? path
+  +Uint8List? bytes
+}
+
+"aphasia_recovery::utils::io::file.dart::WrappedFile" o-- "file_picker::src::platform_file.dart::PlatformFile"
+"aphasia_recovery::utils::io::file.dart::WrappedFile" o-- "dart::typed_data::Uint8List"
+
+class "aphasia_recovery::utils::io::shared_pref.dart::WrappedSharedPref" {
+  -dynamic _prefs
+  {static} +WrappedSharedPref? instance
+  +dynamic saveToken()
+  +dynamic retrieveToken()
+  +dynamic deleteToken()
+}
+
+"aphasia_recovery::utils::io::shared_pref.dart::WrappedSharedPref" o-- "aphasia_recovery::utils::io::shared_pref.dart::WrappedSharedPref"
+
+class "aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer" {
+  +AudioPlayer player
+  +Duration? audioDuration
+  +Duration? playPosition
+  -StreamSubscription<dynamic>? _durationSubscription
+  -StreamSubscription<dynamic>? _positionSubscription
+  -StreamSubscription<dynamic>? _playerCompleteSubscription
+  +void Function()? onComplete
+  +bool isPlaying
+  +bool isPaused
+  +bool isPlayerDisposed
+  +String durationText
+  +String positionText
+  +dynamic play()
+  +dynamic pause()
+  +dynamic stop()
+  +dynamic dispose()
+  +void setup()
+  +void initPlayStateSubscription()
+  +void disposePlayStateSubscription()
+  +Widget buildPlayer()
+}
+
+"aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer" o-- "audioplayers::src::audioplayer.dart::AudioPlayer"
+"aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer" o-- "dart::async::StreamSubscription<dynamic>"
+"aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer" o-- "null::void Function()"
+
+class "aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" {
+  -AudioRecorder _audioRecorder
+  -StreamSubscription<RecordState>? _recordSub
+  -StreamSubscription<Amplitude>? _amplitudeSub
+  -RecordState _recordState
+  -Amplitude? _amplitude
+  +void Function(Map<String, dynamic>)? amplitudeUpdater
+  +void Function(List<int>) onStop
+  +bool isStopped
+  +bool isRecording
+  +bool isPaused
+  -void _initRecorder()
+  -void _updateRecordState()
+  +dynamic requestPermission()
+  +dynamic start()
+  +void disposeSubscription()
+  +dynamic stop()
+  +dynamic dispose()
+  +dynamic pause()
+  +dynamic resume()
+  -dynamic _isEncoderSupported()
+}
+
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "record::src::record.dart::AudioRecorder"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "dart::async::StreamSubscription<RecordState>"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "dart::async::StreamSubscription<Amplitude>"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "record_platform_interface::src::types::record_state.dart::RecordState"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "record_platform_interface::src::types::amplitude.dart::Amplitude"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "null::void Function(Map<String, dynamic>)"
+"aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder" o-- "null::void Function(List<int>)"
+"aphasia_recovery::mixin::audio_record::platform::audio_recorder_web.dart::AudioRecorderMixin" <|-- "aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder"
+
+class "aphasia_recovery::widgets::my_app.dart::MyApp" {
+  +State<MyApp> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::my_app.dart::MyApp"
+
+class "aphasia_recovery::widgets::my_app.dart::_MyAppState" {
+  +ExamQuestionSet testExam
+  +ExamState testState
+  +ExamResult testResult
+  +dynamic loginFuture
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::my_app.dart::_MyAppState" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::my_app.dart::_MyAppState" o-- "aphasia_recovery::states::question_set_states.dart::ExamState"
+"aphasia_recovery::widgets::my_app.dart::_MyAppState" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::my_app.dart::_MyAppState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::my_app.dart::_MyAppState"
+
+class "aphasia_recovery::widgets::ui::answer_result.dart::AnswerResultPage" {
+  +CommonStyles? commonStyles
+  +ExamResult examResult
+  +State<AnswerResultPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::answer_result.dart::AnswerResultPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::answer_result.dart::AnswerResultPage" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::answer_result.dart::AnswerResultPage"
+
+class "aphasia_recovery::widgets::ui::answer_result.dart::_AnswerResultPageState" {
+  +double viewingIconWidth
+  +double expandIconWidth
+  +double listTilePaddingBase
+  -double _menuWidth
+  +dynamic viewingItem
+  +int? categoryIndex
+  +int? subCategoryIndex
+  +int? questionIndex
+  +double getTileWidth()
+  +void initState()
+  +Widget build()
+  -Widget _buildSummaryTile()
+  -Widget _buildQuestionTile()
+  -Widget _buildResultArea()
+  -Widget _buildExamResultArea()
+  -Widget _buildCateResArea()
+  -Widget _buildSubCateResArea()
+  -Widget _buildQuestionResArea()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::answer_result.dart::_AnswerResultPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::answer_result.dart::_AnswerResultPageState"
+
+class "aphasia_recovery::widgets::ui::common::audio_recorder.dart::Recorder" {
+  +void Function(String)? onStop
+  +void Function(List<int>)? onStreamModeStop
+  +AudioEncoder encoder
+  +bool streamMode
+  +State<Recorder> createState()
+}
+
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::Recorder" o-- "null::void Function(String)"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::Recorder" o-- "null::void Function(List<int>)"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::Recorder" o-- "record_platform_interface::src::types::audio_encoder.dart::AudioEncoder"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::common::audio_recorder.dart::Recorder"
+
+class "aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" {
+  -int _recordDuration
+  -Timer? _timer
+  -AudioRecorder _audioRecorder
+  -StreamSubscription<RecordState>? _recordSub
+  -RecordState _recordState
+  -StreamSubscription<Amplitude>? _amplitudeSub
+  -Amplitude? _amplitude
+  +void initState()
+  -dynamic _start()
+  -dynamic _stop()
+  -dynamic _pause()
+  -dynamic _resume()
+  -void _updateRecordState()
+  -dynamic _isEncoderSupported()
+  +Widget build()
+  +void dispose()
+  -Widget _buildRecordStopControl()
+  -Widget _buildPauseResumeControl()
+  -Widget _buildText()
+  -Widget _buildTimer()
+  -String _formatNumber()
+  -void _startTimer()
+}
+
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "dart::async::Timer"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "record::src::record.dart::AudioRecorder"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "dart::async::StreamSubscription<RecordState>"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "record_platform_interface::src::types::record_state.dart::RecordState"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "dart::async::StreamSubscription<Amplitude>"
+"aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState" o-- "record_platform_interface::src::types::amplitude.dart::Amplitude"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState"
+"aphasia_recovery::mixin::audio_record::platform::audio_recorder_web.dart::AudioRecorderMixin" <|-- "aphasia_recovery::widgets::ui::common::audio_recorder.dart::_RecorderState"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::CircleIconSwitchTextButton" {
+  +int state
+  +List<Map<String, dynamic>> btnSetting
+  {static} +Map<String, dynamic> btnSettingWith()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::widgets::ui::common::common.dart::CircleIconSwitchTextButton"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField" {
+  +bool editing
+  +TextEditingController controller
+  +void Function() onQuitEditing
+  +void Function() onEnterEditing
+  +String Function(String?) validator
+  +void Function(String) onChanged
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField" o-- "null::void Function()"
+"aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField" o-- "null::String Function(String)"
+"aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField" o-- "null::void Function(String)"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::common::common.dart::TextOrTextField"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::InnerShadowBox" {
+  +Widget child
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::common::common.dart::InnerShadowBox" o-- "flutter::src::widgets::framework.dart::Widget"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::widgets::ui::common::common.dart::InnerShadowBox"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::SelectImagesDialog" {
+  +String? imageAssetPath
+  +String? imageUrl
+  +CommonStyles? commonStyles
+  +State<SelectImagesDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::common::common.dart::SelectImagesDialog" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::common::common.dart::SelectImagesDialog"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::_SelectImagesDialogState" {
+  +CommonStyles? commonStyles
+  +String? imageUrl
+  +String? imageAssetPath
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::common::common.dart::_SelectImagesDialogState" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::common::common.dart::_SelectImagesDialogState"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::SelectExistingImageDialog" {
+  +bool isBuiltIn
+  +State<SelectExistingImageDialog> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::common::common.dart::SelectExistingImageDialog"
+
+class "aphasia_recovery::widgets::ui::common::common.dart::_SelectExistingImageDialogState" {
+  +dynamic futureImages
+  +Map<String, dynamic>? selectedImage
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::common::common.dart::_SelectExistingImageDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::common::common.dart::_SelectExistingImageDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::DoctorAllExamsListPage" {
+  +bool isRecovery
+  +CommonStyles? commonStyles
+  +State<DoctorAllExamsListPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::DoctorAllExamsListPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::DoctorAllExamsListPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::_DoctorAllExamsListPageState" {
+  +bool? isRecovery
+  +dynamic futureExams
+  +int? selectedExamIndex
+  +void initState()
+  +void didChangeDependencies()
+  +Widget build()
+  +dynamic refreshExam()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::_DoctorAllExamsListPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::_DoctorAllExamsListPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::ExamDetailCard" {
+  +ExamQuestionSet exam
+  +int index
+  -_DoctorAllExamsListPageState _parentState
+  +CommonStyles? commonStyles
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::ExamDetailCard" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::ExamDetailCard" o-- "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::_DoctorAllExamsListPageState"
+"aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::ExamDetailCard" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_all_exams.dart::ExamDetailCard"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPage" {
+  +CommonStyles? commonStyles
+  +State<DoctorExamsManagementPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPageState" {
+  +int selectedIndex
+  +void initState()
+  +void didChangeDependencies()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exams_management.dart::DoctorExamsManagementPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::DoctorExamEditInstructionPage" {
+  +bool recoveryMode
+  +State<DoctorExamEditInstructionPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::DoctorExamEditInstructionPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditInstructionPageState" {
+  -GlobalKey<FormState> _formKey
+  +TextEditingController nameFieldCtrl
+  +TextEditingController descFieldCtrl
+  +TextEditingController templateExamIdField
+  +int currentStep
+  +bool isRecovery
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditInstructionPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditInstructionPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditInstructionPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditInstructionPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::DoctorExamEditPage" {
+  +State<DoctorExamEditPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::DoctorExamEditPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState" {
+  -double _menuWidth
+  +double listTileCommonHeight
+  +double listTilePaddingBase
+  +double tileLeadingWidth
+  +double tileContentWidth
+  +dynamic editItem
+  +int? editCategoryIndex
+  +int? editSubCategoryIndex
+  +int? editQuestionIndex
+  +bool editingItem
+  +bool questionTileExpanded
+  +void initState()
+  +Widget build()
+  -Widget _buildSettingTile()
+  -Widget _buildQuestionTile()
+  -Widget _buildItemName()
+  -TextButton _buildNewItemButton()
+  -Widget _buildActionArea()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::ExamSettingEditSubPage" {
+  +ExamQuestionSet exam
+  -_DoctorExamEditPageState _parentState
+  +State<ExamSettingEditSubPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::ExamSettingEditSubPage" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::ExamSettingEditSubPage" o-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::ExamSettingEditSubPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState" {
+  +ExamQuestionSet exam
+  +TextEditingController examNameCtrl
+  +TextEditingController examDescCtrl
+  +String? Function(String?) examNameValidator
+  +String? Function(String?) examDescValidator
+  +GlobalKey<FormState> examNameFormKey
+  +GlobalKey<FormState> examDescFormKey
+  +bool editingName
+  +bool editingDesc
+  +double listTileCommonHeight
+  +void initState()
+  +void resetState()
+  -void _trySetNotEditing()
+  +void enterNameEdit()
+  +void quitNameEdit()
+  +void enterDescEdit()
+  +void quitDescEdit()
+  -void _showDiagnosisRuleSettingDialog()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState" o-- "null::String Function(String)"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_ExamSettingEditSubPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionCategoryEditSubPage" {
+  +QuestionCategory category
+  +int categoryIndex
+  -_DoctorExamEditPageState _parentState
+  +State<QuestionCategoryEditSubPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionCategoryEditSubPage" o-- "aphasia_recovery::models::exam::category.dart::QuestionCategory"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionCategoryEditSubPage" o-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionCategoryEditSubPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionCategoryEditSubPageState" {
+  +double listTileCommonHeight
+  +TextEditingController descController
+  +QuestionCategory currCategory
+  +bool editingDesc
+  -void _resetState()
+  +void initState()
+  -void _enableDescInput()
+  -void _disableDescInput()
+  -void _showCategoryRuleEditDialog()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionCategoryEditSubPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionCategoryEditSubPageState" o-- "aphasia_recovery::models::exam::category.dart::QuestionCategory"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionCategoryEditSubPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionCategoryEditSubPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionSubCategoryEditSubPage" {
+  +QuestionSubCategory subCategory
+  +int categoryIndex
+  +int subCategoryIndex
+  -_DoctorExamEditPageState _parentState
+  +State<QuestionSubCategoryEditSubPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionSubCategoryEditSubPage" o-- "aphasia_recovery::models::exam::sub_category.dart::QuestionSubCategory"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionSubCategoryEditSubPage" o-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_DoctorExamEditPageState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::QuestionSubCategoryEditSubPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionSubCategoryEditSubPageState" {
+  +double listTileCommonHeight
+  +TextEditingController descController
+  +QuestionSubCategory currSubCategory
+  +bool editingDesc
+  -void _resetState()
+  -void _enableDescInput()
+  -void _disableDescInput()
+  +void initState()
+  -void _showSubCategoryRuleEditDialog()
+  -void _showSubCategoryTerminateRuleEditDialog()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionSubCategoryEditSubPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionSubCategoryEditSubPageState" o-- "aphasia_recovery::models::exam::sub_category.dart::QuestionSubCategory"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionSubCategoryEditSubPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit.dart::_QuestionSubCategoryEditSubPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::ExamDiagnosisRuleEditDialog" {
+  +ExamState examState
+  +int? ruleIndex
+  +State<ExamDiagnosisRuleEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::ExamDiagnosisRuleEditDialog" o-- "aphasia_recovery::states::question_set_states.dart::ExamState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::ExamDiagnosisRuleEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState" {
+  +DiagnoseByScoreRange? oldRule
+  +DiagnoseByScoreRange rule
+  +List<bool> categoriesSelected
+  -GlobalKey<FormState> _formKey
+  +bool editingAphasiaType
+  +TextEditingController aphasiaTypeCtrl
+  +List<List<TextEditingController>> scoreRangeControllers
+  +void resetState()
+  +void quitEditAphasiaType()
+  +void enterEditAphasiaType()
+  +void selectCategory()
+  +void deselectCategory()
+  +void initState()
+  +String? aphasiaTypeValidator()
+  +String? scoreRangeValidator()
+  +String? Function(String?) minScoreValidator()
+  +String? Function(String?) maxScoreValidator()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState" o-- "aphasia_recovery::models::rules.dart::DiagnoseByScoreRange"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_ExamDiagnosisRuleEditDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryEvalRuleEditDialog" {
+  +int categoryIndex
+  +int subCategoryIndex
+  +int? ruleIndex
+  +ExamState examState
+  +State<SubCategoryEvalRuleEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryEvalRuleEditDialog" o-- "aphasia_recovery::states::question_set_states.dart::ExamState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryEvalRuleEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryEvalRuleEditDialogState" {
+  +Type? selectedRuleType
+  +ExamSubCategoryEvalRule rule
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryEvalRuleEditDialogState" o-- "aphasia_recovery::models::rules.dart::ExamSubCategoryEvalRule"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryEvalRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryEvalRuleEditDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryTerminateRuleEditDialog" {
+  +int categoryIndex
+  +int subCategoryIndex
+  +int? ruleIndex
+  +ExamState examState
+  +State<SubCategoryTerminateRuleEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryTerminateRuleEditDialog" o-- "aphasia_recovery::states::question_set_states.dart::ExamState"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::SubCategoryTerminateRuleEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState" {
+  +Type? selectedRuleType
+  +TerminateRule rule
+  -GlobalKey<FormState> _formKey
+  +TextEditingController continuousWrongRuleThresholdCtrl
+  +TextEditingController equivScoreCtrl
+  +TextEditingController terminateReasonCtrl
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState" o-- "aphasia_recovery::models::rules.dart::TerminateRule"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_edit_dialogs.dart::_SubCategoryTerminateRuleEditDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::DoctorExamQuestionEditPage" {
+  +Question? question
+  +State<DoctorExamQuestionEditPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::DoctorExamQuestionEditPage" o-- "aphasia_recovery::models::question::question.dart::Question"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::DoctorExamQuestionEditPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" {
+  {static} +double widgetsElevation
+  {static} +double listTileCommonHeight
+  {static} +Map<Type, String> questionIntroduction
+  +bool requesting
+  +List<Step> steps
+  +int currStep
+  -GlobalKey<FormState> _formKey
+  +AudioQuestion? audioQuestionBackup
+  +ChoiceQuestion? choiceQuestionBackup
+  +CommandQuestion? commandQuestionBackup
+  +WritingQuestion? writingQuestionBackup
+  +ItemFindingQuestion? itemFindingQuestionBackup
+  +Question currQuestion
+  -GlobalKey<FormFieldState<dynamic>> _aliasKey
+  -GlobalKey<FormFieldState<dynamic>> _questionTextKey
+  -GlobalKey<FormFieldState<dynamic>> _omitTimeKey
+  +TextEditingController aliasCtrl
+  +TextEditingController questionTextCtrl
+  +TextEditingController omitTimeCtrl
+  +Map<String, Map<String, dynamic>> ruleFieldsSetting
+  +List<DropdownMenuEntry<Type>> ruleDropdownMenuEntries
+  +bool validateBasicInfoFields()
+  +bool applyBasicInfoFieldsToModel()
+  +void resetBasicInfoFields()
+  +String? keywordValidator()
+  +String? fullScoreValidator()
+  +String? defaultScoreValidator()
+  +String? timeLimitValidator()
+  +String? omitTimeValidator()
+  +String? aliasValidator()
+  +String? questionTextValidator()
+  +void resetQuestionStates()
+  -void _buildEvalRuleDropdownMenuEntries()
+  +bool validateAndApplyChangesBeforeStepChange()
+  +void resetEvalRuleSettingState()
+  +bool validateEvalRuleSetting()
+  +bool setEvalRuleSetting()
+  -void _initEvalRuleSetting()
+  +void initState()
+  +Widget build()
+  +List<Step> createSteps()
+  -Step _buildFirstStep()
+  -Step _buildSecondStep()
+  +double getTextFieldWidth()
+  -Widget _buildAliasField()
+  -Widget _buildQuestionTextField()
+  -Widget _buildAudioSetting()
+  -Widget _buildImageSetting()
+  -Step _buildThirdStep()
+  -Step _buildFourthStep()
+  -Step _buildFifthStep()
+  +Widget wrappedByCardInner()
+  -Widget _actionBtnBuilder()
+  +void resetCurrentStepStates()
+  -Widget? _stepIconBuilder()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::AudioQuestion"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::ChoiceQuestion"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::CommandQuestion"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::WritingQuestion"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::ItemFindingQuestion"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::TextFieldCommonValidators" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit.dart::_DoctorExamQuestionEditPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::AudioSettingDialog" {
+  +String? uploadedAudioUrl
+  +State<AudioSettingDialog> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::AudioSettingDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_AudioSettingDialogState" {
+  +WrappedFile? file
+  +String? uploadedAudioUrl
+  +void resetFileState()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -dynamic _buildAudioActions()
+  -Widget _buildAudioInfo()
+  -Widget _buildPlayer()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_AudioSettingDialogState" o-- "aphasia_recovery::utils::io::file.dart::WrappedFile"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_AudioSettingDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_AudioSettingDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_AudioSettingDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::GenerateAudioFromTextDialog" {
+  +State<GenerateAudioFromTextDialog> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::GenerateAudioFromTextDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_GenerateAudioFromTextDialogState" {
+  +TextEditingController textCtrl
+  +bool generating
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_GenerateAudioFromTextDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_GenerateAudioFromTextDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_GenerateAudioFromTextDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::HintRuleEditDialog" {
+  +Question question
+  +HintRule? hintRule
+  +State<HintRuleEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::HintRuleEditDialog" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::HintRuleEditDialog" o-- "aphasia_recovery::models::rules.dart::HintRule"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::HintRuleEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState" {
+  +Question currQuestion
+  +HintRule hintRule
+  +String? audioUrl
+  +String? imageUrl
+  +String? imageAssetPath
+  +String? hintTextValidator()
+  +String? adjustValueValidator()
+  +String? scoreLowBoundValidator()
+  +String? scoreHighBoundValidator()
+  +void initFieldSettings()
+  +bool applyFieldsChangesToModel()
+  +void resetAllFields()
+  +bool validateAllFields()
+  +void resetState()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState" o-- "aphasia_recovery::models::rules.dart::HintRule"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::AudioPlayerSetting" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::TextFieldCommonValidators" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::StateWithTextFields" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_edit_dialogs.dart::_HintRuleEditDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::DoctorExamQuestionRuleEditSubPage" {
+  +Question currQuestion
+  +Map<String, Map<String, dynamic>> ruleSetting
+  +State<DoctorExamQuestionRuleEditSubPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::DoctorExamQuestionRuleEditSubPage" o-- "aphasia_recovery::models::question::question.dart::Question"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::DoctorExamQuestionRuleEditSubPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState" {
+  {static} +double listTileCommonHeight
+  +Question currQuestion
+  +Map<String, Map<String, dynamic>> ruleFieldsSetting
+  +TextEditingController keywordAdderCtrl
+  +GlobalKey<FormFieldState<dynamic>> keywordAdderKey
+  +void resetState()
+  +void initState()
+  +Widget build()
+  -Widget _buildEvalRuleSetting()
+  -void _buildChoiceQuestionRuleSetting()
+  -void _buildCommandQuestionRuleSetting()
+  -Widget _buildItemSlots()
+  -Widget _buildKeywordItem()
+  -void _buildItemFoundQuestionRuleSetting()
+  -void _buildScoreConditionSetting()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>>"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_DoctorExamQuestionRuleEditSubPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::CommandQuestionActionRecordPage" {
+  +EvalCommandQuestionByCorrectActionCount currRule
+  +State<CommandQuestionActionRecordPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::CommandQuestionActionRecordPage" o-- "aphasia_recovery::models::rules.dart::EvalCommandQuestionByCorrectActionCount"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::CommandQuestionActionRecordPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_CommandQuestionActionRecordPageState" {
+  +EvalCommandQuestionByCorrectActionCount currRule
+  +List<ItemSlot> currSlots
+  +List<StackableItemSlot> slots
+  +List<CommandActions> actions
+  +String commandText
+  +CommandActions? currAction
+  +void resetStates()
+  +void initState()
+  +Widget build()
+  -Widget _buildItemSlots()
+  -Widget _buildSlotImages()
+  -Widget _buildSlotImagesWhenDragging()
+  -Widget _buildDragFeedback()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_CommandQuestionActionRecordPageState" o-- "aphasia_recovery::models::rules.dart::EvalCommandQuestionByCorrectActionCount"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_CommandQuestionActionRecordPageState" o-- "aphasia_recovery::models::rules.dart::CommandActions"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_CommandQuestionActionRecordPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_CommandQuestionActionRecordPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::ItemFindingQuestionAreaSettingPage" {
+  +ItemFindingQuestion question
+  +State<ItemFindingQuestionAreaSettingPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::ItemFindingQuestionAreaSettingPage" o-- "aphasia_recovery::models::question::question.dart::ItemFindingQuestion"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::ItemFindingQuestionAreaSettingPage"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_ItemFindingQuestionAreaSettingPageState" {
+  {static} +int maxPointCount
+  +ItemFindingQuestion currQuestion
+  +int pointCount
+  +List<List<double>> coordinates
+  +bool convexHullFinished
+  +void resetState()
+  +void clearState()
+  +void addCoordinate()
+  +void initState()
+  +dynamic getImageFromProvider()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_ItemFindingQuestionAreaSettingPageState" o-- "aphasia_recovery::models::question::question.dart::ItemFindingQuestion"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_ItemFindingQuestionAreaSettingPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit.dart::_ItemFindingQuestionAreaSettingPageState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ChoiceSettingDialog" {
+  +Choice? choice
+  +State<ChoiceSettingDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ChoiceSettingDialog" o-- "aphasia_recovery::models::rules.dart::Choice"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ChoiceSettingDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState" {
+  +Choice? currChoice
+  -GlobalKey<FormState> _formKey
+  -GlobalKey<FormFieldState<dynamic>> _choiceNameKey
+  +TextEditingController choiceNameCtrl
+  +String? imageUrl
+  +String? imageAssetPath
+  +String? choiceNameValidator()
+  +void resetState()
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState" o-- "aphasia_recovery::models::rules.dart::Choice"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ChoiceSettingDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ItemSlotEditDialog" {
+  +ItemSlot slot
+  +int slotIndex
+  +EvalCommandQuestionByCorrectActionCount rule
+  +State<ItemSlotEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ItemSlotEditDialog" o-- "aphasia_recovery::models::rules.dart::ItemSlot"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ItemSlotEditDialog" o-- "aphasia_recovery::models::rules.dart::EvalCommandQuestionByCorrectActionCount"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::ItemSlotEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState" {
+  +ItemSlot? currSlot
+  -GlobalKey<FormFieldState<dynamic>> _itemNameFieldKey
+  +TextEditingController itemNameCtrl
+  +String? imageUrl
+  +String? imageAssetPath
+  +void resetState()
+  +String? itemNameValidator()
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState" o-- "aphasia_recovery::models::rules.dart::ItemSlot"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>>"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_ItemSlotEditDialogState"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::QuestionScoreConditionEditDialog" {
+  +EvalCondition? condition
+  +QuestionEvalRule evalRule
+  +String scoreConditionName
+  +State<QuestionScoreConditionEditDialog> createState()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::QuestionScoreConditionEditDialog" o-- "aphasia_recovery::models::rules.dart::EvalCondition"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::QuestionScoreConditionEditDialog" o-- "aphasia_recovery::models::rules.dart::QuestionEvalRule"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::QuestionScoreConditionEditDialog"
+
+class "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_QuestionScoreConditionEditDialogState" {
+  +EvalCondition condition
+  +QuestionEvalRule currEvalRule
+  +Map<String, Map<String, dynamic>> fieldsSetting
+  +bool useTimeBound
+  +bool isHinted
+  +String? basicValidator()
+  +String? scoreValidator()
+  +String? mainLowBoundValidator()
+  +String? mainHighBoundValidator()
+  +String? timeLowBoundValidator()
+  +String? timeHighBoundValidator()
+  +bool applyFieldsDataToModel()
+  +void resetAllFields()
+  +bool validateAllFields()
+  -void _initFieldsSetting()
+  +void resetState()
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_QuestionScoreConditionEditDialogState" o-- "aphasia_recovery::models::rules.dart::EvalCondition"
+"aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_QuestionScoreConditionEditDialogState" o-- "aphasia_recovery::models::rules.dart::QuestionEvalRule"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_QuestionScoreConditionEditDialogState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::doctor::doctor_exam_question_rule_edit_dialog.dart::_QuestionScoreConditionEditDialogState"
+
+class "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::AudioQuestionAnswerArea" {
+  +Question question
+  +CommonStyles? commonStyles
+  +void Function(QuestionResult) goToNextQuestion
+  +State<AudioQuestionAnswerArea> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::AudioQuestionAnswerArea" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::AudioQuestionAnswerArea" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::AudioQuestionAnswerArea" o-- "null::void Function(QuestionResult)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::AudioQuestionAnswerArea"
+
+class "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" {
+  +WrappedAudioRecorder recorder
+  +double oldAmplitude
+  +WrappedAudioPlayer player
+  +CountDown? timeLimitCountDown
+  +AudioQuestion currQuestion
+  +AudioQuestionResult result
+  +HintRule? hintingRule
+  +bool evaluating
+  +String? displayImageUrl
+  +String? displayText
+  +bool hinting
+  +void resetState()
+  -void _trySetAnswerTime()
+  +void initQuestionStem()
+  -void _startTimeLimitCounter()
+  +void finishAnswer()
+  +void doFinishAnswer()
+  -void _evalQuestion()
+  -void _triggerHint()
+  -dynamic _setHintStates()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::utils::thirdparty::audio_recorder.dart::WrappedAudioRecorder"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::utils::thirdparty::audio_player.dart::WrappedAudioPlayer"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::utils::counter.dart::CountDown"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::models::question::question.dart::AudioQuestion"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::models::result::results.dart::AudioQuestionResult"
+"aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::models::rules.dart::HintRule"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionImage" <|-- "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionText" <|-- "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::do_exam::audio_question.dart::_AudioQuestionAnswerAreaState"
+
+class "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::ChoiceQuestionAnswerArea" {
+  +Question question
+  +CommonStyles? commonStyles
+  +void Function(QuestionResult) goToNextQuestion
+  +State<ChoiceQuestionAnswerArea> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::choice_question.dart::ChoiceQuestionAnswerArea" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::do_exam::choice_question.dart::ChoiceQuestionAnswerArea" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::choice_question.dart::ChoiceQuestionAnswerArea" o-- "null::void Function(QuestionResult)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::ChoiceQuestionAnswerArea"
+
+class "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState" {
+  +ChoiceQuestion currQuestion
+  +ChoiceQuestionResult result
+  +List<int> choiceSelected
+  +void resetState()
+  +void finishAnswer()
+  +void evalQuestion()
+  +void resetAnswerStateAfterHint()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildChoices()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::models::question::question.dart::ChoiceQuestion"
+"aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState" o-- "aphasia_recovery::models::result::results.dart::ChoiceQuestionResult"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" <|-- "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::do_exam::choice_question.dart::_AudioQuestionAnswerAreaState"
+
+class "aphasia_recovery::widgets::ui::do_exam::command_question.dart::StackableItemSlot" {
+  +List<ItemSlot> items
+  -bool _checkSlot()
+  +void pushItem()
+  +ItemSlot? popItem()
+  +ItemSlot? peekItem()
+}
+
+class "aphasia_recovery::widgets::ui::do_exam::command_question.dart::CommandQuestionAnswerArea" {
+  +Question question
+  +CommonStyles? commonStyles
+  +void Function(QuestionResult) goToNextQuestion
+  +State<CommandQuestionAnswerArea> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::CommandQuestionAnswerArea" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::CommandQuestionAnswerArea" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::CommandQuestionAnswerArea" o-- "null::void Function(QuestionResult)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::command_question.dart::CommandQuestionAnswerArea"
+
+class "aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState" {
+  +CommandQuestion currQuestion
+  +CommandQuestionResult result
+  +List<StackableItemSlot> slots
+  +List<CommandActions> actionsDone
+  +CommandActions? currAction
+  +bool answerStart
+  +void resetState()
+  +void finishAnswer()
+  +void evalQuestion()
+  +void resetAnswerStateAfterHint()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildItemSlots()
+  -Widget _buildSlotImages()
+  -Widget _buildSlotImagesWhenDragging()
+  -Widget _buildDragFeedback()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState" o-- "aphasia_recovery::models::question::question.dart::CommandQuestion"
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState" o-- "aphasia_recovery::models::result::results.dart::CommandQuestionResult"
+"aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState" o-- "aphasia_recovery::models::rules.dart::CommandActions"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" <|-- "aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::do_exam::command_question.dart::_CommandQuestionAnswerAreaState"
+
+class "aphasia_recovery::widgets::ui::do_exam::do_exam.dart::DoExamPage" {
+  +ExamQuestionSet exam
+  +CommonStyles? commonStyles
+  +ExamResult result
+  +State<DoExamPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::do_exam.dart::DoExamPage" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::do_exam::do_exam.dart::DoExamPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::do_exam.dart::DoExamPage" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::do_exam.dart::DoExamPage"
+
+class "aphasia_recovery::widgets::ui::do_exam::do_exam.dart::_DoExamPageState" {
+  +ExamQuestionSet exam
+  +int categoryIndex
+  +int subCategoryIndex
+  +int questionIndex
+  +ExamResult examResult
+  +void goToNextQuestion()
+  -void _evalExam()
+  -void _evalCategory()
+  -void _evalSubCategory()
+  +void initExamResult()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildAnswerArea()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::do_exam.dart::_DoExamPageState" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::do_exam::do_exam.dart::_DoExamPageState" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::do_exam.dart::_DoExamPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::do_exam::do_exam.dart::_DoExamPageState"
+
+class "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::ItemFindingQuestionAnswerArea" {
+  +Question question
+  +CommonStyles? commonStyles
+  +void Function(QuestionResult) goToNextQuestion
+  +State<ItemFindingQuestionAnswerArea> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::ItemFindingQuestionAnswerArea" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::ItemFindingQuestionAnswerArea" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::ItemFindingQuestionAnswerArea" o-- "null::void Function(QuestionResult)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::ItemFindingQuestionAnswerArea"
+
+class "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState" {
+  +ItemFindingQuestion currQuestion
+  +ItemFindingQuestionResult result
+  +bool answerStart
+  +List<double>? clickPosition
+  +void resetState()
+  +void initQuestionStem()
+  +void finishAnswer()
+  +void evalQuestion()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildItemFindingArea()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState" o-- "aphasia_recovery::models::question::question.dart::ItemFindingQuestion"
+"aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState" o-- "aphasia_recovery::models::result::results.dart::ItemFindingQuestionResult"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" <|-- "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::do_exam::Item_finding_question.dart::_ItemFindingQuestionAnswerAreaState"
+
+class "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::WritingQuestionAnswerArea" {
+  +Question question
+  +CommonStyles? commonStyles
+  +void Function(QuestionResult) goToNextQuestion
+  +State<WritingQuestionAnswerArea> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::WritingQuestionAnswerArea" o-- "aphasia_recovery::models::question::question.dart::Question"
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::WritingQuestionAnswerArea" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::WritingQuestionAnswerArea" o-- "null::void Function(QuestionResult)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::WritingQuestionAnswerArea"
+
+class "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState" {
+  +WritingQuestion currQuestion
+  +WritingQuestionResult result
+  +bool answerStart
+  -DrawingController _drawingController
+  -ScreenshotController _screenshotController
+  +void resetState()
+  +void finishAnswer()
+  +void evalQuestion()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildWritingArea()
+}
+
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState" o-- "aphasia_recovery::models::question::question.dart::WritingQuestion"
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState" o-- "aphasia_recovery::models::result::results.dart::WritingQuestionResult"
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState" o-- "flutter_drawing_board::src::drawing_controller.dart::DrawingController"
+"aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState" o-- "screenshot::screenshot.dart::ScreenshotController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::QuestionAnswerArea" <|-- "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::do_exam::writing_question.dart::_WritingQuestionAnswerAreaState"
+
+class "aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::DoRecoveryPage" {
+  +ExamQuestionSet exam
+  +CommonStyles? commonStyles
+  +ExamResult result
+  +State<DoRecoveryPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::DoRecoveryPage" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::DoRecoveryPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::DoRecoveryPage" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::DoRecoveryPage"
+
+class "aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::_DoRecoveryPageState" {
+  +ExamQuestionSet exam
+  +int categoryIndex
+  +int subCategoryIndex
+  +int questionIndex
+  +ExamResult recoveryResult
+  +bool showingResult
+  +void goToNextQuestion()
+  +void showResultAndGotoNext()
+  -void _evalExam()
+  -void _evalCategory()
+  -void _evalSubCategory()
+  +void initExamResult()
+  +void initState()
+  +void setState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildAnswerArea()
+}
+
+"aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::_DoRecoveryPageState" o-- "aphasia_recovery::models::exam::exam_recovery.dart::ExamQuestionSet"
+"aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::_DoRecoveryPageState" o-- "aphasia_recovery::models::result::results.dart::ExamResult"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::_DoRecoveryPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::do_recovery::do_recovery.dart::_DoRecoveryPageState"
+
+class "aphasia_recovery::widgets::ui::login.dart::LoginPage" {
+  +bool isEntry
+  +CommonStyles? commonStyles
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::login.dart::LoginPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "aphasia_recovery::widgets::ui::login.dart::LoginPage"
+
+class "aphasia_recovery::widgets::ui::login.dart::LoginForm" {
+  +bool isEntry
+  +CommonStyles? commonStyles
+  +State<StatefulWidget> createState()
+}
+
+"aphasia_recovery::widgets::ui::login.dart::LoginForm" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::login.dart::LoginForm"
+
+class "aphasia_recovery::widgets::ui::login.dart::_LoginFormState" {
+  -GlobalKey<FormState> _formKey
+  +TextEditingController usernameController
+  +TextEditingController validateCodeController
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::login.dart::_LoginFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"aphasia_recovery::widgets::ui::login.dart::_LoginFormState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::login.dart::_LoginFormState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::login.dart::_LoginFormState"
+
+class "aphasia_recovery::widgets::ui::patient::exam_record_history.dart::ExamRecordHistoryPage" {
+  +bool recoveryMode
+  +CommonStyles? commonStyles
+  +State<ExamRecordHistoryPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::patient::exam_record_history.dart::ExamRecordHistoryPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::patient::exam_record_history.dart::ExamRecordHistoryPage"
+
+class "aphasia_recovery::widgets::ui::patient::exam_record_history.dart::_ExamRecordHistoryPageState" {
+  +DateFormat format
+  +bool recoveryMode
+  +bool initialized
+  +dynamic futureExams
+  +void initState()
+  +Widget build()
+  +dynamic refreshResults()
+}
+
+"aphasia_recovery::widgets::ui::patient::exam_record_history.dart::_ExamRecordHistoryPageState" o-- "intl::src::intl::date_format.dart::DateFormat"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::patient::exam_record_history.dart::_ExamRecordHistoryPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::patient::exam_record_history.dart::_ExamRecordHistoryPageState"
+
+class "aphasia_recovery::widgets::ui::patient::history.dart::HistoryPage" {
+  +CommonStyles? commonStyles
+  +State<HistoryPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::patient::history.dart::HistoryPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::patient::history.dart::HistoryPage"
+
+class "aphasia_recovery::widgets::ui::patient::history.dart::_HistoryPageState" {
+  +int selectedIndex
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::patient::history.dart::_HistoryPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::patient::history.dart::_HistoryPageState"
+
+class "aphasia_recovery::widgets::ui::patient::home.dart::HomePage" {
+  +CommonStyles? commonStyles
+  +State<StatefulWidget> createState()
+}
+
+"aphasia_recovery::widgets::ui::patient::home.dart::HomePage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::patient::home.dart::HomePage"
+
+class "aphasia_recovery::widgets::ui::patient::home.dart::_HomePageState" {
+  +int selectedNavIndex
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::patient::home.dart::_HomePageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::UseCommonStyles" <|-- "aphasia_recovery::widgets::ui::patient::home.dart::_HomePageState"
+
+class "aphasia_recovery::widgets::ui::patient::search.dart::SearchPage" {
+  +CommonStyles? commonStyles
+  +State<SearchPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::patient::search.dart::SearchPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::patient::search.dart::SearchPage"
+
+class "aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState" {
+  +TextEditingController searchCtrl
+  +CommonStyles? commonStyles
+  +QuestionSetType? type
+  +void resetState()
+  +void initState()
+  +Widget build()
+}
+
+"aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState" o-- "aphasia_recovery::enum::radio.dart::QuestionSetType"
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::ResettableState" <|-- "aphasia_recovery::widgets::ui::patient::search.dart::_SearchPageState"
+
+class "aphasia_recovery::widgets::ui::register.dart::RegisterPage" {
+  +CommonStyles? commonStyles
+  +State<RegisterPage> createState()
+}
+
+"aphasia_recovery::widgets::ui::register.dart::RegisterPage" o-- "aphasia_recovery::mixin::widgets_mixin.dart::CommonStyles"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "aphasia_recovery::widgets::ui::register.dart::RegisterPage"
+
+class "aphasia_recovery::widgets::ui::register.dart::_RegisterPageState" {
+  +Map<String, String> registerInfo
+  +bool isDoctor
+  +void initFieldSettings()
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "aphasia_recovery::widgets::ui::register.dart::_RegisterPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::StateWithTextFields" <|-- "aphasia_recovery::widgets::ui::register.dart::_RegisterPageState"
+"aphasia_recovery::mixin::widgets_mixin.dart::TextFieldCommonValidators" <|-- "aphasia_recovery::widgets::ui::register.dart::_RegisterPageState"
+
+
+@enduml

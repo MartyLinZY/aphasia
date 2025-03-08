@@ -1,0 +1,107 @@
+classDiagram
+    class Widget
+
+    Widget <|-- StatefulWidget
+
+    class ExamSettingEditSubPage
+    ExamSettingEditSubPage : +exam ExamQuestionSet
+    ExamSettingEditSubPage : -_parentState _DoctorExamEditPageState
+    ExamSettingEditSubPage o-- _DoctorExamEditPageState
+    ExamSettingEditSubPage : +createState() State<ExamSettingEditSubPage>
+    StatefulWidget <|-- ExamSettingEditSubPage
+    _ExamSettingEditSubPageState o-- ExamSettingEditSubPage
+
+    class QuestionCategoryEditSubPage
+    QuestionCategoryEditSubPage : +category QuestionCategory
+    QuestionCategoryEditSubPage : +categoryIndex int
+    QuestionCategoryEditSubPage : -_parentState _DoctorExamEditPageState
+    QuestionCategoryEditSubPage o-- _DoctorExamEditPageState
+    QuestionCategoryEditSubPage : +createState() State<QuestionCategoryEditSubPage>
+    StatefulWidget <|-- QuestionCategoryEditSubPage
+    _QuestionCategoryEditSubPageState o-- QuestionCategoryEditSubPage
+
+    class QuestionSubCategoryEditSubPage
+    QuestionSubCategoryEditSubPage : +subCategory QuestionSubCategory
+    QuestionSubCategoryEditSubPage : +categoryIndex int
+    QuestionSubCategoryEditSubPage : +subCategoryIndex int
+    QuestionSubCategoryEditSubPage : -_parentState _DoctorExamEditPageState
+    QuestionSubCategoryEditSubPage o-- _DoctorExamEditPageState
+    QuestionSubCategoryEditSubPage : +createState() State<QuestionSubCategoryEditSubPage>
+    StatefulWidget <|-- QuestionSubCategoryEditSubPage
+    _QuestionSubCategoryEditSubPageState o-- QuestionSubCategoryEditSubPage
+
+    class DoctorExamEditPage
+    DoctorExamEditPage : +createState() State<DoctorExamEditPage>
+    StatefulWidget <|-- DoctorExamEditPage
+
+    class _ExamSettingEditSubPageState
+    _ExamSettingEditSubPageState : +exam ExamQuestionSet
+    _ExamSettingEditSubPageState o-- ExamQuestionSet
+    _ExamSettingEditSubPageState : +examNameCtrl TextEditingController
+    _ExamSettingEditSubPageState : +examDescCtrl TextEditingController
+    _ExamSettingEditSubPageState : +examNameValidator String? Function(String?)
+    _ExamSettingEditSubPageState : +examDescValidator String? Function(String?)
+    _ExamSettingEditSubPageState : +examNameFormKey GlobalKey~FormState~
+    _ExamSettingEditSubPageState : +examDescFormKey GlobalKey~FormState~
+    _ExamSettingEditSubPageState : +editingName bool
+    _ExamSettingEditSubPageState : +editingDesc bool
+    _ExamSettingEditSubPageState : +listTileCommonHeight double
+    _ExamSettingEditSubPageState : +initState() void
+    _ExamSettingEditSubPageState : +resetState() void
+    _ExamSettingEditSubPageState : -_trySetNotEditing() void
+    _ExamSettingEditSubPageState : +enterNameEdit() void
+    _ExamSettingEditSubPageState : +quitNameEdit() void
+    _ExamSettingEditSubPageState : +enterDescEdit() void
+    _ExamSettingEditSubPageState : +quitDescEdit() void
+    _ExamSettingEditSubPageState : -_showDiagnosisRuleSettingDialog() void
+    _ExamSettingEditSubPageState : +build() Widget
+    State <|-- _ExamSettingEditSubPageState
+
+    class _QuestionCategoryEditSubPageState
+    _QuestionCategoryEditSubPageState : +listTileCommonHeight double
+    _QuestionCategoryEditSubPageState : +descController TextEditingController
+    _QuestionCategoryEditSubPageState : +currCategory QuestionCategory
+    _QuestionCategoryEditSubPageState : +editingDesc bool
+    _QuestionCategoryEditSubPageState : -_resetState() void
+    _QuestionCategoryEditSubPageState : +initState() void
+    _QuestionCategoryEditSubPageState : -_enableDescInput() void
+    _QuestionCategoryEditSubPageState : -_disableDescInput() void
+    _QuestionCategoryEditSubPageState : -_showCategoryRuleEditDialog() void
+    _QuestionCategoryEditSubPageState : +build() Widget
+    State <|-- _QuestionCategoryEditSubPageState
+
+    class _QuestionSubCategoryEditSubPageState
+    _QuestionSubCategoryEditSubPageState : +listTileCommonHeight double
+    _QuestionSubCategoryEditSubPageState : +descController TextEditingController
+    _QuestionSubCategoryEditSubPageState : +currSubCategory QuestionSubCategory
+    _QuestionSubCategoryEditSubPageState : +editingDesc bool
+    _QuestionSubCategoryEditSubPageState : -_resetState() void
+    _QuestionSubCategoryEditSubPageState : -_enableDescInput() void
+    _QuestionSubCategoryEditSubPageState : -_disableDescInput() void
+    _QuestionSubCategoryEditSubPageState : +initState() void
+    _QuestionSubCategoryEditSubPageState : -_showSubCategoryRuleEditDialog() void
+    _QuestionSubCategoryEditSubPageState : -_showSubCategoryTerminateRuleEditDialog() void
+    _QuestionSubCategoryEditSubPageState : +build() Widget
+    State <|-- _QuestionSubCategoryEditSubPageState
+
+    class _DoctorExamEditPageState
+    _DoctorExamEditPageState : -_menuWidth double
+    _DoctorExamEditPageState : +listTileCommonHeight double
+    _DoctorExamEditPageState : +listTilePaddingBase double
+    _DoctorExamEditPageState : +tileLeadingWidth double
+    _DoctorExamEditPageState : +tileContentWidth double
+    _DoctorExamEditPageState : +editItem dynamic
+    _DoctorExamEditPageState : +editCategoryIndex int?
+    _DoctorExamEditPageState : +editSubCategoryIndex int?
+    _DoctorExamEditPageState : +editQuestionIndex int?
+    _DoctorExamEditPageState : +editingItem bool
+    _DoctorExamEditPageState : +questionTileExpanded bool
+    _DoctorExamEditPageState : +initState() void
+    _DoctorExamEditPageState : +build() Widget
+    _DoctorExamEditPageState : -_buildSettingTile() Widget
+    _DoctorExamEditPageState : -_buildQuestionTile() Widget
+    _DoctorExamEditPageState : -_buildItemName() Widget
+    _DoctorExamEditPageState : -_buildNewItemButton() TextButton
+    _DoctorExamEditPageState : -_buildActionArea() Widget
+    State <|-- _DoctorExamEditPageState
+    _DoctorExamEditPageState o-- DoctorExamEditPage

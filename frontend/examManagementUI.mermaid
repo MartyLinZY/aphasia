@@ -1,0 +1,48 @@
+classDiagram
+    class Widget
+    Widget <|-- StatefulWidget
+    Widget <|-- StatelessWidget
+
+    class DoctorExamsManagementPage
+    DoctorExamsManagementPage : +commonStyles CommonStyles?
+    DoctorExamsManagementPage : +createState() DoctorExamsManagementPageState
+    StatefulWidget <|-- DoctorExamsManagementPage
+
+    class DoctorExamsManagementPageState
+    DoctorExamsManagementPageState : +widget DoctorExamsManagementPage
+    DoctorExamsManagementPageState : +selectedIndex int
+    DoctorExamsManagementPageState : +initState() void
+    DoctorExamsManagementPageState : +didChangeDependencies() void
+    DoctorExamsManagementPageState : +build() Widget
+    State <|-- DoctorExamsManagementPageState
+    DoctorExamsManagementPageState o-- DoctorExamsManagementPage
+    DoctorAllExamsListPage <-- DoctorExamsManagementPageState
+
+    class DoctorAllExamsListPage
+    DoctorAllExamsListPage : +isRecovery bool
+    DoctorAllExamsListPage : +commonStyles CommonStyles?
+
+    DoctorAllExamsListPage : +createState() _DoctorAllExamsListPageState
+    StatefulWidget <|-- DoctorAllExamsListPage
+
+    class _DoctorAllExamsListPageState
+    _DoctorAllExamsListPageState : +widget DoctorAllExamsListPage
+    _DoctorAllExamsListPageState : +isRecovery bool?
+    _DoctorAllExamsListPageState : +futureExams Future~List~ExamResult~~
+    _DoctorAllExamsListPageState : +selectedExamIndex int?
+    _DoctorAllExamsListPageState : +initState() void
+    _DoctorAllExamsListPageState : +didChangeDependencies() void
+    _DoctorAllExamsListPageState : +build() Widget
+    _DoctorAllExamsListPageState : +refreshExam() Future~List~ExamResult~~
+    State <|-- _DoctorAllExamsListPageState
+    _DoctorAllExamsListPageState o-- DoctorAllExamsListPage
+
+
+    class ExamDetailCard
+    ExamDetailCard : +exam ExamQuestionSet
+    ExamDetailCard : +index int
+    ExamDetailCard : -_parentState _DoctorAllExamsListPageState
+    ExamDetailCard o-- _DoctorAllExamsListPageState
+    ExamDetailCard : +commonStyles CommonStyles?
+    ExamDetailCard : +build() Widget
+    StatelessWidget <|-- ExamDetailCard
