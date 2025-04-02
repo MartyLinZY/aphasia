@@ -29,6 +29,9 @@ public class Exam{
     // 是否已发布
     boolean isPublished;
 
+    // 是否已删除
+    boolean isDisabled;
+
     // 亚项列表
     List<QuestionCategory> categories;
 

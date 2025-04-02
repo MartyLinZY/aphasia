@@ -4,8 +4,11 @@ package com.blkn.lr.lr_new_server.dao.impl;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
+import com.blkn.lr.lr_new_server.models.question.Question;
+import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
 public class ExamDaoImpl {
@@ -28,7 +32,7 @@ public class ExamDaoImpl {
 
     public Exam findPublishedExamById(String examId) {
         Exam exam = template.findById(examId, Exam.class);
-        if (exam != null && exam.isPublished()) {
+        if (exam != null && exam.isPublished() && !exam.isDisabled()) {
             return exam;
         } else {
             return null;
@@ -36,7 +40,7 @@ public class ExamDaoImpl {
     }
 
     public List<Exam> getExamsByDoctorId(String targetUID, boolean isRecovery) {
-        return template.find(new BasicQuery("{ownerId: \"" + targetUID + "\", isRecovery: " + isRecovery + "}"), Exam.class);
+        return template.find(new BasicQuery("{ownerId: \"" + targetUID + "\", isRecovery: " + isRecovery + ", isDisabled: " + false + "}"), Exam.class);
     }
 
     public long addCategoryIntoExam(String examId, QuestionCategory model) {
@@ -44,6 +48,10 @@ public class ExamDaoImpl {
                 .matching(where("_id").is(new ObjectId(examId)))
                 .apply(new Update().push("categories", model))
                 .all().getModifiedCount();
+    }
+
+    public long deleteExam(String examId) {
+        return template.update(Exam.class).matching(where("_id").is(new ObjectId(examId))).apply(new Update().set("isDisabled", true)).all().getModifiedCount();
     }
 
     public long deleteCategoryFromExam(String examId, int categoryIndex) {

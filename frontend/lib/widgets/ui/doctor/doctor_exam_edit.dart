@@ -113,6 +113,71 @@ class _DoctorExamEditInstructionPageState extends State<DoctorExamEditInstructio
                 },
                 onStepTapped: (index) { },
                 steps: [
+                  // Step(
+                  //   title: Text("基本信息", style: commonStyles!.titleStyle,),
+                  //   content: Form(
+                  //     key: _formKey,
+                  //     child: ConstrainedBox(
+                  //       constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+                  //       child: Align(
+                  //         heightFactor: 1.0,
+                  //         alignment: Alignment.centerLeft,
+                  //         child: Column(
+                  //           mainAxisSize: MainAxisSize.min,
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Text("套题方案名和简介", style: commonStyles!.titleStyle,),
+                  //             const SizedBox(
+                  //               height: 16,
+                  //             ),
+                  //             Container(
+                  //               constraints: const BoxConstraints(
+                  //                   maxWidth: 600
+                  //               ),
+                  //               child: TextFormField(
+                  //                 decoration: const InputDecoration(
+                  //                   hintText: "套题方案名称（必填）",
+                  //                 ),
+                  //                 controller: nameFieldCtrl,
+                  //                 validator: (String? value) {
+                  //                   if (value == null || value == "") {
+                  //                     return "请输入套题方案名称";
+                  //                   }
+                  //                   return null;
+                  //                 },
+                  //               ),
+                  //             ),
+                  //             const SizedBox(
+                  //               height: 16,
+                  //             ),
+                  //             Container(
+                  //               constraints: const BoxConstraints(
+                  //                   maxWidth: 600
+                  //               ),
+                  //               child: TextFormField(
+                  //                 decoration: const InputDecoration(
+                  //                   hintText: "简介",
+                  //                 ),
+                  //                 controller: descFieldCtrl,
+                  //               ),
+                  //             ),
+                  //             const SizedBox(height: 16,),
+                  //             Row(
+                  //               children: [
+                  //                 Text("是否为康复方案：", style: commonStyles?.bodyStyle),
+                  //                 Checkbox(value: isRecovery, onChanged: (bool? value) {
+                  //                   setState(() {
+                  //                     isRecovery = value ?? false;
+                  //                   });
+                  //                 }),
+                  //               ],
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Step(
                     title: Text("基本信息", style: commonStyles!.titleStyle,),
                     content: Form(
@@ -127,51 +192,41 @@ class _DoctorExamEditInstructionPageState extends State<DoctorExamEditInstructio
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("套题方案名和简介", style: commonStyles!.titleStyle,),
-                              const SizedBox(
-                                height: 16,
-                              ),
+                              const SizedBox(height: 24),  // 增大间距
                               Container(
-                                constraints: const BoxConstraints(
-                                    maxWidth: 600
+                                constraints: BoxConstraints(  // 响应式宽度
+                                  maxWidth: constraints.maxWidth * 0.8,
+                                  minWidth: 300
                                 ),
                                 child: TextFormField(
                                   decoration: const InputDecoration(
                                     hintText: "套题方案名称（必填）",
+                                    border: OutlineInputBorder(),  // 添加边框
+                                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                                   ),
                                   controller: nameFieldCtrl,
-                                  validator: (String? value) {
-                                    if (value == null || value == "") {
-                                      return "请输入套题方案名称";
-                                    }
-                                    return null;
-                                  },
+                                  validator: (String? value) => value?.isEmpty ?? true ? "请输入有效的套题方案名称" : null,
                                 ),
                               ),
-                              const SizedBox(
-                                height: 16,
-                              ),
+                              const SizedBox(height: 24),
                               Container(
-                                constraints: const BoxConstraints(
-                                    maxWidth: 600
+                                constraints: BoxConstraints(
+                                  maxWidth: constraints.maxWidth * 0.8,
+                                  minWidth: 300
                                 ),
                                 child: TextFormField(
                                   decoration: const InputDecoration(
                                     hintText: "简介",
+                                    border: OutlineInputBorder(),  // 统一输入框样式
+                                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                                   ),
                                   controller: descFieldCtrl,
+                                  maxLines: 3,  // 允许多行输入
+                                  minLines: 2,
                                 ),
                               ),
-                              const SizedBox(height: 16,),
-                              Row(
-                                children: [
-                                  Text("是否为康复方案：", style: commonStyles?.bodyStyle),
-                                  Checkbox(value: isRecovery, onChanged: (bool? value) {
-                                    setState(() {
-                                      isRecovery = value ?? false;
-                                    });
-                                  }),
-                                ],
-                              )
+                              const SizedBox(height: 24),
+                              _buildRecoveryToggle(constraints),  // 提取复用组件
                             ],
                           ),
                         ),
@@ -201,6 +256,39 @@ class _DoctorExamEditInstructionPageState extends State<DoctorExamEditInstructio
               );
             }
         ),
+      ),
+    );
+  }
+
+  // 新增复用组件方法
+  Widget _buildRecoveryToggle(BoxConstraints constraints) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      constraints: BoxConstraints(  // 新增宽度约束
+        maxWidth: constraints.maxWidth * 0.8,
+        minWidth: 300
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8)
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center, // 新增垂直居中
+        children: [
+          Padding(  // 新增文本内边距
+            padding: const EdgeInsets.only(left: 16), 
+            child: Text("是否为康复方案：", style: commonStyles?.bodyStyle),
+          ),
+          Padding(  // 新增开关内边距
+            padding: const EdgeInsets.only(right: 8),
+            child: Switch(
+              value: isRecovery,
+              onChanged: (bool value) => setState(() => isRecovery = value),
+              activeColor: commonStyles?.primaryColor,
+            )
+          )
+        ],
       ),
     );
   }

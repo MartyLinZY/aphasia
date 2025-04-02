@@ -22,23 +22,50 @@ void toast(BuildContext context, {required String msg, required String btnText, 
   );
 }
 
-void confirm (BuildContext context, {
+Future<bool?> confirm (BuildContext context, {  // 修改返回类型为Future<bool?>
   required String title,
   required String body,
   void Function(BuildContext dialogContext)? onConfirm,
   void Function(BuildContext dialogContext)? onCancel,
   required CommonStyles? commonStyles}) {
 
-  showDialog(context: context, builder: (context) {
+  return showDialog<bool?>(context: context, builder: (context) {  // 添加泛型类型
+    var result = false;
     return buildSimpleActionDialog(context,
       title: title,
       body: Text(body, style: commonStyles?.bodyStyle,),
       commonStyles: commonStyles,
-      onConfirm: onConfirm,
-      onCancel: onCancel
+      onConfirm: (ctx) {
+        onConfirm?.call(ctx);
+        result = true;
+        Navigator.pop(context, true);  // 确认时返回true
+      },
+      onCancel: (ctx) {
+        onCancel?.call(ctx);
+        result = false;
+        Navigator.pop(context, false); // 取消时返回false
+      }
     );
   });
 }
+
+// void confirm (BuildContext context, {
+//   required String title,
+//   required String body,
+//   void Function(BuildContext dialogContext)? onConfirm,
+//   void Function(BuildContext dialogContext)? onCancel,
+//   required CommonStyles? commonStyles}) {
+
+//   showDialog(context: context, builder: (context) {
+//     return buildSimpleActionDialog(context,
+//       title: title,
+//       body: Text(body, style: commonStyles?.bodyStyle,),
+//       commonStyles: commonStyles,
+//       onConfirm: onConfirm,
+//       onCancel: onCancel
+//     );
+//   });
+// }
 
 Dialog buildSimpleActionDialog(BuildContext context, {
   required String title,

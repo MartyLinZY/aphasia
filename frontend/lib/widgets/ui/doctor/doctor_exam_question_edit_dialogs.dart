@@ -584,163 +584,182 @@ class _HintRuleEditDialogState extends State<HintRuleEditDialog>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildInputFormField(
-                  "提示文本：",
-                  fieldsSetting['hintText']!.key,
-                  fieldsSetting['hintText']!.ctrl,
-                  fieldsSetting['hintText']!.validator,
-                  width: 200,
-                  commonStyles: commonStyles),
-              const SizedBox(
-                height: 16,
+              // buildInputFormField(
+              //     "提示文本：",
+              //     fieldsSetting['hintText']!.key,
+              //     fieldsSetting['hintText']!.ctrl,
+              //     fieldsSetting['hintText']!.validator,
+              //     width: 200,
+              //     commonStyles: commonStyles),
+              // const SizedBox(
+              //   height: 16,
+              // ),
+              // 优化文本输入框布局
+              InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: "提示文本",
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                ),
+                child: TextFormField(
+                  key: fieldsSetting['hintText']!.key,
+                  controller: fieldsSetting['hintText']!.ctrl,
+                  validator: fieldsSetting['hintText']!.validator,
+                  maxLines: 3,
+                  minLines: 1,
+                ),
               ),
-              Row(
-                children: [
-                  Text(
-                    "提示音频：",
-                    style: commonStyles?.bodyStyle,
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => AudioSettingDialog(
-                                uploadedAudioUrl: audioUrl,
-                              )).then((url) {
-                        setState(() {
-                          if (url != null) {
-                            setState(() {
-                              audioUrl = url;
-                              setupPlayer(url);
-                            });
-                          }
-                        });
-                      });
-                    },
-                    child: Text(
-                      "设置",
-                      style: commonStyles?.bodyStyle,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  audioUrl == null
-                      ? const SizedBox.shrink()
-                      : ElevatedButton(
-                          onPressed: () {
-                            confirm(context,
-                                title: "确认",
-                                body: "确认要删除已经设置的音频吗？",
-                                commonStyles: commonStyles, onConfirm: (context) {
-                              Navigator.pop(context);
-                              setState(() {
-                                audioUrl = null;
-                              });
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: commonStyles?.errorColor),
-                          child: Text(
-                            "清除已设置音频",
-                            style: commonStyles?.bodyStyle
-                                ?.copyWith(color: commonStyles?.onErrorColor),
-                          ),
-                        )
-                ],
-              ),
-              audioUrl == null
-                  ? const SizedBox.shrink()
-                  : Row(
-                      children: [
-                        Text(
-                          "音频预览：",
-                          style: commonStyles?.bodyStyle,
-                        ),
-                        buildPlayer(commonStyles: commonStyles),
-                      ],
-                    ),
-              const SizedBox(
-                height: 16,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "提示图片（不设置则默认用题干图片提示）：",
-                    style: commonStyles?.bodyStyle,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => SelectImagesDialog(
-                                imageUrl: imageUrl,
-                                imageAssetPath: imageAssetPath,
-                                commonStyles: commonStyles,
-                              )).then((map) {
-                        setState(() {
-                          if (map != null) {
-                            setState(() {
-                              imageUrl = map['imageUrl'];
-                              imageAssetPath = map['imageAssetPath'];
-                            });
-                          }
-                        });
-                      });
-                    },
-                    child: Text(
-                      "设置",
-                      style: commonStyles?.bodyStyle,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  (imageUrl ?? imageAssetPath) == null
-                      ? const SizedBox.shrink()
-                      : ElevatedButton(
-                          onPressed: () {
-                            confirm(context,
-                                title: "确认",
-                                body: "确认要删除已经设置的图片吗？",
-                                commonStyles: commonStyles, onConfirm: (context) {
-                              Navigator.pop(context);
-                              setState(() {
-                                imageUrl = null;
-                                imageAssetPath = null;
-                              });
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: commonStyles?.errorColor),
-                          child: Text(
-                            "清除已设置图片",
-                            style: commonStyles?.bodyStyle
-                                ?.copyWith(color: commonStyles?.onErrorColor),
-                          ),
-                        )
-                ],
-              ),
-              (imageAssetPath ?? imageUrl) == null
-                  ? const SizedBox.shrink()
-                  : Row(
-                      children: [
-                        Text(
-                          "图片预览：",
-                          style: commonStyles?.bodyStyle,
-                        ),
-                        buildImagePreview(
-                            imageUrl: imageUrl,
-                            imageAssetPath: imageAssetPath,
-                            commonStyles: commonStyles),
-                      ],
-                    ),
-              const SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 24),
+              // 统一多媒体设置区块样式
+              _buildMediaSection(),
+              const SizedBox(height: 24),
+              // Row(
+              //   children: [
+              //     Text(
+              //       "提示音频：",
+              //       style: commonStyles?.bodyStyle,
+              //     ),
+              //     const SizedBox(
+              //       width: 16,
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         showDialog(
+              //             context: context,
+              //             builder: (context) => AudioSettingDialog(
+              //                   uploadedAudioUrl: audioUrl,
+              //                 )).then((url) {
+              //           setState(() {
+              //             if (url != null) {
+              //               setState(() {
+              //                 audioUrl = url;
+              //                 setupPlayer(url);
+              //               });
+              //             }
+              //           });
+              //         });
+              //       },
+              //       child: Text(
+              //         "设置",
+              //         style: commonStyles?.bodyStyle,
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       width: 16,
+              //     ),
+              //     audioUrl == null
+              //         ? const SizedBox.shrink()
+              //         : ElevatedButton(
+              //             onPressed: () {
+              //               confirm(context,
+              //                   title: "确认",
+              //                   body: "确认要删除已经设置的音频吗？",
+              //                   commonStyles: commonStyles, onConfirm: (context) {
+              //                 Navigator.pop(context);
+              //                 setState(() {
+              //                   audioUrl = null;
+              //                 });
+              //               });
+              //             },
+              //             style: ElevatedButton.styleFrom(
+              //                 backgroundColor: commonStyles?.errorColor),
+              //             child: Text(
+              //               "清除已设置音频",
+              //               style: commonStyles?.bodyStyle
+              //                   ?.copyWith(color: commonStyles?.onErrorColor),
+              //             ),
+              //           )
+              //   ],
+              // ),
+              // audioUrl == null
+              //     ? const SizedBox.shrink()
+              //     : Row(
+              //         children: [
+              //           Text(
+              //             "音频预览：",
+              //             style: commonStyles?.bodyStyle,
+              //           ),
+              //           buildPlayer(commonStyles: commonStyles),
+              //         ],
+              //       ),
+              // const SizedBox(
+              //   height: 16,
+              // ),
+              // Row(
+              //   children: [
+              //     Text(
+              //       "提示图片（不设置则默认用题干图片提示）：",
+              //       style: commonStyles?.bodyStyle,
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         showDialog(
+              //             context: context,
+              //             builder: (context) => SelectImagesDialog(
+              //                   imageUrl: imageUrl,
+              //                   imageAssetPath: imageAssetPath,
+              //                   commonStyles: commonStyles,
+              //                 )).then((map) {
+              //           setState(() {
+              //             if (map != null) {
+              //               setState(() {
+              //                 imageUrl = map['imageUrl'];
+              //                 imageAssetPath = map['imageAssetPath'];
+              //               });
+              //             }
+              //           });
+              //         });
+              //       },
+              //       child: Text(
+              //         "设置",
+              //         style: commonStyles?.bodyStyle,
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       width: 16,
+              //     ),
+              //     (imageUrl ?? imageAssetPath) == null
+              //         ? const SizedBox.shrink()
+              //         : ElevatedButton(
+              //             onPressed: () {
+              //               confirm(context,
+              //                   title: "确认",
+              //                   body: "确认要删除已经设置的图片吗？",
+              //                   commonStyles: commonStyles, onConfirm: (context) {
+              //                 Navigator.pop(context);
+              //                 setState(() {
+              //                   imageUrl = null;
+              //                   imageAssetPath = null;
+              //                 });
+              //               });
+              //             },
+              //             style: ElevatedButton.styleFrom(
+              //                 backgroundColor: commonStyles?.errorColor),
+              //             child: Text(
+              //               "清除已设置图片",
+              //               style: commonStyles?.bodyStyle
+              //                   ?.copyWith(color: commonStyles?.onErrorColor),
+              //             ),
+              //           )
+              //   ],
+              // ),
+              // (imageAssetPath ?? imageUrl) == null
+              //     ? const SizedBox.shrink()
+              //     : Row(
+              //         children: [
+              //           Text(
+              //             "图片预览：",
+              //             style: commonStyles?.bodyStyle,
+              //           ),
+              //           buildImagePreview(
+              //               imageUrl: imageUrl,
+              //               imageAssetPath: imageAssetPath,
+              //               commonStyles: commonStyles),
+              //         ],
+              //       ),
+              // const SizedBox(
+              //   height: 16,
+              // ),
               // buildInputFormField(
               //     "提示后正答扣分值：",
               //     fieldsSetting['adjustValue']!.key,
@@ -750,21 +769,57 @@ class _HintRuleEditDialogState extends State<HintRuleEditDialog>
               // const SizedBox(
               //   height: 16,
               // ),
-              buildInputFormField(
-                  "触发分数下界：",
-                  fieldsSetting['scoreLowBound']!.key,
-                  fieldsSetting['scoreLowBound']!.ctrl,
-                  fieldsSetting['scoreLowBound']!.validator,
-                  commonStyles: commonStyles),
-              const SizedBox(
-                height: 16,
+            //   buildInputFormField(
+            //       "触发分数下界：",
+            //       fieldsSetting['scoreLowBound']!.key,
+            //       fieldsSetting['scoreLowBound']!.ctrl,
+            //       fieldsSetting['scoreLowBound']!.validator,
+            //       commonStyles: commonStyles),
+            //   const SizedBox(
+            //     height: 16,
+            //   ),
+            //   buildInputFormField(
+            //       "触发分数上界：",
+            //       fieldsSetting['scoreHighBound']!.key,
+            //       fieldsSetting['scoreHighBound']!.ctrl,
+            //       fieldsSetting['scoreHighBound']!.validator,
+            //       commonStyles: commonStyles),
+              // 优化分数范围输入布局
+              Row(
+                children: [
+                  Expanded(
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: "触发分数下界",
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      ),
+                      child: TextFormField(
+                        key: fieldsSetting['scoreLowBound']!.key,
+                        controller: fieldsSetting['scoreLowBound']!.ctrl,
+                        validator: fieldsSetting['scoreLowBound']!.validator,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: "触发分数上界",
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      ),
+                      child: TextFormField(
+                        key: fieldsSetting['scoreHighBound']!.key,
+                        controller: fieldsSetting['scoreHighBound']!.ctrl,
+                        validator: fieldsSetting['scoreHighBound']!.validator,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              buildInputFormField(
-                  "触发分数上界：",
-                  fieldsSetting['scoreHighBound']!.key,
-                  fieldsSetting['scoreHighBound']!.ctrl,
-                  fieldsSetting['scoreHighBound']!.validator,
-                  commonStyles: commonStyles),
             ],
           ),
         ),
@@ -792,5 +847,186 @@ class _HintRuleEditDialogState extends State<HintRuleEditDialog>
             ));
       }
     });
+  }
+
+  // 在_HintRuleEditDialogState类中添加缺失的方法
+  void _handleSetAudio() {
+    showDialog(
+      context: context,
+      builder: (context) => AudioSettingDialog(uploadedAudioUrl: audioUrl),
+    ).then((url) {
+      if (url != null) {
+        setState(() {
+          audioUrl = url;
+          setupPlayer(url);
+        });
+      }
+    });
+  }
+
+  void _handleClearAudio() {
+    confirm(context,
+        title: "确认",
+        body: "确认要删除已经设置的音频吗？",
+        commonStyles: commonStyles,
+        onConfirm: (context) {
+          Navigator.pop(context);
+          setState(() {
+            audioUrl = null;
+            stop();
+          });
+        });
+  }
+
+  void _handleSetImage() {
+    showDialog(
+      context: context,
+      builder: (context) => SelectImagesDialog(
+        imageUrl: imageUrl,
+        imageAssetPath: imageAssetPath,
+        commonStyles: commonStyles,
+      ),
+    ).then((map) {
+      if (map != null) {
+        setState(() {
+          imageUrl = map['imageUrl'];
+          imageAssetPath = map['imageAssetPath'];
+        });
+      }
+    });
+  }
+
+  void _handleClearImage() {
+    confirm(context,
+        title: "确认",
+        body: "确认要删除已经设置的图片吗？",
+        commonStyles: commonStyles,
+        onConfirm: (context) {
+          Navigator.pop(context);
+          setState(() {
+            imageUrl = null;
+            imageAssetPath = null;
+          });
+        });
+  }
+
+  // 新增复用组件方法
+  Widget _buildMediaSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("多媒体设置", style: commonStyles?.bodyStyle),
+          const SizedBox(height: 16),
+          _buildAudioSection(),
+          const SizedBox(height: 24),
+          _buildImageSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAudioSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("提示音频：", style: commonStyles?.bodyStyle),
+            Wrap(
+              spacing: 8,
+              children: [
+                _buildActionButton(
+                  icon: Icons.audiotrack,
+                  label: "设置音频",
+                  onPressed: _handleSetAudio,
+                ),
+                if (audioUrl != null)
+                  _buildActionButton(
+                    icon: Icons.delete,
+                    label: "清除音频",
+                    color: commonStyles?.errorColor,
+                    onPressed: _handleClearAudio,
+                  ),
+              ],
+            ),
+          ],
+        ),
+        if (audioUrl != null) ...[
+          const SizedBox(height: 12),
+          buildPlayer(commonStyles: commonStyles),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("提示图片：", style: commonStyles?.bodyStyle),
+            Wrap(
+              spacing: 8,
+              children: [
+                _buildActionButton(
+                  icon: Icons.image,
+                  label: "设置图片",
+                  onPressed: _handleSetImage,
+                ),
+                if (imageUrl != null || imageAssetPath != null)
+                  _buildActionButton(
+                    icon: Icons.delete,
+                    label: "清除图片",
+                    color: commonStyles?.errorColor,
+                    onPressed: _handleClearImage,
+                  ),
+              ],
+            ),
+          ],
+        ),
+        if (imageAssetPath != null || imageUrl != null) ...[
+          const SizedBox(height: 12),
+          Card(
+            elevation: 2,
+            child: buildImagePreview(
+              imageUrl: imageUrl,
+              imageAssetPath: imageAssetPath,
+              commonStyles: commonStyles,
+            ),
+          ),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    Color? color,
+    required VoidCallback onPressed,
+  }) {
+    return Tooltip(
+      message: label,
+      child: ElevatedButton.icon(
+        icon: Icon(icon, size: 20),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: color ?? commonStyles?.primaryColor,
+          backgroundColor: color?.withOpacity(0.1),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        onPressed: onPressed,
+      ),
+    );
   }
 }

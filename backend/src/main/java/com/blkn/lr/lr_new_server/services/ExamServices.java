@@ -59,6 +59,10 @@ public class ExamServices {
         return exams.stream().map(e -> new ExamDto(e, questionDao)).toList();
     }
 
+    public long deleteExam(String examId) {
+        return examDao.deleteExam(examId);
+    }
+
     public QuestionCategoryDto addCategory(QuestionCategoryDto newCategory, String examId) {
         if (examDao.addCategoryIntoExam(examId, newCategory.toModel()) > 0) {
             return newCategory;

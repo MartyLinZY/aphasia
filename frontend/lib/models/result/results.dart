@@ -15,7 +15,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'results.g.dart';
 
-typedef ExtraResults = Map<String,String>;
+typedef ExtraResults = Map<String, String>;
 
 @JsonSerializable(explicitToJson: true)
 class ExamResult {
@@ -25,10 +25,19 @@ class ExamResult {
   DateTime? startTime;
   DateTime? finishTime;
   bool isRecovery;
+  bool isDisabled;
   String examName;
   List<CategoryResult> categoryResults = [];
 
-  ExamResult({this.id, this.resultText, this.finalScore, this.startTime, this.finishTime, this.isRecovery = false, required this.examName});
+  ExamResult(
+      {this.id,
+      this.resultText,
+      this.finalScore,
+      this.startTime,
+      this.finishTime,
+      this.isRecovery = false,
+      this.isDisabled = false,
+      required this.examName});
 
   factory ExamResult.fromJson(JsonObject json) => _$ExamResultFromJson(json);
 
@@ -43,18 +52,19 @@ class ExamResult {
         .delete(url: "${HttpConstants.backendBaseUrl}/api/examRecord/$id");
   }
 
-  static Future<List<ExamResult>> getByUid({required bool isRecovery, required String uid}) async {
+  static Future<List<ExamResult>> getByUid(
+      {required bool isRecovery, required String uid}) async {
     List<dynamic> jsonData;
     if (!isRecovery) {
-      jsonData = await HttpClientManager()
-          .get(url: "${HttpConstants.backendBaseUrl}/api/patient/$uid/examRecords");
+      jsonData = await HttpClientManager().get(
+          url: "${HttpConstants.backendBaseUrl}/api/patient/$uid/examRecords");
     } else {
-      jsonData = await HttpClientManager()
-          .get(url: "${HttpConstants.backendBaseUrl}/api/patient/$uid/recoveryRecords");
+      jsonData = await HttpClientManager().get(
+          url:
+              "${HttpConstants.backendBaseUrl}/api/patient/$uid/recoveryRecords");
     }
 
     try {
-
       // var fakeResult = ExamResult.fromJson(jsonDecode('{"id":null,"resultText":"重度失语","finalScore":null,"startTime":"2024-03-21T13:28:19.525","finishTime":"2024-03-21T13:29:44.603","isRecovery":false,"examName":"新测评","categoryResults":[{"name":"第一项","finalScore":32,"subResults":[{"name":"第一子项","finalScore":22,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"叉子","questionText":"写出刚刚展示的图片中的物体的名字","audioUrl":"http://localhost:8080/audio_1710342468507.wav","imageUrl":"assets/images/for_question_setting/fork.jpg","omitImageAfterSeconds":5,"typeName":"WritingQuestion","evalRule":{"enableFuzzyEvaluation":true,"keyword":"叉子","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":2,"highBound":2}],"isHinted":false},{"score":8,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":6,"ranges":[{"lowBound":2,"highBound":2}],"isHinted":true},{"score":4,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"写出刚刚展示的物体的名字","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":0,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalWritingQuestionByMatchRate"},"id":null},"finalScore":0,"answerTime":0,"isHinted":true,"extraResults":{"患者书写内容":"测试结果","关键词":"叉子","关键词正确字数":"0"},"typeName":"WritingQuestionResult"},{"sourceQuestion":{"alias":"梳子","questionText":"选出梳子","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"ChoiceQuestion","evalRule":{"enforceOrder":false,"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"再想想，梳头发的梳子是哪一个？","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":9,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalChoiceQuestionByCorrectChoiceCount","choices":[{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/comb.png","text":"梳子"},{"imageUrl":"https://photo.16pic.com/00/75/74/16pic_7574368_b.jpg","imageAssetPath":null,"text":"向日葵"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/cup.jpg","text":"其他"}],"correctChoices":[0]},"id":null},"finalScore":10,"answerTime":2,"isHinted":false,"extraResults":{"正确选项":"0","患者选择的选项":"0","题目是否要求按顺序选择选项":"否"},"typeName":"ChoiceQuestionResult","choiceSelected":[0]},{"sourceQuestion":{"alias":"多关键词","questionText":"老人和小孩在一起放风筝","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"WritingQuestion","evalRule":{"enableFuzzyEvaluation":true,"keywords":["老人","小孩","一起","放风筝"],"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":4,"highBound":4}],"isHinted":false},{"score":8,"ranges":[{"lowBound":3,"highBound":3}],"isHinted":false},{"score":6,"ranges":[{"lowBound":1,"highBound":2}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":4,"highBound":4}],"isHinted":true},{"score":4,"ranges":[{"lowBound":1,"highBound":2}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"老人和小孩在一起放风筝","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":6,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalWritingQuestionByCorrectKeywordCount"},"id":null},"finalScore":0,"answerTime":1,"isHinted":true,"extraResults":{"患者书写内容":"测试结果","关键词列表":"老人, 小孩, 一起, 放风筝","关键词正确个数":"0"},"typeName":"WritingQuestionResult"},{"sourceQuestion":{"alias":"空调","questionText":"指出空调","audioUrl":null,"imageUrl":"assets/images/for_question_setting/furniture.jpg","omitImageAfterSeconds":20,"typeName":"ItemFindingQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false}],"hintRules":[{"hintText":"空调","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5.9,"adjustValue":3,"scoreAdjustType":1}],"typeName":"EvalItemFoundQuestion","imageUrl":"assets/images/for_question_setting/furniture.jpg","coordinates":[[0.15661047027506655,0.2780242531795327],[0.13797692990239574,0.25140490979000296],[0.17790594498669032,0.2780242531795327],[0.20008873114463177,0.27062999112688557],[0.2160603371783496,0.21147589470570838],[0.20629991126885536,0.1611949127477078],[0.19210292812777285,0.1212658976634132],[0.1725820763087844,0.07098491570541261],[0.1557231588287489,0.048802129547471165],[0.12821650399290152,0.04732327713694174],[0.1157941437444543,0.053238686779059456],[0.10159716060337179,0.10351966873706005],[0.09982253771073647,0.14788524105294293],[0.11135758651286602,0.20408163265306126]]},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者是否正确点击目标区域":"是"},"typeName":"ItemFindingQuestionResult","clickCoordinate":[0.14617142857142854,0.14095238095238094]},{"sourceQuestion":{"alias":"指令题：梳子","questionText":"先指一下梳子，再拿起梳子盖在书本上","audioUrl":"http://localhost:8080/audio_1710342468507.wav","imageUrl":"assets/images/for_question_setting/comb.png","omitImageAfterSeconds":5,"typeName":"CommandQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":6,"highBound":6},{"lowBound":0,"highBound":10}],"isHinted":false},{"score":5,"ranges":[{"lowBound":6,"highBound":6},{"lowBound":11,"highBound":20}],"isHinted":false},{"score":4,"ranges":[{"lowBound":4,"highBound":5},{"lowBound":0,"highBound":20}],"isHinted":false},{"score":3,"ranges":[{"lowBound":0,"highBound":7}],"isHinted":false},{"score":3,"ranges":[{"lowBound":6,"highBound":6}],"isHinted":true},{"score":2,"ranges":[{"lowBound":4,"highBound":5}],"isHinted":true},{"score":1,"ranges":[{"lowBound":0,"highBound":3}],"isHinted":true}],"hintRules":[{"hintText":"指一下梳子，然后把梳子放在书本上","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":3,"adjustValue":3,"scoreAdjustType":1}],"typeName":"EvalCommandQuestionByCorrectActionCount","slots":[{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"香烟","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/cigarettes.jpg"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"书本","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/book.png"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"梳子","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/comb.png"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null}],"actions":[{"sourceSlotIndex":7,"firstAction":"touch","targetSlotIndex":null,"secondAction":null},{"sourceSlotIndex":7,"firstAction":"take","targetSlotIndex":3,"secondAction":"putDown"}],"invalidActionPunishment":0,"detailMode":true,"commandText":"先指一下梳子，再拿起梳子盖在书本上"},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者操作":"先指一下梳子，再拿起梳子盖在书本上","正确指令":"先指一下梳子，再拿起梳子盖在书本上","动作（单位）正确个数":"6","动作顺序错误个数":"0","动作顺序错误扣分值":"0","无效动作个数":"0","无效动作扣分值":"0"},"typeName":"CommandQuestionResult","actions":[{"sourceSlotIndex":7,"firstAction":"touch","targetSlotIndex":null,"secondAction":null},{"sourceSlotIndex":7,"firstAction":"take","targetSlotIndex":3,"secondAction":"putDown"}]}]},{"name":"新子项","finalScore":10,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"录音题：照相机","questionText":"这是什么","audioUrl":null,"imageUrl":"assets/images/for_question_setting/camera.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"keywords":["照相机","拍照的","拍照","录像机","相机"],"enforceOrder":false,"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"这是照...","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":9,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByKeywordsMatchesCount"},"id":null},"finalScore":0,"answerTime":1,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","关键词列表":"照相机, 拍照的, 拍照, 录像机, 相机","关键词正确个数":"0","是否要求关键词按顺序说出":"否"},"typeName":"AudioQuestionResult","audioContent":"测试结果"},{"sourceQuestion":{"alias":"录音题：单关键字","questionText":"球","audioUrl":null,"imageUrl":"assets/images/for_question_setting/ball.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"keyword":"球","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"这是qi...","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":0,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByKeywordMatch"},"id":null},"finalScore":0,"answerTime":0,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","关键词":"球","关键词正确字数":"0"},"typeName":"AudioQuestionResult","audioContent":"测试结果"},{"sourceQuestion":{"alias":"录音题：流畅度","questionText":"请描述一下图里的内容","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[],"hintRules":[{"hintText":"野餐、风筝、人、房子、树？","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByFluency"},"id":null},"finalScore":10,"answerTime":3,"isHinted":false,"extraResults":{"患者说话内容":"有两个人在野餐，一个人在放风筝，远处有一艘船，然后有一棵树，树下有房子还有旗杆，还有一个小孩在玩沙子，还有一条狗。","流利性情况说明":"句子有正常的长度和复杂性，无确定的缓慢、踌躇或发音困难，无错语"},"typeName":"AudioQuestionResult","audioContent":"有两个人在野餐，一个人在放风筝，远处有一艘船，然后有一棵树，树下有房子还有旗杆，还有一个小孩在玩沙子，还有一条狗。"},{"sourceQuestion":{"alias":"录音题：相似度","questionText":"请描述一下图里的内容","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"answerText":"两个人在地上野餐，一个人在放风筝","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[],"hintRules":[{"hintText":"野餐、风筝","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionBySimilarity","fullScoreThreshold":0.8},"id":null},"finalScore":0,"answerTime":9,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","答案文本":"两个人在地上野餐，一个人在放风筝","相似度":"23.9%"},"typeName":"AudioQuestionResult","audioContent":"测试结果"}]}]},{"name":"新亚项","finalScore":10,"subResults":[{"name":"新子项","finalScore":4,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"选择题：球","questionText":"球是哪一个？","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"ChoiceQuestion","evalRule":{"enforceOrder":false,"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":4,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":2,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"再想一想，球是哪一个，可以拍的球","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":1,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalChoiceQuestionByCorrectChoiceCount","choices":[{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/ball.jpg","text":"球"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/type4_cup.jpg","text":"其他"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/bicycle.jpg","text":"其他"}],"correctChoices":[0]},"id":null},"finalScore":4,"answerTime":3,"isHinted":false,"extraResults":{"正确选项":"0","患者选择的选项":"0","题目是否要求按顺序选择选项":"否"},"typeName":"ChoiceQuestionResult","choiceSelected":[0]}]},{"name":"新子项","finalScore":6,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"场景寻物题：找风筝","questionText":"请指出风筝在哪里","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":20,"typeName":"ItemFindingQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":3,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false}],"hintRules":[{"hintText":"再想一想，连着线的风筝在哪里","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalItemFoundQuestion","imageUrl":"assets/images/for_question_setting/type2_view.jpg","coordinates":[[0.7860103626943006,0.16580310880829016],[0.8002220577350111,0.2664692820133235],[0.8597335307179867,0.15544041450777202],[0.8881569207994079,0.2768319763138416]]},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者是否正确点击目标区域":"是"},"typeName":"ItemFindingQuestionResult","clickCoordinate":[0.8113142857142857,0.20952380952380953]}]}]}]}'));
       // var fakeResult1 = ExamResult.fromJson(jsonDecode('{"id":null,"resultText":"重度失语","finalScore":null,"startTime":"2024-03-21T13:28:19.525","finishTime":"2024-03-21T13:29:44.603","isRecovery":false,"examName":"新测评","categoryResults":[{"name":"第一项","finalScore":32,"subResults":[{"name":"第一子项","finalScore":22,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"叉子","questionText":"写出刚刚展示的图片中的物体的名字","audioUrl":"http://localhost:8080/audio_1710342468507.wav","imageUrl":"assets/images/for_question_setting/fork.jpg","omitImageAfterSeconds":5,"typeName":"WritingQuestion","evalRule":{"enableFuzzyEvaluation":true,"keyword":"叉子","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":2,"highBound":2}],"isHinted":false},{"score":8,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":6,"ranges":[{"lowBound":2,"highBound":2}],"isHinted":true},{"score":4,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"写出刚刚展示的物体的名字","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":0,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalWritingQuestionByMatchRate"},"id":null},"finalScore":0,"answerTime":0,"isHinted":true,"extraResults":{"患者书写内容":"测试结果","关键词":"叉子","关键词正确字数":"0"},"typeName":"WritingQuestionResult"},{"sourceQuestion":{"alias":"梳子","questionText":"选出梳子","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"ChoiceQuestion","evalRule":{"enforceOrder":false,"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"再想想，梳头发的梳子是哪一个？","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":9,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalChoiceQuestionByCorrectChoiceCount","choices":[{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/comb.png","text":"梳子"},{"imageUrl":"https://photo.16pic.com/00/75/74/16pic_7574368_b.jpg","imageAssetPath":null,"text":"向日葵"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/cup.jpg","text":"其他"}],"correctChoices":[0]},"id":null},"finalScore":10,"answerTime":2,"isHinted":false,"extraResults":{"正确选项":"0","患者选择的选项":"0","题目是否要求按顺序选择选项":"否"},"typeName":"ChoiceQuestionResult","choiceSelected":[0]},{"sourceQuestion":{"alias":"多关键词","questionText":"老人和小孩在一起放风筝","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"WritingQuestion","evalRule":{"enableFuzzyEvaluation":true,"keywords":["老人","小孩","一起","放风筝"],"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":4,"highBound":4}],"isHinted":false},{"score":8,"ranges":[{"lowBound":3,"highBound":3}],"isHinted":false},{"score":6,"ranges":[{"lowBound":1,"highBound":2}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":4,"highBound":4}],"isHinted":true},{"score":4,"ranges":[{"lowBound":1,"highBound":2}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"老人和小孩在一起放风筝","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":6,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalWritingQuestionByCorrectKeywordCount"},"id":null},"finalScore":0,"answerTime":1,"isHinted":true,"extraResults":{"患者书写内容":"测试结果","关键词列表":"老人, 小孩, 一起, 放风筝","关键词正确个数":"0"},"typeName":"WritingQuestionResult"},{"sourceQuestion":{"alias":"空调","questionText":"指出空调","audioUrl":null,"imageUrl":"assets/images/for_question_setting/furniture.jpg","omitImageAfterSeconds":20,"typeName":"ItemFindingQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false}],"hintRules":[{"hintText":"空调","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5.9,"adjustValue":3,"scoreAdjustType":1}],"typeName":"EvalItemFoundQuestion","imageUrl":"assets/images/for_question_setting/furniture.jpg","coordinates":[[0.15661047027506655,0.2780242531795327],[0.13797692990239574,0.25140490979000296],[0.17790594498669032,0.2780242531795327],[0.20008873114463177,0.27062999112688557],[0.2160603371783496,0.21147589470570838],[0.20629991126885536,0.1611949127477078],[0.19210292812777285,0.1212658976634132],[0.1725820763087844,0.07098491570541261],[0.1557231588287489,0.048802129547471165],[0.12821650399290152,0.04732327713694174],[0.1157941437444543,0.053238686779059456],[0.10159716060337179,0.10351966873706005],[0.09982253771073647,0.14788524105294293],[0.11135758651286602,0.20408163265306126]]},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者是否正确点击目标区域":"是"},"typeName":"ItemFindingQuestionResult","clickCoordinate":[0.14617142857142854,0.14095238095238094]},{"sourceQuestion":{"alias":"指令题：梳子","questionText":"先指一下梳子，再拿起梳子盖在书本上","audioUrl":"http://localhost:8080/audio_1710342468507.wav","imageUrl":"assets/images/for_question_setting/comb.png","omitImageAfterSeconds":5,"typeName":"CommandQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":6,"highBound":6},{"lowBound":0,"highBound":10}],"isHinted":false},{"score":5,"ranges":[{"lowBound":6,"highBound":6},{"lowBound":11,"highBound":20}],"isHinted":false},{"score":4,"ranges":[{"lowBound":4,"highBound":5},{"lowBound":0,"highBound":20}],"isHinted":false},{"score":3,"ranges":[{"lowBound":0,"highBound":7}],"isHinted":false},{"score":3,"ranges":[{"lowBound":6,"highBound":6}],"isHinted":true},{"score":2,"ranges":[{"lowBound":4,"highBound":5}],"isHinted":true},{"score":1,"ranges":[{"lowBound":0,"highBound":3}],"isHinted":true}],"hintRules":[{"hintText":"指一下梳子，然后把梳子放在书本上","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":3,"adjustValue":3,"scoreAdjustType":1}],"typeName":"EvalCommandQuestionByCorrectActionCount","slots":[{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"香烟","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/cigarettes.jpg"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"书本","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/book.png"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":"梳子","itemImageUrl":null,"itemImageAssetPath":"assets/images/for_question_setting/comb.png"},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null},{"itemName":null,"itemImageUrl":null,"itemImageAssetPath":null}],"actions":[{"sourceSlotIndex":7,"firstAction":"touch","targetSlotIndex":null,"secondAction":null},{"sourceSlotIndex":7,"firstAction":"take","targetSlotIndex":3,"secondAction":"putDown"}],"invalidActionPunishment":0,"detailMode":true,"commandText":"先指一下梳子，再拿起梳子盖在书本上"},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者操作":"先指一下梳子，再拿起梳子盖在书本上","正确指令":"先指一下梳子，再拿起梳子盖在书本上","动作（单位）正确个数":"6","动作顺序错误个数":"0","动作顺序错误扣分值":"0","无效动作个数":"0","无效动作扣分值":"0"},"typeName":"CommandQuestionResult","actions":[{"sourceSlotIndex":7,"firstAction":"touch","targetSlotIndex":null,"secondAction":null},{"sourceSlotIndex":7,"firstAction":"take","targetSlotIndex":3,"secondAction":"putDown"}]}]},{"name":"新子项","finalScore":10,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"录音题：照相机","questionText":"这是什么","audioUrl":null,"imageUrl":"assets/images/for_question_setting/camera.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"keywords":["照相机","拍照的","拍照","录像机","相机"],"enforceOrder":false,"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"这是照...","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":9,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByKeywordsMatchesCount"},"id":null},"finalScore":0,"answerTime":1,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","关键词列表":"照相机, 拍照的, 拍照, 录像机, 相机","关键词正确个数":"0","是否要求关键词按顺序说出":"否"},"typeName":"AudioQuestionResult","audioContent":"测试结果"},{"sourceQuestion":{"alias":"录音题：单关键字","questionText":"球","audioUrl":null,"imageUrl":"assets/images/for_question_setting/ball.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"keyword":"球","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[{"score":10,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":5,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"这是qi...","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":0,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByKeywordMatch"},"id":null},"finalScore":0,"answerTime":0,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","关键词":"球","关键词正确字数":"0"},"typeName":"AudioQuestionResult","audioContent":"测试结果"},{"sourceQuestion":{"alias":"录音题：流畅度","questionText":"请描述一下图里的内容","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[],"hintRules":[{"hintText":"野餐、风筝、人、房子、树？","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionByFluency"},"id":null},"finalScore":10,"answerTime":3,"isHinted":false,"extraResults":{"患者说话内容":"有两个人在野餐，一个人在放风筝，远处有一艘船，然后有一棵树，树下有房子还有旗杆，还有一个小孩在玩沙子，还有一条狗。","流利性情况说明":"句子有正常的长度和复杂性，无确定的缓慢、踌躇或发音困难，无错语"},"typeName":"AudioQuestionResult","audioContent":"有两个人在野餐，一个人在放风筝，远处有一艘船，然后有一棵树，树下有房子还有旗杆，还有一个小孩在玩沙子，还有一条狗。"},{"sourceQuestion":{"alias":"录音题：相似度","questionText":"请描述一下图里的内容","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":-1,"typeName":"AudioQuestion","evalRule":{"enableFuzzyEvaluation":true,"answerText":"两个人在地上野餐，一个人在放风筝","fullScore":10,"timeLimit":20,"defaultScore":0,"conditions":[],"hintRules":[{"hintText":"野餐、风筝","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalAudioQuestionBySimilarity","fullScoreThreshold":0.8},"id":null},"finalScore":0,"answerTime":9,"isHinted":true,"extraResults":{"患者说话内容":"测试结果","答案文本":"两个人在地上野餐，一个人在放风筝","相似度":"23.9%"},"typeName":"AudioQuestionResult","audioContent":"测试结果"}]}]},{"name":"新亚项","finalScore":10,"subResults":[{"name":"新子项","finalScore":4,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"选择题：球","questionText":"球是哪一个？","audioUrl":null,"imageUrl":null,"omitImageAfterSeconds":20,"typeName":"ChoiceQuestion","evalRule":{"enforceOrder":false,"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":4,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":2,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":true}],"hintRules":[{"hintText":"再想一想，球是哪一个，可以拍的球","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":1,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalChoiceQuestionByCorrectChoiceCount","choices":[{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/ball.jpg","text":"球"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/type4_cup.jpg","text":"其他"},{"imageUrl":null,"imageAssetPath":"assets/images/for_question_setting/bicycle.jpg","text":"其他"}],"correctChoices":[0]},"id":null},"finalScore":4,"answerTime":3,"isHinted":false,"extraResults":{"正确选项":"0","患者选择的选项":"0","题目是否要求按顺序选择选项":"否"},"typeName":"ChoiceQuestionResult","choiceSelected":[0]}]},{"name":"新子项","finalScore":6,"terminateReason":null,"questionResults":[{"sourceQuestion":{"alias":"场景寻物题：找风筝","questionText":"请指出风筝在哪里","audioUrl":null,"imageUrl":"assets/images/for_question_setting/type2_view.jpg","omitImageAfterSeconds":20,"typeName":"ItemFindingQuestion","evalRule":{"fullScore":6,"timeLimit":20,"defaultScore":0,"conditions":[{"score":6,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":false},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false},{"score":3,"ranges":[{"lowBound":1,"highBound":1}],"isHinted":true},{"score":0,"ranges":[{"lowBound":0,"highBound":0}],"isHinted":false}],"hintRules":[{"hintText":"再想一想，连着线的风筝在哪里","hintAudioUrl":null,"hintImageUrl":null,"hintImageAssetPath":null,"scoreLowBound":0,"scoreHighBound":5,"adjustValue":0,"scoreAdjustType":1}],"typeName":"EvalItemFoundQuestion","imageUrl":"assets/images/for_question_setting/type2_view.jpg","coordinates":[[0.7860103626943006,0.16580310880829016],[0.8002220577350111,0.2664692820133235],[0.8597335307179867,0.15544041450777202],[0.8881569207994079,0.2768319763138416]]},"id":null},"finalScore":6,"answerTime":1,"isHinted":false,"extraResults":{"患者是否正确点击目标区域":"是"},"typeName":"ItemFindingQuestionResult","clickCoordinate":[0.8113142857142857,0.20952380952380953]}]}]}]}'));
       // if (isRecovery) {
@@ -70,8 +80,10 @@ class ExamResult {
     }
   }
 
-  static Future<ExamResult> createExamResult({required ExamQuestionSet exam, required bool isRecovery}) async {
-    final testResult = ExamResult(isRecovery: isRecovery, examName: exam.name, startTime: DateTime.now());
+  static Future<ExamResult> createExamResult(
+      {required ExamQuestionSet exam, required bool isRecovery}) async {
+    final testResult = ExamResult(
+        isRecovery: isRecovery, examName: exam.name, startTime: DateTime.now());
     for (var cate in exam.categories) {
       var cateRes = CategoryResult(name: cate.description);
       for (var subCate in cate.subCategories) {
@@ -80,16 +92,18 @@ class ExamResult {
       }
       testResult.categoryResults.add(cateRes);
     }
-    
-    var jsonData = await HttpClientManager()
-      .post(url: "${HttpConstants.backendBaseUrl}/api/examRecord", body: jsonEncode(testResult.toJson()));
-    
+
+    var jsonData = await HttpClientManager().post(
+        url: "${HttpConstants.backendBaseUrl}/api/examRecord",
+        body: jsonEncode(testResult.toJson()));
+
     return ExamResult.fromJson(jsonData);
   }
 
   static Future<ExamResult> saveExamResult({required ExamResult result}) async {
-    var jsonData = await HttpClientManager()
-        .post(url: "${HttpConstants.backendBaseUrl}/api/examRecord", body: jsonEncode(result.toJson()));
+    var jsonData = await HttpClientManager().post(
+        url: "${HttpConstants.backendBaseUrl}/api/examRecord",
+        body: jsonEncode(result.toJson()));
 
     return ExamResult.fromJson(jsonData);
   }
@@ -104,7 +118,8 @@ class CategoryResult {
 
   List<SubCategoryResult> subResults = [];
 
-  factory CategoryResult.fromJson(Map<String, dynamic> jsonMap) => _$CategoryResultFromJson(jsonMap);
+  factory CategoryResult.fromJson(Map<String, dynamic> jsonMap) =>
+      _$CategoryResultFromJson(jsonMap);
 
   Map<String, dynamic> toJson() => _$CategoryResultToJson(this);
 }
@@ -124,7 +139,8 @@ class SubCategoryResult {
     questionResults.add(result);
   }
 
-  factory SubCategoryResult.fromJson(Map<String, dynamic> jsonMap) => _$SubCategoryResultFromJson(jsonMap);
+  factory SubCategoryResult.fromJson(Map<String, dynamic> jsonMap) =>
+      _$SubCategoryResultFromJson(jsonMap);
 
   Map<String, dynamic> toJson() => _$SubCategoryResultToJson(this);
 }
@@ -137,7 +153,12 @@ abstract class QuestionResult {
   ExtraResults extraResults = {};
   late String typeName;
 
-  QuestionResult({required this.sourceQuestion, this.finalScore, ExtraResults? extraResults, this.answerTime, this.isHinted = false}) {
+  QuestionResult(
+      {required this.sourceQuestion,
+      this.finalScore,
+      ExtraResults? extraResults,
+      this.answerTime,
+      this.isHinted = false}) {
     typeName = runtimeType.toString();
     if (extraResults != null) {
       this.extraResults = extraResults;
@@ -163,7 +184,6 @@ abstract class QuestionResult {
   }
 
   Map<String, dynamic> toJson();
-
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -173,9 +193,14 @@ class AudioQuestionResult extends QuestionResult {
   @JsonKey(includeFromJson: false, includeToJson: false)
   List<int>? rawPcm16Data;
 
-  AudioQuestionResult({required super.sourceQuestion, this.audioContent = "", super.answerTime, this.rawPcm16Data});
+  AudioQuestionResult(
+      {required super.sourceQuestion,
+      this.audioContent = "",
+      super.answerTime,
+      this.rawPcm16Data});
 
-  factory AudioQuestionResult.fromJson(Map<String, dynamic> json) => _$AudioQuestionResultFromJson(json);
+  factory AudioQuestionResult.fromJson(Map<String, dynamic> json) =>
+      _$AudioQuestionResultFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$AudioQuestionResultToJson(this);
@@ -185,13 +210,17 @@ class AudioQuestionResult extends QuestionResult {
 class CommandQuestionResult extends QuestionResult {
   List<CommandActions> actions = [];
 
-  CommandQuestionResult({required super.sourceQuestion, List<CommandActions>? actions, super.answerTime}) {
+  CommandQuestionResult(
+      {required super.sourceQuestion,
+      List<CommandActions>? actions,
+      super.answerTime}) {
     if (actions != null) {
       this.actions = actions;
     }
   }
 
-  factory CommandQuestionResult.fromJson(Map<String, dynamic> json) => _$CommandQuestionResultFromJson(json);
+  factory CommandQuestionResult.fromJson(Map<String, dynamic> json) =>
+      _$CommandQuestionResultFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$CommandQuestionResultToJson(this);
@@ -201,13 +230,17 @@ class CommandQuestionResult extends QuestionResult {
 class ChoiceQuestionResult extends QuestionResult {
   List<int> choiceSelected = [];
 
-  ChoiceQuestionResult({required super.sourceQuestion, List<int>? choiceSelected, super.answerTime}) {
+  ChoiceQuestionResult(
+      {required super.sourceQuestion,
+      List<int>? choiceSelected,
+      super.answerTime}) {
     if (choiceSelected != null) {
       this.choiceSelected = choiceSelected;
     }
   }
 
-  factory ChoiceQuestionResult.fromJson(Map<String, dynamic> json) => _$ChoiceQuestionResultFromJson(json);
+  factory ChoiceQuestionResult.fromJson(Map<String, dynamic> json) =>
+      _$ChoiceQuestionResultFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ChoiceQuestionResultToJson(this);
@@ -218,9 +251,13 @@ class WritingQuestionResult extends QuestionResult {
   @JsonKey(includeToJson: false, includeFromJson: false)
   Uint8List? handWriteImageData;
 
-  WritingQuestionResult({required super.sourceQuestion, this.handWriteImageData, super.answerTime});
+  WritingQuestionResult(
+      {required super.sourceQuestion,
+      this.handWriteImageData,
+      super.answerTime});
 
-  factory WritingQuestionResult.fromJson(Map<String, dynamic> json) => _$WritingQuestionResultFromJson(json);
+  factory WritingQuestionResult.fromJson(Map<String, dynamic> json) =>
+      _$WritingQuestionResultFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$WritingQuestionResultToJson(this);
@@ -229,13 +266,17 @@ class WritingQuestionResult extends QuestionResult {
 @JsonSerializable(explicitToJson: true)
 class ItemFindingQuestionResult extends QuestionResult {
   late List<double>? clickCoordinate;
-  ItemFindingQuestionResult({required super.sourceQuestion, List<double>? coordinate, super.answerTime}) {
+  ItemFindingQuestionResult(
+      {required super.sourceQuestion,
+      List<double>? coordinate,
+      super.answerTime}) {
     if (coordinate != null) {
       clickCoordinate = coordinate;
     }
   }
 
-  factory ItemFindingQuestionResult.fromJson(Map<String, dynamic> json) => _$ItemFindingQuestionResultFromJson(json);
+  factory ItemFindingQuestionResult.fromJson(Map<String, dynamic> json) =>
+      _$ItemFindingQuestionResultFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ItemFindingQuestionResultToJson(this);

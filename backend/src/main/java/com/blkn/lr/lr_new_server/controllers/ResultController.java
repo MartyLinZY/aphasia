@@ -38,12 +38,10 @@ public class ResultController {
     @PostMapping("/examRecord")
     ExamResultDto saveResult(@RequestBody ExamResultDto resultDto, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
-
         ExamResult updated = resultDao.save(resultDto.toModel(uid));
         if (updated == null) {
             throw new BusinessErrorException("保存id为" + resultDto.getId() + "的作答结果失败");
         }
-
         return new ExamResultDto(updated, questionDao);
     }
 

@@ -17,9 +17,9 @@ class WritingQuestionAnswerArea extends StatefulWidget {
 
   const WritingQuestionAnswerArea(
       {super.key,
-        required this.question,
-        required this.commonStyles,
-        required this.goToNextQuestion});
+      required this.question,
+      required this.commonStyles,
+      required this.goToNextQuestion});
 
   @override
   State<WritingQuestionAnswerArea> createState() =>
@@ -29,6 +29,12 @@ class WritingQuestionAnswerArea extends StatefulWidget {
 class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
     with QuestionAnswerArea
     implements ResettableState {
+  // 新增样式常量
+  static const _cardRadius = 20.0;
+  static const _buttonPadding =
+      EdgeInsets.symmetric(horizontal: 32, vertical: 16);
+  static const _actionSpacing = 24.0;
+  static const _writingBorderWidth = 2.0;
 
   // 常规变量
   late WritingQuestion currQuestion;
@@ -37,7 +43,8 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
   bool answerStart = false;
 
   // 画板控制器
-  DrawingController _drawingController = DrawingController(config: DrawConfig.def(contentType: SmoothLine, color: Colors.black));
+  DrawingController _drawingController = DrawingController(
+      config: DrawConfig.def(contentType: SmoothLine, color: Colors.black));
 
   // 截屏控制器
   ScreenshotController _screenshotController = ScreenshotController();
@@ -48,7 +55,8 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
     result = WritingQuestionResult(sourceQuestion: widget.question);
     answerStart = false;
 
-    _drawingController = DrawingController(config: DrawConfig.def(contentType: SmoothLine, color: Colors.black));
+    _drawingController = DrawingController(
+        config: DrawConfig.def(contentType: SmoothLine, color: Colors.black));
     _screenshotController = ScreenshotController();
 
     initQuestionStem(currQuestion);
@@ -65,17 +73,26 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
       doCommonFinishStep(result);
 
       if (handWriteData != null) {
-        evalQuestion(handWriteData: handWriteData, question: currQuestion, result: result);
+        evalQuestion(
+            handWriteData: handWriteData,
+            question: currQuestion,
+            result: result);
       } else {
         toast(context, msg: "获取手写结果失败，请联系开发者", btnText: "确认");
       }
     });
   }
 
-  void evalQuestion({required Uint8List? handWriteData, required WritingQuestion question, required WritingQuestionResult result}) {
+  void evalQuestion(
+      {required Uint8List? handWriteData,
+      required WritingQuestion question,
+      required WritingQuestionResult result}) {
     result.handWriteImageData = handWriteData;
 
-    doEvalQuestion(question: question, result: result, goToNextQuestion: widget.goToNextQuestion);
+    doEvalQuestion(
+        question: question,
+        result: result,
+        goToNextQuestion: widget.goToNextQuestion);
   }
 
   @override
@@ -112,115 +129,167 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text('评分中，请稍候', style: commonStyles!.hintTextStyle,),
-            ),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('评分中，请稍候', style: commonStyles?.hintTextStyle),
           ],
         ),
       );
     }
-
-    List<Widget> questionBoard = [];
-    if (isQuestionTextDisplayed) {
-      questionBoard.add(Expanded(
-          flex: 1,
-          child: Center(
-            child: Text(
-              displayText ?? "不应该为这个",
-              style: commonStyles?.titleStyle,
-            ),
-          )));
-    }
-
-    if (imageDisplayed) {
-      questionBoard.add(Expanded(
-        flex: 6,
-        child: buildUrlOrAssetsImage(
-          context,
-          imageUrl: displayImageUrl!,
-          commonStyles: commonStyles,
-        ),
-      ));
-    } else {
-      questionBoard.add(Expanded(
-        flex: 6,
-        child: _buildWritingArea(context, commonStyles: commonStyles, question: currQuestion),
-      ));
-    }
-
-    Widget actionArea = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-            onPressed: () {
-              _drawingController.clear();
-            },
-            child: Text(
-              "重写",
-              style: commonStyles?.bodyStyle,
-            )),
-        const SizedBox(
-          height: 48,
-        ),
-        ElevatedButton(
-            onPressed: () {
-              finishAnswer();
-            },
-            child: Text(
-              "好了",
-              style: commonStyles?.bodyStyle,
-            )),
-        const SizedBox(
-          height: 16,
-        ),
-        timeLimitCountDown!.buildCountWidget(commonStyles: commonStyles)
-      ],
-    );
-
-    Widget contentArea;
-    if (questionBoard.isEmpty) {
-      contentArea = Center(
-        child: actionArea,
-      );
-    } else {
-      contentArea = Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: questionBoard,
-            ),
-          ),
-          const SizedBox(
-            width: 8.0,
-          ),
-          Expanded(flex: 1, child: actionArea),
-        ],
-      );
-    }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: contentArea,
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_cardRadius),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  widget.commonStyles?.primaryColor?.withOpacity(0.03) ??
+                      Colors.white,
+                  widget.commonStyles?.onPrimaryColor?.withOpacity(0.05) ??
+                      Colors.white,
+                ]),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: _buildContentArea(widget.commonStyles),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildWritingArea(BuildContext context, {CommonStyles? commonStyles, required WritingQuestion question}) {
+  Widget _buildContentArea(CommonStyles? commonStyles) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: _buildQuestionBoard(commonStyles),
+        ),
+        const SizedBox(width: _actionSpacing),
+        Expanded(
+          flex: 1,
+          child: _buildActionArea(commonStyles),
+        )
+      ],
+    );
+  }
+
+  Widget _buildActionArea(CommonStyles? commonStyles) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.restart_alt, color: Colors.white),
+          label: Text("重写",
+              style: commonStyles?.bodyStyle
+                  ?.copyWith(color: Colors.white, fontSize: 16)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            padding: _buttonPadding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_cardRadius),
+            ),
+            elevation: 4,
+          ),
+          onPressed: () => _drawingController.clear(),
+        ),
+        const SizedBox(height: _actionSpacing),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.check_circle, color: Colors.white),
+          label: Text("提交答案",
+              style: commonStyles?.bodyStyle
+                  ?.copyWith(color: Colors.white, fontSize: 16)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: commonStyles?.primaryColor ?? Colors.blueAccent,
+            padding: _buttonPadding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_cardRadius),
+            ),
+            elevation: 4,
+          ),
+          onPressed: finishAnswer,
+        ),
+        const SizedBox(height: _actionSpacing),
+        timeLimitCountDown!.buildCountWidget(commonStyles: commonStyles)
+      ],
+    );
+  }
+
+  Widget _buildDrawingBoard(BuildContext context, CommonStyles? commonStyles) {
+    return Screenshot(
+      controller: _screenshotController,
+      child: DrawingBoard(
+        background: _buildBoardBackground(context, commonStyles),
+        controller: _drawingController,
+        showDefaultActions: false,
+        showDefaultTools: false,
+        boardBoundaryMargin: const EdgeInsets.all(20),
+      ),
+    );
+  }
+
+  Widget _buildBoardBackground(
+      BuildContext context, CommonStyles? commonStyles) {
+    if (currQuestion.imageUrl == null) {
+      return Container(color: Colors.white);
+    }
+    return buildUrlOrAssetsImage(context,
+        imageUrl: currQuestion.imageUrl!, commonStyles: commonStyles);
+  }
+
+  Widget _buildQuestionBoard(CommonStyles? commonStyles) {
+    return Column(
+      children: [
+        if (isQuestionTextDisplayed)
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text(
+                displayText ?? "题目文本加载中",
+                style: commonStyles?.titleStyle
+                    ?.copyWith(fontSize: 24, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        Expanded(
+          flex: 6,
+          child: imageDisplayed
+              ? buildUrlOrAssetsImage(
+                  context,
+                  imageUrl: displayImageUrl!,
+                  commonStyles: commonStyles,
+                )
+              : _buildWritingArea(context,
+                  commonStyles: commonStyles, question: currQuestion),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWritingArea(BuildContext context,
+      {CommonStyles? commonStyles, required WritingQuestion question}) {
     final mediaSize = MediaQuery.of(context).size;
     double boxWidth = mediaSize.width * 0.7;
     double boxHeight = mediaSize.height * 0.7;
 
     Widget drawingBoardBackground;
-    if (currQuestion.imageUrl == null || currQuestion.omitImageAfterSeconds != -1) {
-      drawingBoardBackground = Container(color: Colors.white, width: boxWidth, height: boxHeight,);
+    if (currQuestion.imageUrl == null ||
+        currQuestion.omitImageAfterSeconds != -1) {
+      drawingBoardBackground = Container(
+        color: Colors.white,
+        width: boxWidth,
+        height: boxHeight,
+      );
     } else {
-      drawingBoardBackground = buildUrlOrAssetsImage(context, imageUrl: currQuestion.imageUrl!, commonStyles: commonStyles);
+      drawingBoardBackground = buildUrlOrAssetsImage(context,
+          imageUrl: currQuestion.imageUrl!, commonStyles: commonStyles);
     }
 
 

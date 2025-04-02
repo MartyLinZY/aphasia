@@ -18,6 +18,7 @@ public class ExamResult {
     Date startTime;
     Date finishTime;
     Boolean isRecovery;
+    Boolean isDisabled;
     String examName;
     List<CategoryResult> categoryResults;
 }

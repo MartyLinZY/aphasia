@@ -502,23 +502,69 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
   }
 
   Step _buildSecondStep(BuildContext context) {
+    // return Step(
+    //   title: Text("基础设置", style: commonStyles?.bodyStyle,),
+    //   content: wrappedByCardInner(
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.start,
+    //         children: [
+    //           Text("题目基础设置：", style: commonStyles?.titleStyle,),
+    //           const Divider(height: 24, thickness: 0.5,),
+    //           _buildAliasField(),
+    //           const SizedBox(height: 16,),
+    //           _buildQuestionTextField(),
+    //           const SizedBox(height: 16,),
+    //           _buildAudioSetting(),
+    //           const SizedBox(height: 16,),
+    //           _buildImageSetting(),
+    //         ],
+    //       )
+    //   )
+    // );
     return Step(
-      title: Text("基础设置", style: commonStyles?.bodyStyle,),
+      title: Text("基础设置", style: commonStyles?.bodyStyle),
       content: wrappedByCardInner(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("题目基础设置：", style: commonStyles?.titleStyle,),
-              const Divider(height: 24, thickness: 0.5,),
-              _buildAliasField(),
-              const SizedBox(height: 16,),
-              _buildQuestionTextField(),
-              const SizedBox(height: 16,),
-              _buildAudioSetting(),
-              const SizedBox(height: 16,),
-              _buildImageSetting(),
-            ],
-          )
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("题目基础设置：", style: commonStyles?.titleStyle),
+            const Divider(height: 24, thickness: 0.5),
+            // 统一输入框样式
+            _buildDecoratedTextField(
+              label: "题目名称：",
+              controller: aliasCtrl,
+              key: _aliasKey,
+              validator: aliasValidator,
+              maxLength: 20
+            ),
+            const SizedBox(height: 16),
+            _buildDecoratedTextField(
+              label: "题干文本：",
+              controller: questionTextCtrl,
+              key: _questionTextKey,
+              validator: questionTextValidator,
+              maxLength: 50
+            ),
+            const SizedBox(height: 16),
+            // 优化多媒体设置区块
+            _buildMediaSection(
+              title: "题干音频设置",
+              value: currQuestion.audioUrl,
+              setAction: _handleSetAudio,
+              clearAction: _handleClearAudio,
+              icon: Icons.audiotrack
+            ),
+            const SizedBox(height: 16),
+            _buildMediaSection(
+              title: "题干图片设置", 
+              value: currQuestion.imageUrl,
+              setAction: _handleSetImage,
+              clearAction: _handleClearImage,
+              icon: Icons.image,
+              extraContent: _buildImageOmitTime()
+            ),
+          ],
+        ),
       )
     );
   }
@@ -527,137 +573,332 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
     return max(MediaQuery.of(context).size.width / 4, textFieldMinWidth);
   }
 
-  Widget _buildAliasField() {
-    double textFieldMinWidth = 100.0;
-    return Row(
+  void _handleSetAudio() {
+    showDialog<String?>(
+      context: context,
+      builder: (context) => AudioSettingDialog(uploadedAudioUrl: currQuestion.audioUrl),
+    ).then((fileUrl) {
+      if (fileUrl != null) {
+        setState(() => currQuestion.audioUrl = fileUrl);
+      }
+    });
+  }
+
+  void _handleClearAudio() {
+    confirm(
+      context,
+      title: "确认",
+      body: "确认要删除已经设置的音频吗？",
+      commonStyles: commonStyles,
+      onConfirm: (context) {
+        Navigator.pop(context);
+        setState(() => currQuestion.audioUrl = null);
+      }
+    );
+  }
+
+  void _handleSetImage() {
+    String? imageAssetPath = isImageUrlAssets(currQuestion.imageUrl) 
+        ? currQuestion.imageUrl 
+        : null;
+    String? imageUrl = !isImageUrlAssets(currQuestion.imageUrl)
+        ? currQuestion.imageUrl
+        : null;
+
+    showDialog<Map<String, dynamic>?>(
+      context: context,
+      builder: (context) => SelectImagesDialog(
+        imageAssetPath: imageAssetPath,
+        imageUrl: imageUrl,
+        commonStyles: commonStyles,
+      ),
+    ).then((map) {
+    //   if (map != null) {
+    //     setState(() {
+    //       currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
+    //     });
+    //   }
+    // });
+      if (map != null && (map['imageUrl'] != null || map['imageAssetPath'] != null)) {
+        setState(() {
+          currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
+        });
+      }
+    });
+  }
+
+  void _handleClearImage() {
+    confirm(
+      context,
+      title: "确认",
+      body: "确认要删除已经设置的图片吗？",
+      commonStyles: commonStyles,
+      onConfirm: (context) {
+        Navigator.pop(context);
+        setState(() {
+          currQuestion.imageUrl = null;
+          currQuestion.omitImageAfterSeconds = -1;
+        });
+      }
+    );
+  }
+
+  // 新增复用组件方法
+  Widget _buildDecoratedTextField({
+    required String label,
+    required TextEditingController controller,
+    required GlobalKey<FormFieldState> key,
+    required FormFieldValidator<String?> validator,
+    int? maxLength
+  }) {
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      ),
+      child: TextFormField(
+        controller: controller,
+        key: key,
+        validator: validator,
+        maxLength: maxLength,
+        style: commonStyles?.bodyStyle,
+      ),
+    );
+  }
+
+  Widget _buildMediaSection({
+    required String title,
+    required String? value,
+    required VoidCallback setAction,
+    required VoidCallback clearAction,
+    required IconData icon,
+    Widget? extraContent
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("题目名称：", style: commonStyles?.bodyStyle,),
-        Container(
-          constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
-          child: TextFormField(
-            key: _aliasKey,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            maxLength: 20,
-            controller: aliasCtrl,
-            style: commonStyles?.bodyStyle,
-            validator: aliasValidator,
+        Text(title, style: commonStyles?.titleStyle),
+        const SizedBox(height: 8),
+        Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, size: 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(value ?? "未设置", 
+                    style: commonStyles?.bodyStyle?.copyWith(
+                      color: value != null 
+                        ? commonStyles?.primaryColor 
+                        : commonStyles?.primaryColor?.withOpacity(0.5)
+                    )
+                  ),
+                ),
+                _buildMediaButton(
+                  label: value != null ? "重新设置" : "设置",
+                  icon: icon,
+                  onPressed: setAction
+                ),
+                if (value != null) ...[
+                  const SizedBox(width: 8),
+                  _buildMediaButton(
+                    label: "清除",
+                    icon: Icons.delete,
+                    color: commonStyles?.errorColor,
+                    onPressed: clearAction
+                  )
+                ]
+              ],
+            ),
           ),
         ),
+        if (extraContent != null) extraContent,
       ],
     );
   }
 
-  Widget _buildQuestionTextField() {
-    double textFieldMinWidth = 100;
-    return Row(
-      children: [
-        Text("题干文本：", style: commonStyles?.bodyStyle,),
-        Container(
-          constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
-          child: TextFormField(
-            key: _questionTextKey,
-            maxLength: 50,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            controller: questionTextCtrl,
-            style: commonStyles?.bodyStyle,
-            validator: questionTextValidator,
-          ),
+  Widget _buildMediaButton({
+    required String label,
+    required IconData icon,
+    Color? color,
+    required VoidCallback onPressed
+  }) {
+    return Tooltip(
+      message: label,
+      child: TextButton.icon(
+        icon: Icon(icon, size: 20),
+        label: Text(label),
+        style: TextButton.styleFrom(
+          foregroundColor: color ?? commonStyles?.primaryColor,
+          backgroundColor: color?.withOpacity(0.1),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
-      ],
+        onPressed: onPressed,
+      ),
     );
   }
 
-  Widget _buildAudioSetting() {
-
-    return Row(
+  Widget _buildImageOmitTime() {
+    return Column(
       children: [
-        Text("设置题干音频：", style: commonStyles?.bodyStyle,),
-        ElevatedButton (
-          onPressed: () {
-            showDialog<String?>(context: context, builder: (context) => AudioSettingDialog(uploadedAudioUrl: currQuestion.audioUrl,))
-              .then((fileUrl) {
-              if (fileUrl != null) {
-                setState(() {
-                  currQuestion.audioUrl = fileUrl;
-                });
-              }
-            });
-          },
-          child: Text("设置", style: commonStyles?.bodyStyle,),
-        ),
-        const SizedBox(width: 16,),
-        currQuestion.audioUrl == null ? const SizedBox.shrink(): ElevatedButton(
-          onPressed: () {
-            confirm(context, title: "确认", body: "确认要删除已经设置的音频吗？", commonStyles: commonStyles,
-              onConfirm: (context) {
-                Navigator.pop(context);
-                setState(() {
-                  currQuestion.audioUrl = null;
-                });
-              }
-            );
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
-          child: Text("清除已设置音频", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor), ),
+        const SizedBox(height: 16),
+        Visibility(
+          visible: currQuestion.imageUrl != null,
+          child: Column(
+            children: [
+              _buildDecoratedTextField(
+                label: "图片展示时间（秒）：",
+                controller: omitTimeCtrl,
+                key: _omitTimeKey,
+                validator: omitTimeValidator,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "提示：场景寻物题设为-1保持显示\n其他题型最大${Question.maxOmitTime}秒",
+                style: commonStyles?.hintTextStyle
+              )
+            ],
+          ),
         )
       ],
     );
   }
 
-  Widget _buildImageSetting() {
-    String? imageAssetPath;
-    String? imageUrl;
-    if (isImageUrlAssets(currQuestion.imageUrl)) {
-      imageAssetPath = currQuestion.imageUrl;
-    } else {
-      imageUrl = currQuestion.imageUrl;
-    }
+  // Widget _buildAliasField() {
+  //   double textFieldMinWidth = 100.0;
+  //   return Row(
+  //     children: [
+  //       Text("题目名称：", style: commonStyles?.bodyStyle,),
+  //       Container(
+  //         constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
+  //         child: TextFormField(
+  //           key: _aliasKey,
+  //           decoration: const InputDecoration(border: OutlineInputBorder()),
+  //           maxLength: 20,
+  //           controller: aliasCtrl,
+  //           style: commonStyles?.bodyStyle,
+  //           validator: aliasValidator,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text("设置题干图片：", style: commonStyles?.bodyStyle,),
-            ElevatedButton (
-              onPressed: () {
-                showDialog<Map<String, dynamic>?>(context: context, builder: (context) => SelectImagesDialog (
-                  imageAssetPath: imageAssetPath,
-                  imageUrl: imageUrl,
-                  commonStyles: commonStyles,
-                )).then((map) {
-                  if(map != null) {
-                    setState(() {
-                      currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
-                    });
-                  }
-                });
-              },
-              child: Text("设置", style: commonStyles?.bodyStyle,),
-            ),
-            const SizedBox(width: 16,),
-            currQuestion.imageUrl == null ? const SizedBox.shrink(): ElevatedButton(
-                onPressed: () {
-                  confirm(context, title: "确认", body: "确认要删除已经设置的图片吗？", commonStyles: commonStyles,
-                    onConfirm: (context) {
-                      Navigator.pop(context);
-                      setState(() {
-                        currQuestion.imageUrl = null;
-                        currQuestion.omitImageAfterSeconds = -1;
-                      });
-                    }
-                  );
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
-                child: Text("清除已设置图片", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor),)
-            )
-          ],
-        ),
-        const SizedBox(height: 16,),
-        currQuestion.imageUrl == null? const SizedBox.shrink() : buildInputFormField("图片展示时间（1-${Question.maxOmitTime}）：", _omitTimeKey, omitTimeCtrl, omitTimeValidator, commonStyles: commonStyles),
-        currQuestion.imageUrl == null? const SizedBox.shrink() : Text("场景寻物题不需要修改该值；对于录音题，可以将该值设为-1来设置始终显示图片；对于选择题、指令题和书写题，该值最大为${Question.maxOmitTime}", style: commonStyles?.bodyStyle,),
-      ],
-    );
-  }
+  // Widget _buildQuestionTextField() {
+  //   double textFieldMinWidth = 100;
+  //   return Row(
+  //     children: [
+  //       Text("题干文本：", style: commonStyles?.bodyStyle,),
+  //       Container(
+  //         constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
+  //         child: TextFormField(
+  //           key: _questionTextKey,
+  //           maxLength: 50,
+  //           decoration: const InputDecoration(border: OutlineInputBorder()),
+  //           controller: questionTextCtrl,
+  //           style: commonStyles?.bodyStyle,
+  //           validator: questionTextValidator,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  // Widget _buildAudioSetting() {
+
+  //   return Row(
+  //     children: [
+  //       Text("设置题干音频：", style: commonStyles?.bodyStyle,),
+  //       ElevatedButton (
+  //         onPressed: () {
+  //           showDialog<String?>(context: context, builder: (context) => AudioSettingDialog(uploadedAudioUrl: currQuestion.audioUrl,))
+  //             .then((fileUrl) {
+  //             if (fileUrl != null) {
+  //               setState(() {
+  //                 currQuestion.audioUrl = fileUrl;
+  //               });
+  //             }
+  //           });
+  //         },
+  //         child: Text("设置", style: commonStyles?.bodyStyle,),
+  //       ),
+  //       const SizedBox(width: 16,),
+  //       currQuestion.audioUrl == null ? const SizedBox.shrink(): ElevatedButton(
+  //         onPressed: () {
+  //           confirm(context, title: "确认", body: "确认要删除已经设置的音频吗？", commonStyles: commonStyles,
+  //             onConfirm: (context) {
+  //               Navigator.pop(context);
+  //               setState(() {
+  //                 currQuestion.audioUrl = null;
+  //               });
+  //             }
+  //           );
+  //         },
+  //         style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
+  //         child: Text("清除已设置音频", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor), ),
+  //       )
+  //     ],
+  //   );
+  // }
+
+  // Widget _buildImageSetting() {
+  //   String? imageAssetPath;
+  //   String? imageUrl;
+  //   if (isImageUrlAssets(currQuestion.imageUrl)) {
+  //     imageAssetPath = currQuestion.imageUrl;
+  //   } else {
+  //     imageUrl = currQuestion.imageUrl;
+  //   }
+
+  //   return Column(
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Text("设置题干图片：", style: commonStyles?.bodyStyle,),
+  //           ElevatedButton (
+  //             onPressed: () {
+  //               showDialog<Map<String, dynamic>?>(context: context, builder: (context) => SelectImagesDialog (
+  //                 imageAssetPath: imageAssetPath,
+  //                 imageUrl: imageUrl,
+  //                 commonStyles: commonStyles,
+  //               )).then((map) {
+  //                 if(map != null) {
+  //                   setState(() {
+  //                     currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
+  //                   });
+  //                 }
+  //               });
+  //             },
+  //             child: Text("设置", style: commonStyles?.bodyStyle,),
+  //           ),
+  //           const SizedBox(width: 16,),
+  //           currQuestion.imageUrl == null ? const SizedBox.shrink(): ElevatedButton(
+  //               onPressed: () {
+  //                 confirm(context, title: "确认", body: "确认要删除已经设置的图片吗？", commonStyles: commonStyles,
+  //                   onConfirm: (context) {
+  //                     Navigator.pop(context);
+  //                     setState(() {
+  //                       currQuestion.imageUrl = null;
+  //                       currQuestion.omitImageAfterSeconds = -1;
+  //                     });
+  //                   }
+  //                 );
+  //               },
+  //               style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
+  //               child: Text("清除已设置图片", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor),)
+  //           )
+  //         ],
+  //       ),
+  //       const SizedBox(height: 16,),
+  //       currQuestion.imageUrl == null? const SizedBox.shrink() : buildInputFormField("图片展示时间（1-${Question.maxOmitTime}）：", _omitTimeKey, omitTimeCtrl, omitTimeValidator, commonStyles: commonStyles),
+  //       currQuestion.imageUrl == null? const SizedBox.shrink() : Text("场景寻物题不需要修改该值；对于录音题，可以将该值设为-1来设置始终显示图片；对于选择题、指令题和书写题，该值最大为${Question.maxOmitTime}", style: commonStyles?.bodyStyle,),
+  //     ],
+  //   );
+  // }
 
   Step _buildThirdStep(BuildContext context) {
     return Step(

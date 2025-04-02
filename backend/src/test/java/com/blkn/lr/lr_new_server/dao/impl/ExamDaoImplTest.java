@@ -2,10 +2,12 @@ package com.blkn.lr.lr_new_server.dao.impl;
 
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
+import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -17,6 +17,7 @@ ExamResult _$ExamResultFromJson(Map<String, dynamic> json) => ExamResult(
           ? null
           : DateTime.parse(json['finishTime'] as String),
       isRecovery: json['isRecovery'] as bool? ?? false,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       examName: json['examName'] as String,
     )..categoryResults = (json['categoryResults'] as List<dynamic>)
         .map((e) => CategoryResult.fromJson(e as Map<String, dynamic>))
@@ -30,6 +31,7 @@ Map<String, dynamic> _$ExamResultToJson(ExamResult instance) =>
       'startTime': instance.startTime?.toIso8601String(),
       'finishTime': instance.finishTime?.toIso8601String(),
       'isRecovery': instance.isRecovery,
+      'isDisabled': instance.isDisabled,
       'examName': instance.examName,
       'categoryResults':
           instance.categoryResults.map((e) => e.toJson()).toList(),
