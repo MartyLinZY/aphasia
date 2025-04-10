@@ -29,6 +29,11 @@ class _AudioQuestionAnswerAreaState extends State<ChoiceQuestionAnswerArea>
     with QuestionAnswerArea
     implements ResettableState {
 
+  // 新增样式常量
+  static const _cardRadius = 20.0;
+  static const _buttonPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+  static const _choiceAnimationDuration = Duration(milliseconds: 300);
+
   // 常规变量
   late ChoiceQuestion currQuestion;
   late ChoiceQuestionResult result;
@@ -94,171 +99,193 @@ class _AudioQuestionAnswerAreaState extends State<ChoiceQuestionAnswerArea>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text('评分中，请稍候', style: commonStyles!.hintTextStyle,),
-            ),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('评分中，请稍候', style: commonStyles?.hintTextStyle),
           ],
         ),
       );
     }
 
-    List<Widget> questionBoard = [];
-    if (isQuestionTextDisplayed) {
-      questionBoard.add(Expanded(
-          flex: 1,
-          child: Center(
-            child: Text(
-              displayText ?? "不应该为这个",
-              style: commonStyles?.titleStyle,
-            ),
-          )));
-    }
-
-    if (imageDisplayed) {
-      questionBoard.add(Expanded(
-        flex: 6,
-        child: buildUrlOrAssetsImage(
-          context,
-          imageUrl: displayImageUrl!,
-          commonStyles: commonStyles,
-        ),
-      ));
-    } else {
-      questionBoard.add(Expanded(
-        flex: 6,
-        child: _buildChoices(context, commonStyles: commonStyles, question: currQuestion),
-      ));
-    }
-
-    Widget actionArea = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-            onPressed: () {
-              finishAnswer();
-            },
-            child: Text(
-              "选好了",
-              style: commonStyles?.bodyStyle,
-            )),
-        const SizedBox(
-          height: 16,
-        ),
-        timeLimitCountDown!.buildCountWidget(commonStyles: commonStyles)
-      ],
-    );
-
-    Widget contentArea;
-    if (questionBoard.isEmpty) {
-      contentArea = Center(
-        child: actionArea,
-      );
-    } else {
-      contentArea = Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: questionBoard,
-            ),
-          ),
-          const SizedBox(
-            width: 8.0,
-          ),
-          Expanded(flex: 1, child: actionArea),
-        ],
-      );
-    }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: contentArea,
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_cardRadius),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                widget.commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
+                widget.commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+              ]
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: _buildContentArea(widget.commonStyles),
+          ),
+        ),
+      ),
     );
+  }
+  Widget _buildContentArea(CommonStyles? commonStyles) {
+   return Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: _buildQuestionBoard(commonStyles),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          flex: 1,
+          child: _buildActionArea(commonStyles),
+        )
+      ],
+    );
+  }
+
+  Widget _buildQuestionBoard(CommonStyles? commonStyles) {
+    if (imageDisplayed) {
+      return buildUrlOrAssetsImage(
+        context,
+        imageUrl: displayImageUrl!,
+        commonStyles: commonStyles,
+      );
+    }
+    return _buildChoices(context, commonStyles: commonStyles, question: currQuestion);
   }
 
   Widget _buildChoices(BuildContext context, {required Question question, CommonStyles? commonStyles}) {
-    question = question as ChoiceQuestion;
-    EvalChoiceQuestionByCorrectChoiceCount evalRule = question.evalRule! as EvalChoiceQuestionByCorrectChoiceCount;
-
-    final media = MediaQuery.of(context);
-    var screenAspectRatio = media.size.aspectRatio + 0.3;
-
-    int crossAxisCount;
-    if (evalRule.choices.length <= 4) {
-      crossAxisCount = 2;
-    } else if (evalRule.choices.length <= 9) {
-      crossAxisCount = 3;
-    } else if (evalRule.choices.length <= 12) {
-      crossAxisCount = 4;
-    } else if (evalRule.choices.length <= 20) {
-      crossAxisCount = 5;
-    } else {
-      throw UnimplementedError("预期外的错误，超过了20个选项");
-    }
-
-    return GridView.count(
-      mainAxisSpacing: 4.0,
-      crossAxisCount: crossAxisCount,
-      crossAxisSpacing: 4.0,
-      childAspectRatio: screenAspectRatio,
-      shrinkWrap: true,
-      children: evalRule.choices.asMap().entries.map((e) {
-        int index = e.key;
-        Choice choice = e.value;
-
-        int indexInSelected = choiceSelected.indexOf(index);
-
-        bool isSingleChoose = evalRule.correctChoices.length == 1;
-
-        return InkWell(
-          onTap: () {
-            setState(() {
-              if (isSingleChoose) {
-                choiceSelected.clear();
-                choiceSelected.add(index);
-              } else {
-                if (choiceSelected.contains(index)) {
-                  choiceSelected.remove(index);
-                } else {
-                  choiceSelected.add(index);
-                }
-              }
-            });
-          },
-          child: Stack(
-            children: [
-              Center(
-                child: buildUrlOrAssetsImage(context,
-                  imageUrl: choice.imageUrlOrPath!,
-                  commonStyles: commonStyles
-                ),
-              ),
-              Center(
-                child: indexInSelected == -1
-                    ? const SizedBox.shrink()
-                    : Container(
-                  decoration: BoxDecoration(
-                    color: commonStyles?.primaryColor,
-                    shape: BoxShape.circle
-                  ),
-                  width: 32,
-                  height: 32,
-                  child: isSingleChoose
-                      ? Icon(Icons.check_circle_outline, color: commonStyles?.onPrimaryColor, size: 32,)
-                      : Center(child: Text("${indexInSelected+1}", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles.onPrimaryColor),)),
-                ),
-              )
-            ],
-          )
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        return GridView.count(
+          mainAxisSpacing: 8.0,
+          crossAxisCount: _calculateCrossAxisCount(question),
+          childAspectRatio: 1.2,
+          shrinkWrap: true,
+          children: _buildChoiceCards(context, question, screenWidth, commonStyles),
         );
-      }).toList(),
+      }
     );
   }
 
+  Widget _buildActionArea(CommonStyles? commonStyles) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.check_circle, color: Colors.white),
+          label: Text("提交答案",
+            style: commonStyles?.bodyStyle?.copyWith(
+              color: Colors.white,
+              fontSize: 16
+            )
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: commonStyles?.primaryColor ?? Colors.blueAccent,
+            padding: _buttonPadding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_cardRadius),
+            ),
+          ),
+          onPressed: finishAnswer,
+        ),
+        const SizedBox(height: 24),
+        timeLimitCountDown!.buildCountWidget(commonStyles: commonStyles)
+      ],
+    );
+  }
+
+  List<Widget> _buildChoiceCards(BuildContext context, Question question, double screenWidth, CommonStyles? commonStyles) {
+    final evalRule = (question as ChoiceQuestion).evalRule as EvalChoiceQuestionByCorrectChoiceCount;
+    return evalRule.choices.asMap().entries.map((e) {
+      final isSelected = choiceSelected.contains(e.key);
+      
+      return AnimatedContainer(
+        duration: _choiceAnimationDuration,
+        margin: EdgeInsets.all(screenWidth > 600 ? 8 : 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected 
+              ? commonStyles?.primaryColor ?? Colors.blue 
+              : Colors.transparent,
+            width: 2
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isSelected ? 0.1 : 0.05),
+              blurRadius: 8,
+              offset: Offset(0, isSelected ? 4 : 2)
+            )
+          ]
+        ),
+        child: _buildChoiceItem(e.key, e.value, commonStyles),
+      );
+    }).toList();
+  }
+
+  Widget _buildChoiceItem(int index, Choice choice, CommonStyles? commonStyles) {
+    return InkWell(
+      onTap: () => _handleChoiceSelection(index),
+      borderRadius: BorderRadius.circular(10),
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          Center(child: choice.imageUrlOrPath != null 
+            ? buildUrlOrAssetsImage(context, 
+                imageUrl: choice.imageUrlOrPath!, // 移除非空断言!
+                commonStyles: commonStyles
+              )
+            : const Icon(Icons.error_outline, color: Colors.red) // 添加空路径处理
+          ),
+          if (choiceSelected.contains(index))
+            Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: commonStyles?.primaryColor,
+                shape: BoxShape.circle
+              ),
+              child: Text(
+                "${choiceSelected.indexOf(index) + 1}",
+                style: commonStyles?.bodyStyle?.copyWith(
+                  color: commonStyles.onPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            )
+        ],
+      ),
+    );
+  }
+
+  int _calculateCrossAxisCount(Question question) {
+    final choiceQuestion = question as ChoiceQuestion;
+    final evalRule = choiceQuestion.evalRule as EvalChoiceQuestionByCorrectChoiceCount;
+    final choiceCount = evalRule.choices.length;
+    if (choiceCount <= 4) return 2;
+    if (choiceCount <= 9) return 3;
+    if (choiceCount <= 12) return 4;
+    return 5;
+  }
+
+  void _handleChoiceSelection(int index) {
+    setState(() {
+      if ((currQuestion.evalRule as EvalChoiceQuestionByCorrectChoiceCount).correctChoices.length == 1) {
+        choiceSelected = [index];
+      } else {
+        choiceSelected.contains(index) 
+          ? choiceSelected.remove(index)
+          : choiceSelected.add(index);
+      }
+    });
+  }
 }

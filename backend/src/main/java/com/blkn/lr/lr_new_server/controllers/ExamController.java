@@ -98,6 +98,14 @@ public class ExamController {
         return Map.of("msg", "ok");
     }
 
+    @DeleteMapping("/exams/{examId}")
+    Map<String, String> deleteExam(@PathVariable String examId) {
+        if (examServices.deleteExam(examId) <= 0) {
+            throw new BusinessErrorException("删除id为" + examId + "的套题失败");
+        }
+        return Map.of("msg", "ok");
+    }
+
     @PostMapping("/exams/{examId}/category")
     QuestionCategoryDto addCategory(@RequestBody QuestionCategoryDto newCategory, @PathVariable("examId") String examId) {
         return examServices.addCategory(newCategory, examId);

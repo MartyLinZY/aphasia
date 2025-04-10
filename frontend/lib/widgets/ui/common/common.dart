@@ -9,6 +9,11 @@ import '../../../utils/io/file.dart';
 import '../../../utils/http/http_common.dart';
 
 class CircleIconSwitchTextButton extends StatelessWidget {
+  // 新增样式常量
+  static const _buttonSize = 48.0;
+  static const _elevation = 6.0;
+  static const _iconSize = 24.0;
+
   final int state;
   final List<Map<String, dynamic>> btnSetting;
 
@@ -31,23 +36,45 @@ class CircleIconSwitchTextButton extends StatelessWidget {
     var setting = btnSetting[state];
 
     return SizedBox(
-      width: 30,
-      child: TextButton (
-        style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 0.0)),
-        onPressed: setting['btnAction'],
-        child: Tooltip(
-          message: setting['btnTooltipMsg'],
-          child: SizedBox(
-            width: 30,
-            child: setting['btnIcon']
-          ),
+      // width: 40, // 增加宽度
+      // height: 40, // 增加高度
+      // child: ElevatedButton (
+      //   style: ElevatedButton.styleFrom(
+      //   padding: EdgeInsets.zero, // 去除内边距
+      //   shape: const CircleBorder(), // 圆形按钮
+      //   backgroundColor: Colors.blueAccent, // 背景颜色
+      //   elevation: 5, // 阴影效果
+      // ),
+      width: _buttonSize,
+      height: _buttonSize,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.zero,
+        shape: const CircleBorder(),
+        backgroundColor: setting['btnIcon'].color ?? Colors.blueAccent,
+        elevation: _elevation,
+        shadowColor: Colors.black.withOpacity(0.2),
+      ),
+       onPressed: setting['btnAction'],
+      child: Tooltip(
+        message: setting['btnTooltipMsg'],
+        child: IconTheme(
+          data: const IconThemeData(color: Colors.white), // 图标颜色
+          child: setting['btnIcon'],
         ),
+      ),
       ),
     );
   }
 }
 
 class TextOrTextField extends StatelessWidget with UseCommonStyles {
+  // 新增样式常量
+  static const _maxInputWidth = 280.0;
+  static const _borderRadius = 12.0;
+  static const _focusBorderWidth = 2.0;
+  static const _iconSize = 24.0;
+
   final bool editing;
   final TextEditingController controller;
   final void Function() onQuitEditing;
@@ -69,44 +96,111 @@ class TextOrTextField extends StatelessWidget with UseCommonStyles {
   Widget build(BuildContext context) {
     initStyles(context);
 
-    Widget textOrInput;
-    Widget actionBtn;
+    // Widget textOrInput;
+    // Widget actionBtn;
 
-    if (editing) {
-      textOrInput = Container(
-        constraints: const BoxConstraints(maxWidth: 200, minWidth: 100),
-        child: TextFormField(
-          autofocus: true,
-          controller: controller,
-          maxLength: 50,
-          onChanged: onChanged,
-          onEditingComplete: onQuitEditing,
-          validator: validator,
-        ),
-      );
-      actionBtn = TextButton(
-          onPressed: onEnterEditing,
-          child: const Icon(Icons.check)
-      );
-    } else {
-      textOrInput = Text(controller.text, style: commonStyles?.bodyStyle,);
-      actionBtn = TextButton(
-          onPressed: onEnterEditing,
-          child: const Icon(Icons.edit_outlined)
-      );
-    }
+    // if (editing) {
+    //   textOrInput = Container(
+    //     constraints: const BoxConstraints(maxWidth: 200, minWidth: 100),
+    //     child: TextFormField(
+    //       autofocus: true,
+    //       controller: controller,
+    //       maxLength: 50,
+    //       onChanged: onChanged,
+    //       onEditingComplete: onQuitEditing,
+    //       validator: validator,
+    //       decoration: InputDecoration(
+    //         enabledBorder: OutlineInputBorder(
+    //           borderSide: const BorderSide(color: Colors.grey),
+    //           borderRadius: BorderRadius.circular(10),
+    //         ),
+    //         focusedBorder: OutlineInputBorder(
+    //           borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+    //           borderRadius: BorderRadius.circular(10),
+    //         ),
+    //         border: OutlineInputBorder(
+    //           borderRadius: BorderRadius.circular(10),
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    //   actionBtn = TextButton(
+    //       onPressed: onEnterEditing,
+    //       child: const Icon(Icons.check, color: Colors.green)
+    //   );
+    // } else {
+    //   textOrInput = Text(controller.text, style: commonStyles?.bodyStyle,);
+    //   actionBtn = TextButton(
+    //       onPressed: onEnterEditing,
+    //       child: const Icon(Icons.edit_outlined, color: Colors.blueAccent)
+    //   );
+    // }
 
+    // return Row(
+    //   children: [
+    //     textOrInput,
+    //     const SizedBox(width: 8),
+    //     actionBtn
+    //   ],
+    // );
+     return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: editing ? _buildEditMode(commonStyles) : _buildViewMode(commonStyles),
+    );
+  }
+
+    Widget _buildEditMode(CommonStyles? styles) {
     return Row(
       children: [
-        textOrInput,
-        actionBtn
+        Container(
+          constraints: const BoxConstraints(maxWidth: _maxInputWidth),
+          child: TextFormField(
+            // ... 已有参数添加边框样式 ...
+            decoration: InputDecoration(
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.grey),
+                borderRadius: BorderRadius.circular(_borderRadius),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: styles?.primaryColor ?? Colors.blueAccent,
+                  width: _focusBorderWidth
+                ),
+                borderRadius: BorderRadius.circular(_borderRadius),
+              ),
+            ),
+          ),
+        ),
+        _buildActionButton(Icons.check, Colors.green, onQuitEditing)
       ],
+    );
+  }
+
+  Widget _buildViewMode(CommonStyles? styles) {
+    return Row(
+      children: [
+        Text(controller.text, style: styles?.bodyStyle),
+        _buildActionButton(Icons.edit_outlined, styles?.primaryColor, onEnterEditing)
+      ],
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, Color? color, VoidCallback action) {
+    return IconButton(
+      icon: Icon(icon, color: color),
+      onPressed: action,
+      splashRadius: 24,
+      iconSize: _iconSize,
     );
   }
 }
 
 
 class InnerShadowBox extends StatelessWidget {
+  // 新增默认参数
+  static const _defaultRadius = 16.0;
+  static const _shadowOpacity = 0.15;
+
   final Widget child;
 
   const InnerShadowBox({super.key, required this.child});
@@ -114,19 +208,42 @@ class InnerShadowBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(10), // 圆角
+        //   boxShadow: [
+        //     BoxShadow(
+        //       color: Colors.grey.withOpacity(0.5),
+        //       spreadRadius: 2,
+        //       blurRadius: 5,
+        //       offset: const Offset(0, 3),
+        //     ),
+        //     const BoxShadow(
+        //       color: Colors.white,
+        //       spreadRadius: -4.0,
+        //       blurRadius: 2.0,
+        //     ),
+        //   ],
+        // ),
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_defaultRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey[400]!,
+              color: Colors.grey.withOpacity(_shadowOpacity),
+              spreadRadius: 3,
+              blurRadius: 8,
+              offset: const Offset(2, 4),
             ),
             const BoxShadow(
               color: Colors.white,
-              spreadRadius: -4.0,
-              blurRadius: 2.0,
+              spreadRadius: -6.0,
+              blurRadius: 4.0,
             ),
           ],
         ),
-        child: child
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10), // 圆角
+          child: child,
+        ),
     );
   }
 }
@@ -361,16 +478,13 @@ class _SelectExistingImageDialogState extends State<SelectExistingImageDialog> w
 
               return Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(),
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text('读取中，请稍候', style: commonStyles?.hintTextStyle,),
-                    ),
+                    const SizedBox(height: 16),
+                    Text('读取中，请稍候', style: commonStyles?.hintTextStyle),
                   ],
                 ),
               );
@@ -445,7 +559,8 @@ class _SelectExistingAudioDialogState extends State<SelectExistingAudioDialog> w
                                     Expanded(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          border: Border.all(color: commonStyles?.primaryColor ?? Colors.blueAccent, width: 1)
+                                          border: Border.all(color: commonStyles?.primaryColor ?? Colors.blueAccent, width: 2),
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
                                         child: SizedBox.expand(
                                           child: Icon(Icons.music_note, color: commonStyles?.primaryColor,)

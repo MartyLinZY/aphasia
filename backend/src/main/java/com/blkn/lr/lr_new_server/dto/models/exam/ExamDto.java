@@ -29,6 +29,9 @@ public class ExamDto {
     // 是否已发布
     boolean isPublished;
 
+    // 是否已删除
+    boolean isDisabled;
+
     // 亚项列表
     List<QuestionCategoryDto> categories;
 
@@ -46,6 +49,7 @@ public class ExamDto {
 //        isRecovery = getIsRecovery();
         isPublished = exam.isPublished();
         isRecovery = exam.isRecovery();
+        isDisabled = exam.isDisabled();
         categories = exam.getCategories().stream().map(e -> new QuestionCategoryDto(e, questionDao)).toList();
         diagnosisRules = exam.getDiagnosisRules();
         rules = exam.getRules();
@@ -64,6 +68,7 @@ public class ExamDto {
         model.setDescription(description);
         model.setPublished(isPublished);
         model.setRecovery(isRecovery);
+        model.setDisabled(isDisabled);
         model.setCategories(categories.stream().map(QuestionCategoryDto::toModel).toList());
         model.setDiagnosisRules(diagnosisRules);
         model.setRules(rules);

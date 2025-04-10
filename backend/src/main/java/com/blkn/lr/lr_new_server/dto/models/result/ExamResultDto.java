@@ -19,6 +19,7 @@ public class ExamResultDto {
     Date startTime;
     Date finishTime;
     Boolean isRecovery;
+    Boolean isDisabled;
     String examName;
     List<CategoryResultDto> categoryResults;
 
@@ -29,6 +30,7 @@ public class ExamResultDto {
         startTime = examResult.getStartTime();
         finishTime = examResult.getFinishTime();
         isRecovery = examResult.getIsRecovery();
+        isDisabled = examResult.getIsDisabled();
         examName = examResult.getExamName();
         categoryResults = examResult.getCategoryResults().stream().map(e -> new CategoryResultDto(e, questionDao)).toList();
     }
@@ -42,6 +44,7 @@ public class ExamResultDto {
         model.setStartTime(startTime);
         model.setFinishTime(finishTime);
         model.setIsRecovery(isRecovery);
+        model.setIsDisabled(isDisabled);
         model.setExamName(examName);
         model.setCategoryResults(categoryResults.stream().map(CategoryResultDto::toModel).toList());
         return model;

@@ -38,12 +38,14 @@ public class BaiduApiManager {
         String url = BaiduApiConfig.authorizeUrl;
         String api_key = BaiduApiConfig.apiKey;
         String secret = BaiduApiConfig.clientSecrete;
+
         Request request = new Request.Builder()
                 .url(url + "?grant_type=client_credentials&client_id=" + api_key + "&client_secret="+secret)
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json")
                 .build();
+        Response execute = OkHttpManager.getClient().newCall(request).execute();
         try (Response response = OkHttpManager.getClient().newCall(request).execute()) {
             assert (response.body() != null);
             // TODO: 考虑换成gson
@@ -54,7 +56,6 @@ public class BaiduApiManager {
                 throw new BaiduAuthorizeFailException();
             }
             System.out.println("百度api token获取成功");
-//            System.out.println(accessToken);
         }
     }
 
@@ -133,7 +134,7 @@ public class BaiduApiManager {
         } catch (Exception e) {
             throw new BaiduApiFailException("手写识别错误");
         }
-
+        System.out.println(accessToken);
         JSONObject resultObj = JSON.parseObject(result);
 
         JSONArray results;
@@ -142,7 +143,6 @@ public class BaiduApiManager {
         } else {
             return null;
         }
-
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0;i < results.size();i++) {

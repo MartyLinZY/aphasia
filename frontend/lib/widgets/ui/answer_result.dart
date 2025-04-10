@@ -18,6 +18,13 @@ class AnswerResultPage extends StatefulWidget {
 }
 
 class _AnswerResultPageState extends State<AnswerResultPage> with UseCommonStyles {
+  // 在_AnswerResultPageState类顶部添加以下常量
+static const _minMenuWidth = 200.0;
+static const _maxMenuWidth = 600.0;
+static const _cardElevation = 8.0;
+static const _resultPadding = 16.0;
+static const _sectionSpacing = 16.0;
+
   final double viewingIconWidth = 36.0;
   final double expandIconWidth = 36.0;
   final double listTilePaddingBase = 8.0;
@@ -95,6 +102,61 @@ class _AnswerResultPageState extends State<AnswerResultPage> with UseCommonStyle
     );
   }
 
+  // 在类中添加通用构建方法
+  Widget _buildSectionTitle(String text) => Padding(
+    padding: const EdgeInsets.only(bottom: _sectionSpacing),
+    child: Text(text, style: commonStyles?.titleStyle),
+  );
+
+  Widget _buildInfoRow(String label, dynamic value) => Padding(
+    padding: const EdgeInsets.only(bottom: _sectionSpacing),
+    child: Row(
+      children: [
+        Text("$label：", style: commonStyles?.bodyStyle),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value.toString(), style: commonStyles?.bodyStyle)),
+      ],
+    ),
+  );
+
+  // 新增响应式内容构建方法
+  Widget _buildResultContent(BoxConstraints constraints) {
+    final isWideScreen = constraints.maxWidth > 800;
+    
+    return ScrollConfiguration(
+      behavior: const ScrollBehavior().copyWith(scrollbars: false),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(_resultPadding),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: isWideScreen ? 600 : 300,
+            minHeight: constraints.maxHeight,
+            maxHeight: constraints.maxHeight
+          ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _buildDynamicContent(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDynamicContent() {
+    if (viewingItem == null) {
+      return const SizedBox.shrink();
+    }
+    if (viewingItem is ExamResult) {
+      return _buildExamResultArea(context, viewingItem as ExamResult);
+    } else if (viewingItem is CategoryResult) {
+      return _buildCateResArea(context, viewingItem as CategoryResult);
+    } else if (viewingItem is SubCategoryResult) {
+      return _buildSubCateResArea(context, viewingItem as SubCategoryResult);
+    } else if (viewingItem is QuestionResult) {
+      return _buildQuestionResArea(context, viewingItem as QuestionResult);
+    }
+    return Center(child: Text("未知内容类型：${viewingItem.runtimeType}", style: commonStyles?.bodyStyle));
+  }
 
   Widget _buildSummaryTile(ExamResult result) {
     bool viewingSummary = viewingItem.runtimeType == ExamResult;
@@ -240,95 +302,165 @@ class _AnswerResultPageState extends State<AnswerResultPage> with UseCommonStyle
   }
 
   Widget _buildResultArea(BuildContext context) {
-    Widget child;
+    // Widget child;
 
-    if (viewingItem == null) {
-      child = const SizedBox.shrink();
-    } else if (viewingItem.runtimeType == ExamResult) {
-      child = _buildExamResultArea(context, viewingItem);
-    } else if (viewingItem.runtimeType == CategoryResult) {
-      child = _buildCateResArea(context, viewingItem);
-    } else if (viewingItem.runtimeType == SubCategoryResult) {
-      child = _buildSubCateResArea(context, viewingItem);
-    } else if (viewingItem is QuestionResult) {
-      child = _buildQuestionResArea(context, viewingItem);
-    } else {
-      throw UnimplementedError("unexpected viewingItem");
-    }
+    // if (viewingItem == null) {
+    //   child = const SizedBox.shrink();
+    // } else if (viewingItem.runtimeType == ExamResult) {
+    //   child = _buildExamResultArea(context, viewingItem);
+    // } else if (viewingItem.runtimeType == CategoryResult) {
+    //   child = _buildCateResArea(context, viewingItem);
+    // } else if (viewingItem.runtimeType == SubCategoryResult) {
+    //   child = _buildSubCateResArea(context, viewingItem);
+    // } else if (viewingItem is QuestionResult) {
+    //   child = _buildQuestionResArea(context, viewingItem);
+    // } else {
+    //   throw UnimplementedError("unexpected viewingItem");
+    // }
 
-    return SizedBox.expand(
-      child: DecoratedBox(
-          decoration: const BoxDecoration(color: Colors.blueGrey),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Card(
-              elevation: 16.0,
-              child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    var minHeight = 400.0;
-                    var minWidth = 600.0;
+    // return SizedBox.expand(
+    //   child: DecoratedBox(
+    //       decoration: const BoxDecoration(color: Colors.blueGrey),
+    //       child: Padding(
+    //         padding: const EdgeInsets.all(16.0),
+    //         child: Card(
+    //           elevation: 16.0,
+    //           child: LayoutBuilder(
+    //               builder: (BuildContext context, BoxConstraints constraints) {
+    //                 var minHeight = 400.0;
+    //                 var minWidth = 600.0;
 
-                    var horizontalScrollCtrl = ScrollController();
-                    var verticalScrollCtrl = ScrollController();
-                    return Scrollbar(
-                      controller: horizontalScrollCtrl,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: horizontalScrollCtrl,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                              minWidth: minWidth,
-                              minHeight: minHeight,
-                              maxWidth: constraints.maxWidth < minWidth? minWidth : constraints.maxWidth
-                          ),
-                          child: Scrollbar(
-                            controller: verticalScrollCtrl,
-                            child: SingleChildScrollView(
-                              controller: verticalScrollCtrl,
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    minWidth: minWidth,
-                                    minHeight: minHeight,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32.0),
-                                  child: child,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }
+    //                 var horizontalScrollCtrl = ScrollController();
+    //                 var verticalScrollCtrl = ScrollController();
+    //                 return Scrollbar(
+    //                   controller: horizontalScrollCtrl,
+    //                   child: SingleChildScrollView(
+    //                     scrollDirection: Axis.horizontal,
+    //                     controller: horizontalScrollCtrl,
+    //                     child: ConstrainedBox(
+    //                       constraints: BoxConstraints(
+    //                           minWidth: minWidth,
+    //                           minHeight: minHeight,
+    //                           maxWidth: constraints.maxWidth < minWidth? minWidth : constraints.maxWidth
+    //                       ),
+    //                       child: Scrollbar(
+    //                         controller: verticalScrollCtrl,
+    //                         child: SingleChildScrollView(
+    //                           controller: verticalScrollCtrl,
+    //                           child: ConstrainedBox(
+    //                             constraints: BoxConstraints(
+    //                                 minWidth: minWidth,
+    //                                 minHeight: minHeight,
+    //                             ),
+    //                             child: Padding(
+    //                               padding: const EdgeInsets.all(32.0),
+    //                               child: child,
+    //                             ),
+    //                           ),
+    //                         ),
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 );
+    //               }
+    //           ),
+    //         ),
+    //       )
+    //   ),
+    // );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox.expand(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: commonStyles?.theme.canvasColor,
+              borderRadius: BorderRadius.circular(8)
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(_resultPadding),
+              child: Card(
+                elevation: _cardElevation,
+                child: _buildResultContent(constraints),
               ),
             ),
-          )
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildExamResultArea(BuildContext context, ExamResult result) {
-    DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
+    // DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     Text("测评整体结果", style: commonStyles?.titleStyle,),
+    //     const Divider( ),
+    //     Row(
+    //       children: [
+    //         Text("诊断结果：", style: commonStyles?.bodyStyle,),
+    //         Text(result.resultText ?? "", style: commonStyles?.bodyStyle?.copyWith(fontWeight: FontWeight.bold),),
+    //       ],
+    //     ),
+    //     const SizedBox(height: 16,),
+    //     result.finalScore == null
+    //         ? const SizedBox.shrink()
+    //         : Text("测评总分：${result.finalScore}", style: commonStyles?.bodyStyle,),
+    //     const SizedBox(height: 16,),
+    //     Text("开始作答时间：${format.format(result.startTime!)}", style: commonStyles?.bodyStyle,),
+    //     const SizedBox(height: 16,),
+    //     Text("结束作答时间：${result.finishTime == null ? "": format.format(result.finishTime!)}", style: commonStyles?.bodyStyle,),
+    //   ],
+    // );
+    // final format = DateFormat("yyyy-MM-dd HH:mm");
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     _buildSectionTitle("测评整体结果"),
+    //     _buildInfoRow("诊断结果", result.resultText ?? ""),
+    //     if (result.finalScore != null) 
+    //       _buildInfoRow("测评总分", result.finalScore),
+    //     _buildInfoRow("开始时间", format.format(result.startTime!)),
+    //     if (result.finishTime != null)
+    //       _buildInfoRow("结束时间", format.format(result.finishTime!)),
+    //   ],
+    // );
+    final format = DateFormat("yyyy-MM-dd HH:mm");
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("测评整体结果", style: commonStyles?.titleStyle,),
-        const Divider( ),
-        Row(
-          children: [
-            Text("诊断结果：", style: commonStyles?.bodyStyle,),
-            Text(result.resultText ?? "", style: commonStyles?.bodyStyle?.copyWith(fontWeight: FontWeight.bold),),
-          ],
+        // Replace Spacer with fixed size
+        const SizedBox(height: 20),
+        // Add ConstrainedBox to ensure proper layout
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 100),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSectionTitle("测评整体结果"),
+                const SizedBox(height: 24),
+                _buildInfoRow("诊断结果", result.resultText ?? ""),
+                if (result.finalScore != null) 
+                  _buildInfoRow("测评总分", result.finalScore),
+              ],
+            ),
+          ),
         ),
-        const SizedBox(height: 16,),
-        result.finalScore == null
-            ? const SizedBox.shrink()
-            : Text("测评总分：${result.finalScore}", style: commonStyles?.bodyStyle,),
-        const SizedBox(height: 16,),
-        Text("开始作答时间：${format.format(result.startTime!)}", style: commonStyles?.bodyStyle,),
-        const SizedBox(height: 16,),
-        Text("结束作答时间：${result.finishTime == null ? "": format.format(result.finishTime!)}", style: commonStyles?.bodyStyle,),
+        // Replace Spacer with flexible space
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow("开始时间", format.format(result.startTime!)),
+                if (result.finishTime != null)
+                  _buildInfoRow("结束时间", format.format(result.finishTime!)),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

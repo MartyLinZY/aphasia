@@ -10,13 +10,13 @@ import 'package:aphasia_recovery/utils/http/http_common.dart';
 import 'package:aphasia_recovery/widgets/ui/common/common.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../../../mixin/eval_rule_mixin.dart';
+import 'package:aphasia_recovery/mixin/eval_rule_mixin.dart';
+import 'doctor_exam_question_rule_edit_dialog.dart';
 import '../../../models/question/question.dart';
 import '../../../models/rules.dart';
 import '../../../utils/common_widget_function.dart';
 import '../do_exam/command_question.dart';
-import 'doctor_exam_question_rule_edit_dialog.dart';
+
 
 class DoctorExamQuestionRuleEditSubPage extends StatefulWidget {
   final Question currQuestion;
@@ -28,8 +28,9 @@ class DoctorExamQuestionRuleEditSubPage extends StatefulWidget {
 }
 
 class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRuleEditSubPage> with UseCommonStyles {
-  static const double listTileCommonHeight = 32;
 
+  static const double listTileCommonHeight = 32;
+  
   late Question currQuestion;
   late Map<String, Map<String, dynamic>> ruleFieldsSetting;
 
@@ -48,6 +49,7 @@ class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRu
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
     if (currQuestion != widget.currQuestion) {
@@ -57,6 +59,7 @@ class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRu
     initStyles(context);
     return _buildEvalRuleSetting();
   }
+
 
   Widget _buildEvalRuleSetting() {
     var evalRule = currQuestion.evalRule!;
@@ -75,7 +78,8 @@ class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRu
       final setting = ruleFieldsSetting['keyword']!;
       settingFields.add(const SizedBox(height: 16,));
       settingFields.add(buildInputFormField("关键词：", setting['key'], setting['ctrl'], setting['validator'], commonStyles: commonStyles));
-    } else if (evalRule is KeywordList) {
+    } 
+    if (evalRule is KeywordList) {
       var keywordSetting = ruleFieldsSetting['keyword']!;
       settingFields.add(const SizedBox(height: 16,));
       var keywordListRule = evalRule as KeywordList;
@@ -141,20 +145,20 @@ class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRu
       ));
     }
 
-    // if (evalRule is FuzzyEvalSetting) {
-    //   settingFields.add(const SizedBox(height: 16,));
-    //   var fuzzyRule = evalRule as FuzzyEvalSetting;
-    //   settingFields.add(Row(
-    //     children: [
-    //       Text("模糊评分：", style: commonStyles?.bodyStyle,),
-    //       Checkbox(value: fuzzyRule.enableFuzzyEvaluation, onChanged: (bool? value) {
-    //         setState(() {
-    //           fuzzyRule.enableFuzzyEvaluation = value ?? false;
-    //         });
-    //       })
-    //     ],
-    //   ));
-    // }
+    if (evalRule is FuzzyEvalSetting) {
+      settingFields.add(const SizedBox(height: 16,));
+      var fuzzyRule = evalRule as FuzzyEvalSetting;
+      settingFields.add(Row(
+        children: [
+          Text("模糊评分：", style: commonStyles?.bodyStyle,),
+          Checkbox(value: fuzzyRule.enableFuzzyEvaluation, onChanged: (bool? value) {
+            setState(() {
+              fuzzyRule.enableFuzzyEvaluation = value ?? false;
+            });
+          })
+        ],
+      ));
+    }
 
     // 某些规则特有的设置或内容
     final questionType = currQuestion.evalRule.runtimeType;

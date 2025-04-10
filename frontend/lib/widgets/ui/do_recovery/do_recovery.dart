@@ -34,6 +34,10 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
   int subCategoryIndex = 0;
   int questionIndex = 0;
   late ExamResult recoveryResult;
+  // 新增样式常量
+  static const _cardRadius = 20.0;
+  static const _appBarIconSize = 28.0;
+  static const _progressHeight = 6.0;
 
   bool showingResult = false;
 
@@ -167,6 +171,12 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
     recoveryResult.startTime = DateTime.now();
   }
 
+  QuestionSubCategory get subCategory => 
+    exam.categories[categoryIndex].subCategories[subCategoryIndex];
+    
+  Question get currQuestion => 
+    subCategory.questions[questionIndex];
+
 
   @override
   void initState() {
@@ -199,34 +209,182 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
 
   @override
   Widget build(BuildContext context) {
-    final category = exam.categories[categoryIndex];
-    final subCategory = category.subCategories[subCategoryIndex];
-    final currQuestion = subCategory.questions[questionIndex];
+    // final category = exam.categories[categoryIndex];
+    // final subCategory = category.subCategories[subCategoryIndex];
+    // final currQuestion = subCategory.questions[questionIndex];
 
+    // return Scaffold(
+    //     appBar: AppBar(
+    //       title: Row(
+    //         children: [
+    //           TextButton(
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //             },
+    //             child: Text("< 暂时退出",
+    //                 style:
+    //                     commonStyles?.bodyStyle?.copyWith(color: Colors.blue),
+    //                 overflow: TextOverflow.ellipsis),
+    //           ),
+    //           Text(
+    //             "当前：${exam.name}/${category.description}/${subCategory.description}/${currQuestion.alias}",
+    //             style: commonStyles?.bodyStyle,
+    //             overflow: TextOverflow.ellipsis,
+    //           ),
+    //         ],
+    //       ),
+    //       bottom: PreferredSize(
+    //         preferredSize: const Size.fromHeight(4),
+    //         child: LinearProgressIndicator(
+    //           value: (categoryIndex + 1) / exam.categories.length,
+    //           backgroundColor: Colors.grey[300],
+    //           valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+    //         ),
+    //       ),
+    //     ),
+    //     // body: SafeArea(
+    //     //   child: _buildAnswerArea(context, question: currQuestion),
+    //     // ));
+    //     body: SafeArea(
+    //       child: Padding(
+    //         padding: const EdgeInsets.all(16.0),
+    //         child: Card(
+    //           elevation: 8,
+    //           shape: RoundedRectangleBorder(
+    //             borderRadius: BorderRadius.circular(20),
+    //           ),
+    //           child: Padding(
+    //             padding: const EdgeInsets.all(20),
+    //             child: _buildAnswerArea(context, question: currQuestion),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("< 暂时退出",
-                    style:
-                        commonStyles?.bodyStyle?.copyWith(color: Colors.blue),
-                    overflow: TextOverflow.ellipsis),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back, 
+                size: _appBarIconSize,
+                color: commonStyles?.primaryColor,
               ),
-              Text(
-                "当前：${exam.name}/${category.description}/${subCategory.description}/${currQuestion.alias}",
-                style: commonStyles?.bodyStyle,
+              onPressed: () => _showExitConfirmation(context),
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                "${exam.name} · ${subCategory.description}",
+                style: commonStyles?.titleStyle?.copyWith(
+                  fontSize: screenWidth > 600 ? 20 : 16,
+                ),
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-            ],
+            ),
+          ],
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(_progressHeight + 4),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(_cardRadius),
+              child: LinearProgressIndicator(
+                value: (categoryIndex + 1) / exam.categories.length,
+                backgroundColor: Colors.grey.withOpacity(0.5),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  commonStyles?.primaryColor ?? Colors.blueAccent
+                ),
+                minHeight: _progressHeight,
+              ),
+            ),
           ),
         ),
-        body: SafeArea(
-          child: _buildAnswerArea(context, question: currQuestion),
-        ));
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth > 600 ? 48.0 : 16.0,
+            vertical: 24.0
+          ),
+          child: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(_cardRadius),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
+                    commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                  ]
+                ),
+                borderRadius: BorderRadius.circular(_cardRadius),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(_cardRadius),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -60,
+                      top: -60,
+                      child: Icon(Icons.psychology_alt_outlined,
+                        size: 200,
+                        color: commonStyles?.primaryColor?.withOpacity(0.1),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: _buildAnswerArea(context, question: currQuestion),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 新增退出确认弹窗
+  void _showExitConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_cardRadius)
+        ),
+        icon: Icon(Icons.exit_to_app, color: commonStyles?.onErrorColor),
+        title: Text("退出康复训练", style: commonStyles?.titleStyle),
+        content: Text("确认要暂时退出当前训练吗？", style: commonStyles?.bodyStyle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("取消", style: commonStyles?.bodyStyle),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: commonStyles?.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8)
+              )
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: Text("确认退出", 
+              style: commonStyles?.bodyStyle?.copyWith(
+                color: commonStyles?.onPrimaryColor
+              )
+            ),
+          ),
+        ],
+      )
+    );
   }
 
   Widget _buildAnswerArea(BuildContext context, {required Question question}) {
@@ -235,14 +393,28 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
 //               return ScaleTransition(scale: animation, child: child);
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(2.0, 0.0),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          );
-        },
+            return ScaleTransition(
+                        scale: CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.fastOutSlowIn,
+                        ),
+                        child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.5, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          // return SlideTransition(
+          //   position: Tween<Offset>(
+          //     begin: const Offset(2.0, 0.0),
+          //     end: Offset.zero,
+          //   ).animate(animation),
+          //   child: child,
+          // );
+        // },
         child: question.buildAnswerAreaWidget(
           context,
           commonStyles: commonStyles,

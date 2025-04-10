@@ -13,6 +13,8 @@ class CountDown {
 
   int get timePassed => maxCount - _currCount;
 
+  int get timeLeft => _currCount;
+
   bool get isComplete => _isComplete;
 
   CountDown(this.maxCount, {this.onCount, this.onComplete})
@@ -48,7 +50,10 @@ class CountDown {
   }
 
   Widget buildCountWidget({required CommonStyles? commonStyles}) {
-    return Text("倒计时: $_currCount", style: commonStyles?.bodyStyle);
+    return Text("倒计时: $_currCount", style: commonStyles?.bodyStyle?.copyWith(  // 使用bodyStyle为基础样式
+        fontSize: 28,
+        color: Colors.red
+      ),);
   }
 }
 
@@ -92,6 +97,9 @@ class Counter {
   }
 
   Widget buildCountWidget({required CommonStyles? commonStyles}) {
-    return Text("计时: $_currCount", style: commonStyles?.bodyStyle);
+    return Text("计时: $_currCount", style: commonStyles?.bodyStyle?.copyWith(  // 使用bodyStyle为基础样式
+        fontSize: 28,
+        color: commonStyles.onErrorColor
+      ),);
   }
 }
