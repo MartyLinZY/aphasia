@@ -23,7 +23,7 @@ class _SearchPageState extends State<SearchPage> implements ResettableState {
   QuestionSetType? type = QuestionSetType.exam;
   static const _inputRadius = 12.0;
   static const _buttonPadding =
-      EdgeInsets.symmetric(horizontal: 24, vertical: 16);
+  EdgeInsets.symmetric(horizontal: 24, vertical: 16);
 
   @override
   void resetState() {
@@ -41,117 +41,117 @@ class _SearchPageState extends State<SearchPage> implements ResettableState {
     if (commonStyles != widget.commonStyles) {
       resetState();
     }
-    
+
     return Center(
         child: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 新增输入框标签
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    "输入测评/康复方案ID",
-                    style: commonStyles?.bodyStyle?.copyWith(
-                        color: Colors.grey[700], fontWeight: FontWeight.w500),
-                  ),
-                ),
-                // 优化输入框和按钮布局
-                Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(_inputRadius),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.blueAccent.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4))
-                          ],
-                        ),
-                        child: TextField(
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(_inputRadius),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: '例如：67cfxxxxxxxxxxxdb',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              prefixIcon: const Icon(Icons.search,
-                                  color: Colors.blueAccent),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 20)),
-                          controller: searchCtrl,
-                          enableInteractiveSelection: true,
-                          autofocus: true,
-                          textInputAction: TextInputAction.go,
-                          onSubmitted: (_) => _handleSearch(),
-                        ),
+                    // 新增输入框标签
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        "输入测评/康复方案ID",
+                        style: commonStyles?.bodyStyle?.copyWith(
+                            color: Colors.grey[700], fontWeight: FontWeight.w500),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // 优化按钮样式
-                    Material(
-                      elevation: 3,
-                      borderRadius: BorderRadius.circular(_inputRadius),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [
-                            Colors.blueAccent,
-                            Colors.lightBlue[400]!
-                          ]),
-                          borderRadius: BorderRadius.circular(_inputRadius),
-                        ),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              padding: _buttonPadding,
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(_inputRadius))),
-                          onPressed: _handleSearch,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.play_arrow, color: Colors.white),
-                              const SizedBox(width: 8),
-                              Text(
-                                "开始训练",
-                                style: commonStyles?.bodyStyle?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500),
-                              )
-                            ],
+                    // 优化输入框和按钮布局
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(_inputRadius),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.blueAccent.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4))
+                              ],
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(_inputRadius),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintText: '例如：67cfxxxxxxxxxxxdb',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  prefixIcon: const Icon(Icons.search,
+                                      color: Colors.blueAccent),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 20)),
+                              controller: searchCtrl,
+                              enableInteractiveSelection: true,
+                              autofocus: true,
+                              textInputAction: TextInputAction.go,
+                              onSubmitted: (_) => _handleSearch(),
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 16),
+                        // 优化按钮样式
+                        Material(
+                          elevation: 3,
+                          borderRadius: BorderRadius.circular(_inputRadius),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [
+                                Colors.blueAccent,
+                                Colors.lightBlue[400]!
+                              ]),
+                              borderRadius: BorderRadius.circular(_inputRadius),
+                            ),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  padding: _buttonPadding,
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(_inputRadius))),
+                              onPressed: _handleSearch,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.play_arrow, color: Colors.white),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "开始训练",
+                                    style: commonStyles?.bodyStyle?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    // 新增帮助提示
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "请输入医生提供的方案ID",
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
                       ),
                     )
                   ],
                 ),
-                // 新增帮助提示
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    "请输入医生提供的方案ID",
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                  ),
-                )
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
   // 新增处理方法
@@ -199,13 +199,13 @@ class _SearchPageState extends State<SearchPage> implements ResettableState {
           MaterialPageRoute(
               builder: (context) => exam.recovery
                   ? DoRecoveryPage(
-                      exam: exam,
-                      commonStyles: commonStyles,
-                      result: createdResult)
+                  exam: exam,
+                  commonStyles: commonStyles,
+                  result: createdResult)
                   : DoExamPage(
-                      exam: exam,
-                      commonStyles: commonStyles,
-                      result: createdResult)));
+                  exam: exam,
+                  commonStyles: commonStyles,
+                  result: createdResult)));
     } catch (err) {
       if (!mounted) return;
       Navigator.pop(context); // 关闭加载对话框
