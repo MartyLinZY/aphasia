@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../mixin/widgets_mixin.dart';
+import 'package:aphasia_recovery/widgets/ui/llm_service/llm_service_intro.dart';
 
 class HomePage extends StatefulWidget {
   final CommonStyles? commonStyles;
@@ -15,7 +16,6 @@ class HomePage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
-
 }
 
 class _HomePageState extends State<HomePage> with UseCommonStyles {
@@ -23,12 +23,17 @@ class _HomePageState extends State<HomePage> with UseCommonStyles {
   static const _cardRadius = 16.0;
   static const _navRailWidth = 72.0;
   final _navItems = const [
-     _NavigationItem(
+    _NavigationItem(
       icon: Icons.search,
       label: "搜索",
       selectedColor: Colors.blueAccent,
     ),
-     _NavigationItem(
+    _NavigationItem(
+      icon: Icons.smart_toy,
+      label: "人工智能服务",
+      selectedColor: Colors.green,
+    ),
+    _NavigationItem(
       icon: Icons.person,
       label: "我的",
       selectedColor: Colors.purple,
@@ -45,89 +50,96 @@ class _HomePageState extends State<HomePage> with UseCommonStyles {
       builder: (context, constraints) {
         return Scaffold(
           body: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      // 优化导航栏
-                      Material(
-                        elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  // 优化导航栏
+                  Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(_cardRadius),
+                    child: Container(
+                      width: _navRailWidth,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(_cardRadius),
-                        child: Container(
-                          width: _navRailWidth,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(_cardRadius),
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: NavigationRail(
-                                  backgroundColor: Colors.transparent,
-                                  selectedIconTheme: IconThemeData(
-                                    color: _navItems[selectedNavIndex].selectedColor,
-                                    size: 28,
-                                  ),
-                                  unselectedIconTheme: const IconThemeData(
-                                    size: 24,
-                                    color: Colors.grey,
-                                  ),
-                                  extended: constraints.maxWidth >= 1200,
-                                  destinations: _navItems.map((item) => 
-                                    NavigationRailDestination(
-                                      icon: Icon(item.icon),
-                                      label: Padding(
-                                        padding: const EdgeInsets.only(top: 8.0),
-                                        child: Text(
-                                          userIdentity.isDoctor ? '套题管理' : item.label,
-                                          style: commonStyles?.bodyStyle,
-                                        ),
-                                      ),
-                                    )).toList(),
-                                  selectedIndex: selectedNavIndex,
-                                  onDestinationSelected: (value) => 
-                                    setState(() => selectedNavIndex = value),
-                                ),
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: NavigationRail(
+                              backgroundColor: Colors.transparent,
+                              selectedIconTheme: IconThemeData(
+                                color:
+                                _navItems[selectedNavIndex].selectedColor,
+                                size: 28,
                               ),
-                              _buildLogoutButton(),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      
-                      // 优化内容区域
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: Card(
-                            key: ValueKey<int>(selectedNavIndex),
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(_cardRadius),
+                              unselectedIconTheme: const IconThemeData(
+                                size: 24,
+                                color: Colors.grey,
+                              ),
+                              extended: constraints.maxWidth >= 1200,
+                              destinations: _navItems
+                                  .map((item) => NavigationRailDestination(
+                                icon: Icon(item.icon),
+                                label: Padding(
+                                  padding:
+                                  const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    userIdentity.isDoctor
+                                        ? '套题管理'
+                                        : item.label,
+                                    style: commonStyles?.bodyStyle,
+                                  ),
+                                ),
+                              ))
+                                  .toList(),
+                              selectedIndex: selectedNavIndex,
+                              onDestinationSelected: (value) =>
+                                  setState(() => selectedNavIndex = value),
                             ),
-                            child: _buildContentPage(),
                           ),
-                        ),
+                          _buildLogoutButton(),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 16),
+
+                  // 优化内容区域
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Card(
+                        key: ValueKey<int>(selectedNavIndex),
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(_cardRadius),
+                        ),
+                        child: _buildContentPage(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
+            ),
+          ),
         );
+      },
+    );
   }
 
   Widget _buildContentPage() {
     final userIdentity = context.watch<UserIdentity>();
-    
+
     switch (selectedNavIndex) {
       case 0:
-        return userIdentity.isDoctor 
+        return userIdentity.isDoctor
             ? DoctorExamsManagementPage(commonStyles: commonStyles)
             : SearchPage(commonStyles: commonStyles);
       case 1:
+        return LLMServiceIntroPage(commonStyles: commonStyles); // 人工智能服务介绍页
+      case 2:
         return HistoryPage(commonStyles: commonStyles); // 直接返回历史记录页
       default:
         return const Center(child: Text('页面不存在'));
@@ -178,6 +190,7 @@ class _HomePageState extends State<HomePage> with UseCommonStyles {
     );
   }
 }
+
 // 新增私有组件和方法
 class _NavigationItem {
   final IconData icon;

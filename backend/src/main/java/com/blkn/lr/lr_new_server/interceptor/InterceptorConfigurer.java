@@ -21,6 +21,9 @@ public class InterceptorConfigurer implements WebMvcConfigurer {
 			.excludePathPatterns("/api/auth")
 			.excludePathPatterns("/api/register")
 			.excludePathPatterns("/api/test/**")
+			.excludePathPatterns("/api/diagnose1")
+			.excludePathPatterns("/api/diagnose2")
+			.excludePathPatterns("/api/repair")
 		;
 	}
 
