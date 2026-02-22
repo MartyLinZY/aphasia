@@ -1,9 +1,20 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:aphasia_recovery/models/typedef.dart';
 import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/utils/http/http_manager.dart';
 import 'package:http/http.dart';
+
+/// 调用后端翻译服务，对文本进行补全/猜测并返回翻译结果。
+Future<String> translateText(String text) async {
+  if (text.trim().isEmpty) return text;
+  JsonObject result = await HttpClientManager().post(
+    url: "${HttpConstants.backendBaseUrl}/api/translate",
+    body: jsonEncode({"text": text}),
+  );
+  return result['translatedText'] ?? text;
+}
 
 Future<String> recognizeAudioContent(List<int> rawPcm16Data) async {
   final pcm16File =

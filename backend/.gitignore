@@ -33,3 +33,6 @@ build/
 .vscode/
 /audio/
 /images/
+
+# 本地配置（含密钥，勿提交）
+**/application-local.properties
