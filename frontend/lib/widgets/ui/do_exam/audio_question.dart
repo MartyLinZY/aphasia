@@ -63,12 +63,22 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
   String? displayImageUrl;
   String? displayText;
 
+  /// 结束录制后先展示识别文字与翻译，再提交答案
+  bool _showRecordedResult = false;
+  String _recordedText = '';
+  String? _translatedText;
+  bool _translating = false;
+
   @override
   void resetState() {
     currQuestion = widget.question as AudioQuestion;
     result = AudioQuestionResult(sourceQuestion: widget.question);
     hintingRule = null;
     evaluating = false;
+    _showRecordedResult = false;
+    _recordedText = '';
+    _translatedText = null;
+    _translating = false;
 
     // 初始化录音器
     recorder = WrappedAudioRecorder(
@@ -193,22 +203,44 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
   }
 
   void doFinishAnswer(List<int> rawPcm16Data) {
-    setState(() {
-      evaluating = true;
-    });
-
     if (currQuestion.evalRule is EvalAudioQuestionByFluency) {
       result.rawPcm16Data = rawPcm16Data;
-      // 流畅度评分不需要先获取内容
-      _evalQuestion(question: currQuestion, result: result);
+      setState(() {
+        _showRecordedResult = true;
+        _recordedText = '';
+      });
     } else {
-      // 其他规则先获取内容再触发评分
       recognizeAudioContent(rawPcm16Data).then((content) {
         _trySetAnswerTime(result, timeLimitCountDown!.timePassed);
-
-        _evalQuestion(content: content, result: result, question: currQuestion);
+        result.audioContent = content;
+        setState(() {
+          _showRecordedResult = true;
+          _recordedText = content;
+        });
       });
     }
+  }
+
+  void _onTranslate() async {
+    if (_recordedText.trim().isEmpty) return;
+    setState(() => _translating = true);
+    try {
+      final translated = await translateText(_recordedText);
+      setState(() {
+        _translatedText = translated;
+        _translating = false;
+      });
+    } catch (e) {
+      setState(() => _translating = false);
+      if (mounted) {
+        toast(context, msg: '翻译请求失败', btnText: '确认');
+      }
+    }
+  }
+
+  void _onSubmitAnswer() {
+    setState(() => evaluating = true);
+    _evalQuestion(content: result.audioContent, result: result, question: currQuestion);
   }
 
   void _evalQuestion(
@@ -461,6 +493,9 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
   }
 
   Widget _buildEnhancedContent(CommonStyles? commonStyles) {
+    if (_showRecordedResult) {
+      return _buildRecordedResultContent(commonStyles);
+    }
     return Column(
       children: [
         Expanded(
@@ -469,6 +504,118 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
         _buildVisualFeedback(commonStyles),
         const SizedBox(height: 20),
         _buildActionPanel(commonStyles),
+      ],
+    );
+  }
+
+  /// 结束录制后：上方图片，下方左侧为识别文字+翻译按钮，右侧为翻译结果，底部提交答案
+  Widget _buildRecordedResultContent(CommonStyles? commonStyles) {
+    return Column(
+      children: [
+        if (imageDisplayed && displayImageUrl != null)
+          Expanded(
+            flex: 5,
+            child: buildUrlOrAssetsImage(
+              context,
+              imageUrl: displayImageUrl!,
+              commonStyles: commonStyles,
+            ),
+          ),
+        Expanded(
+          flex: 4,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '识别文字',
+                        style: commonStyles?.bodyStyle?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: commonStyles?.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _recordedText.isEmpty ? '（无识别内容）' : _recordedText,
+                          style: commonStyles?.bodyStyle,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _recordedText.trim().isEmpty || _translating
+                                ? null
+                                : _onTranslate,
+                            icon: _translating
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.translate, size: 20),
+                            label: Text(_translating ? '翻译中...' : '翻译', style: commonStyles?.bodyStyle),
+                          ),
+                          const SizedBox(width: 16),
+                          ElevatedButton.icon(
+                            onPressed: _onSubmitAnswer,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: commonStyles?.primaryColor,
+                            ),
+                            icon: const Icon(Icons.check, size: 20),
+                            label: const Text('提交答案'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '翻译结果',
+                        style: commonStyles?.bodyStyle?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: commonStyles?.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _translatedText ?? '—',
+                          style: commonStyles?.bodyStyle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -582,10 +729,18 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
     );
   }
 
-  // 重构题干信息区域
+  // 重构题干信息区域：上方图片，下方题干文字
   Widget _buildQuestionInfoArea(CommonStyles? commonStyles) {
     return Column(
       children: [
+        if (imageDisplayed)
+          Expanded(
+            child: buildUrlOrAssetsImage(
+              context,
+              imageUrl: displayImageUrl!,
+              commonStyles: commonStyles,
+            ),
+          ),
         if (isQuestionTextDisplayed)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -595,14 +750,6 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
                 fontSize: 24,
                 fontWeight: FontWeight.w600
               ),
-            ),
-          ),
-        if (imageDisplayed)
-          Expanded(
-            child: buildUrlOrAssetsImage(
-              context,
-              imageUrl: displayImageUrl!,
-              commonStyles: commonStyles,
             ),
           ),
       ],
