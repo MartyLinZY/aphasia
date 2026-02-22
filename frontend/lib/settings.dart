@@ -1,9 +1,9 @@
 class HttpConstants {
   HttpConstants._();
-  static const String backendBaseUrl = "http://localhost:8080";
-  static const String backendBaseUrlWithoutProtocol = "localhost:8080";
-  // static const String backendBaseUrl = "http://192.168.0.110:8080";
-  // static const String backendBaseUrlWithoutProtocol = "192.168.0.110:8080";
+  // static const String backendBaseUrl = "http://localhost:8080";
+  // static const String backendBaseUrlWithoutProtocol = "localhost:8080";
+  static const String backendBaseUrl = "http://192.168.0.110:8080";
+  static const String backendBaseUrlWithoutProtocol = "192.168.0.110:8080";
 }
 
 class AppSettings {

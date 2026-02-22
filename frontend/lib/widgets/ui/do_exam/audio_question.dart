@@ -508,11 +508,12 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
     );
   }
 
-  /// 结束录制后：上方图片，下方左侧为识别文字+翻译按钮，右侧为翻译结果，底部提交答案
+  /// 结束录制后：上方图片，下方左侧为识别文字（旁边翻译按钮），右侧为翻译结果，底部提交答案
   Widget _buildRecordedResultContent(CommonStyles? commonStyles) {
     return Column(
       children: [
-        if (imageDisplayed && displayImageUrl != null)
+        // 上方固定为图片
+        if (displayImageUrl != null)
           Expanded(
             flex: 5,
             child: buildUrlOrAssetsImage(
@@ -528,6 +529,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 左侧：识别文字 + 旁边的翻译按钮
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,21 +543,23 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          _recordedText.isEmpty ? '（无识别内容）' : _recordedText,
-                          style: commonStyles?.bodyStyle,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                _recordedText.isEmpty ? '（无识别内容）' : _recordedText,
+                                style: commonStyles?.bodyStyle,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           ElevatedButton.icon(
                             onPressed: _recordedText.trim().isEmpty || _translating
                                 ? null
@@ -567,23 +571,43 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   )
                                 : const Icon(Icons.translate, size: 20),
-                            label: Text(_translating ? '翻译中...' : '翻译', style: commonStyles?.bodyStyle),
-                          ),
-                          const SizedBox(width: 16),
-                          ElevatedButton.icon(
-                            onPressed: _onSubmitAnswer,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: commonStyles?.primaryColor,
+                            label: Text(
+                              _translating ? '翻译中...' : '翻译',
+                              style: (commonStyles?.bodyStyle ?? const TextStyle()).copyWith(
+                                color: commonStyles?.onPrimaryColor ?? Colors.white,
+                              ),
                             ),
-                            icon: const Icon(Icons.check, size: 20),
-                            label: const Text('提交答案'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              backgroundColor: commonStyles?.primaryColor,
+                              foregroundColor: commonStyles?.onPrimaryColor ?? Colors.white,
+                            ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _onSubmitAnswer,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: commonStyles?.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        ),
+                        icon: Icon(Icons.check, size: 20, color: Colors.white),
+                        label: Text(
+                          '提交答案',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 24),
+                // 右侧：翻译结果（由 TranslationService 返回）
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
