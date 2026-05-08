@@ -21,29 +21,40 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FlyTekManager {
-    private static class InstanceHolder {
-        static final FlyTekManager instance = new FlyTekManager();
-    }
+    @Autowired
+    private FlyTekApiConfig flyTekApiConfig;
 
-    private FlyTekManager() {}
-
-    static public FlyTekManager getInstance() {
-        return InstanceHolder.instance;
-    }
+    public FlyTekManager() {}
 
     public Future<String> recognizeAudio(byte[] pcm16bitsData) throws Exception {
-        String authedUrl = getAuthUrl(FlyTekApiConfig.audioRecognizeUrl, FlyTekApiConfig.apiKey, FlyTekApiConfig.clientSecrete);
+        String authedUrl = getAuthUrl(
+                flyTekApiConfig.getAudioRecognizeUrl(),
+                flyTekApiConfig.getApiKey(),
+                flyTekApiConfig.getClientSecret()
+        );
         OkHttpClient client = OkHttpManager.getClient();
         Request request = new Request.Builder().url(authedUrl).build();
         CompletableFuture<String> future = new CompletableFuture<>();
-        WebSocket webSocket = client.newWebSocket(request, new FlyTekAudioRecognizer(pcm16bitsData, future::complete));
+        FlyTekAudioRecognizer recognizer = new FlyTekAudioRecognizer(pcm16bitsData, future::complete);
+        recognizer.setAppId(flyTekApiConfig.getAppId());
+        WebSocket webSocket = client.newWebSocket(
+                request,
+                recognizer
+        );
         return future;
     }
 
     public Future<String> synthesisAudioFromText(String text, String uid, String serverPort) throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException, FileNotFoundException {
-        String authedUrl = getAuthUrl(FlyTekApiConfig.audioSynthesisUrl, FlyTekApiConfig.apiKey, FlyTekApiConfig.clientSecrete);
+        String authedUrl = getAuthUrl(
+                flyTekApiConfig.getAudioSynthesisUrl(),
+                flyTekApiConfig.getApiKey(),
+                flyTekApiConfig.getClientSecret()
+        );
         OkHttpClient client = OkHttpManager.getClient();
         Request request = new Request.Builder().url(authedUrl).build();
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -52,7 +63,10 @@ public class FlyTekManager {
         String destFilePath = StaticResourcesConfig.getAudioDirPath(uid) + fileName;
         String fileUrlPath = StaticResourcesConfig.getUrlPrefix(serverPort) + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
 
-        client.newWebSocket(request, new FlyTekAudioSynthesiser(FlyTekApiConfig.appId, text, destFilePath, () -> future.complete(fileUrlPath)));
+        client.newWebSocket(
+                request,
+                new FlyTekAudioSynthesiser(flyTekApiConfig.getAppId(), text, destFilePath, () -> future.complete(fileUrlPath))
+        );
         return future;
     }
 

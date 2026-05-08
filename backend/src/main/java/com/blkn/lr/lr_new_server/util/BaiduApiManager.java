@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -30,14 +29,17 @@ public class BaiduApiManager {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private BaiduApiConfig baiduApiConfig;
+
     String accessToken;
 
     public void authorize() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create("", mediaType);
-        String url = BaiduApiConfig.authorizeUrl;
-        String api_key = BaiduApiConfig.apiKey;
-        String secret = BaiduApiConfig.clientSecrete;
+        String url = baiduApiConfig.getAuthorizeUrl();
+        String api_key = baiduApiConfig.getApiKey();
+        String secret = baiduApiConfig.getClientSecret();
 
         Request request = new Request.Builder()
                 .url(url + "?grant_type=client_credentials&client_id=" + api_key + "&client_secret="+secret)
@@ -45,13 +47,12 @@ public class BaiduApiManager {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json")
                 .build();
-        Response execute = OkHttpManager.getClient().newCall(request).execute();
         try (Response response = OkHttpManager.getClient().newCall(request).execute()) {
             assert (response.body() != null);
             // TODO: 考虑换成gson
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> jsonObject = mapper.readValue(response.body().bytes(), HashMap.class);
-            accessToken = jsonObject.get("access_token");
+            Map<?, ?> jsonObject = mapper.readValue(response.body().bytes(), HashMap.class);
+            accessToken = (String) jsonObject.get("access_token");
             if (accessToken == null) {
                 throw new BaiduAuthorizeFailException();
             }
@@ -86,12 +87,12 @@ public class BaiduApiManager {
     }
 
     public JSONObject verbalAnalysis(String text){
-        String verbal_analysiz_url= BaiduApiConfig.lexerUrl + "&access_token=";
+        String verbal_analysiz_url= baiduApiConfig.getLexerUrl() + "&access_token=";
         return requestTextService(text, verbal_analysiz_url);
     }
 
     public JSONObject dnn(String text) {
-        String dnn_url= BaiduApiConfig.dnnUrl + "&access_token=";
+        String dnn_url= baiduApiConfig.getDnnUrl() + "&access_token=";
         return requestTextService(text, dnn_url);
     }
 
@@ -102,7 +103,7 @@ public class BaiduApiManager {
             throw new RuntimeException("百度API鉴权失败", e);
         }
 
-        String url = BaiduApiConfig.shortTextSimUrl + "&access_token=";
+        String url = baiduApiConfig.getShortTextSimUrl() + "&access_token=";
         JSONObject param=new JSONObject();
         param.put("text_1",text1);
         param.put("text_2",text2);
@@ -130,7 +131,7 @@ public class BaiduApiManager {
 
         String result;
         try {
-            result = BaiduHttpUtil.post(BaiduApiConfig.handWriteRecognizeUrl, accessToken, param);
+            result = BaiduHttpUtil.post(baiduApiConfig.getHandWriteRecognizeUrl(), accessToken, param);
         } catch (Exception e) {
             throw new BaiduApiFailException("手写识别错误");
         }

@@ -1,0 +1,71 @@
+# =====================================================
+# 项目根 .gitignore
+# 注意：backend/ 与 frontend/ 已各自有 .gitignore，
+#      此处只补充根目录与子模块未覆盖的部分。
+# =====================================================
+
+# --------- 项目内分析/规划文档（本地参考，不入库） ---------
+IMPROVEMENTS.md
+PROJECT_ANALYSIS.md
+
+# --------- 操作系统 ---------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --------- 通用 IDE / 编辑器 ---------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+.history/
+.project
+.classpath
+.settings/
+
+# --------- 日志 / 临时文件 ---------
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+
+# --------- 环境变量 / 本地配置（含密钥，勿提交） ---------
+.env
+.env.local
+.env.*.local
+*.local.properties
+**/application-local.properties
+
+# --------- LLM/ 目录（Python 脚本与本地产物） ---------
+LLM/__pycache__/
+LLM/**/__pycache__/
+LLM/*.pyc
+LLM/.venv/
+LLM/venv/
+LLM/.ipynb_checkpoints/
+LLM/audio_test.wav
+LLM/output.txt
+LLM/diagnosis.txt
+LLM/repair.txt
+
+# --------- backend 根目录的本地生成物（不在 backend/.gitignore 中） ---------
+backend/recorded.pcm
+backend/handWrite.png
+backend/*.pcm
+backend/*.wav
+
+# --------- 其他常见构建/缓存产物 ---------
+node_modules/
+dist/
+out/
+coverage/
+

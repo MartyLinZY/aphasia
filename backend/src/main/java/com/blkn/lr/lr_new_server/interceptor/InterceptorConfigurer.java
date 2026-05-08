@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.interceptor;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -12,6 +13,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class InterceptorConfigurer implements WebMvcConfigurer {
+	@Value("${app.cors.allowed-origins:http://localhost:3000}")
+	private String allowedOrigins;
+
+	@Value("${app.cors.allowed-methods:GET,POST,PUT,PATCH,DELETE,OPTIONS}")
+	private String allowedMethods;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
@@ -21,20 +27,18 @@ public class InterceptorConfigurer implements WebMvcConfigurer {
 			.excludePathPatterns("/api/auth")
 			.excludePathPatterns("/api/register")
 			.excludePathPatterns("/api/test/**")
-			.excludePathPatterns("/api/diagnose1")
-			.excludePathPatterns("/api/diagnose2")
-			.excludePathPatterns("/api/repair")
 		;
 	}
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		// the CORS setting is only for developing
-		// TODO: Comment this in production mode since the frontend will be put together with the backend
 		registry.addMapping("/**")
-				.allowedOrigins("*") // this only for developing
-				.allowedMethods("*");
-//				.allowCredentials(true);
-//                .exposedHeaders("failType");
+				.allowedOrigins(splitByComma(allowedOrigins))
+				.allowedMethods(splitByComma(allowedMethods))
+				.allowedHeaders("*");
+	}
+
+	private String[] splitByComma(String value) {
+		return value.split("\\s*,\\s*");
 	}
 }

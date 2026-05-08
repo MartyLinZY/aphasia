@@ -8,6 +8,7 @@ import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
 import com.blkn.lr.lr_new_server.expection.NotFoundException;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
+@RequireRole({2})
 public class ExamController {
     @Autowired
     private ExamServices examServices;
@@ -30,6 +32,7 @@ public class ExamController {
     private ExamDaoImpl examDao;
 
     @GetMapping("/exams/{examId}")
+    @RequireRole({1, 2})
     ExamDto getExamById(@PathVariable String examId) {
         Exam exam = examDao.findPublishedExamById(examId);
 

@@ -7,6 +7,7 @@ import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
 import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
 import com.blkn.lr.lr_new_server.expection.FlyTekApiException;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
 import com.blkn.lr.lr_new_server.util.ThreadPools;
@@ -33,6 +34,9 @@ public class ProxyController {
     @Autowired
     private FluencyProcessor processor;
 
+    @Autowired
+    private FlyTekManager flyTekManager;
+
 
     @Autowired
     Environment environment;
@@ -52,7 +56,7 @@ public class ProxyController {
 
     @PostMapping("/audio_recognize")
     AudioRecognizeResult recognizeAudioContent(@RequestParam("file") MultipartFile file) throws Exception {
-        Future<String> future = FlyTekManager.getInstance().recognizeAudio(file.getBytes());
+        Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
         String result = future.get();
 //        System.out.println("收到一次语音识别请求");
 //        String result = "测试结果";
@@ -65,7 +69,7 @@ public class ProxyController {
     @PostMapping("/fluency")
     FluencyResult calFluency(@RequestParam("file") MultipartFile file) throws FlyTekApiException {
         try {
-            Future<String> future = FlyTekManager.getInstance().recognizeAudio(file.getBytes());
+            Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
             String audioContent = future.get();
             System.out.println(audioContent);
             if (audioContent.isEmpty()) {
@@ -142,6 +146,7 @@ public class ProxyController {
     }
 
     @PostMapping("/audio_from_text")
+    @RequireRole({2})
     Map<String, String> generateAudioFromText(@RequestBody Map<String, String> param, HttpServletRequest request) throws Exception {
         if (!param.containsKey("text") || param.get("text").isEmpty()) {
             throw new BusinessErrorException("收到内容为空的语音合成请求");
@@ -154,14 +159,9 @@ public class ProxyController {
         }
 
         String uid = (String) request.getAttribute("uid");
-        int uType = (int) request.getAttribute("uType");
-
-        if (uType != 2) {
-            throw new BusinessErrorException("收到非法的语音合成请求，用户不为医生");
-        }
 
         String port = environment.getProperty("server.port");
-        Future<String> future = FlyTekManager.getInstance().synthesisAudioFromText(text, uid, port);
+        Future<String> future = flyTekManager.synthesisAudioFromText(text, uid, port);
         String url = future.get();
 
         String[] tokens = url.split("/");

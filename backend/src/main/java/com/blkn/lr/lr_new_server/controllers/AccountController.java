@@ -2,6 +2,7 @@ package com.blkn.lr.lr_new_server.controllers;
 
 import com.blkn.lr.lr_new_server.dto.common.UserDto;
 import com.blkn.lr.lr_new_server.services.AccountServices;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public UserDto register(@RequestBody UserDto dto) {
+    public UserDto register(@Valid @RequestBody UserDto dto) {
         return service.register(dto);
     }
 }

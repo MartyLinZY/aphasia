@@ -1,26 +1,20 @@
 package com.blkn.lr.lr_new_server.thirdparty;
 
-import com.blkn.lr.lr_new_server.config.FlyTekApiConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import okhttp3.*;
-import org.yaml.snakeyaml.util.ArrayUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @NoArgsConstructor
 public class FlyTekAudioRecognizer extends WebSocketListener {
@@ -43,10 +37,22 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     private byte[] pcm16bitsData;
 
     private Consumer<String> onComplete;
+    private String appId;
 
     public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete) {
         this.pcm16bitsData = pcm16bitsData;
         this.onComplete = onComplete;
+        this.appId = "";
+    }
+
+    public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete, String appId) {
+        this.pcm16bitsData = pcm16bitsData;
+        this.onComplete = onComplete;
+        this.appId = appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
 
@@ -75,7 +81,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                             JsonObject common = new JsonObject();  //第一帧必须发送
                             JsonObject data = new JsonObject();  //每一帧都要发送
                             // 填充common
-                            common.addProperty("app_id", FlyTekApiConfig.appId);
+                            common.addProperty("app_id", appId);
                             //填充business
                             business.addProperty("language", "zh_cn");
                             //business.addProperty("language", "en_us");//英文
@@ -205,7 +211,11 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     }
     public static void main(String[] args) throws Exception {
         // 构建鉴权url
-        String authUrl = getAuthUrl(hostUrl, FlyTekApiConfig.apiKey, FlyTekApiConfig.clientSecrete);
+        String authUrl = getAuthUrl(
+                hostUrl,
+                System.getenv().getOrDefault("FLYTEK_API_KEY", ""),
+                System.getenv().getOrDefault("FLYTEK_CLIENT_SECRET", "")
+        );
         OkHttpClient client = new OkHttpClient.Builder().build();
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
         String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
@@ -213,7 +223,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         Request request = new Request.Builder().url(url).build();
         // System.out.println(client.newCall(request).execute());
         //System.out.println("url===>" + url);
-        WebSocket webSocket = client.newWebSocket(request, new FlyTekAudioRecognizer());
+        client.newWebSocket(request, new FlyTekAudioRecognizer());
     }
     public static String getAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {
         URL url = new URL(hostUrl);
