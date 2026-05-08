@@ -10,12 +10,14 @@ import 'package:aphasia_recovery/models/exam/exam_recovery.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
 import 'package:aphasia_recovery/models/rules.dart';
 import 'package:aphasia_recovery/utils/http/http_manager.dart';
+import 'package:aphasia_recovery/utils/io/shared_pref.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../TestBase.dart';
 import '../http_mock.mocks.dart';
@@ -23,6 +25,15 @@ import '../fake_data.dart' as fake;
 
 
 void main() {
+  // 涉及 ExamQuestionSet 网络请求的用例会在 HttpClientManager 中读取本地 token，
+  // 因此需要先初始化 Flutter Binding 并 mock SharedPreferences。
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    WrappedSharedPref.instance = null;
+  });
+
   TestBase.commonSetUp();
   group("Exam and Recovery model test", () {
     test("ExamQuestionSet json test", () async {
@@ -113,18 +124,26 @@ void main() {
       exam.id = examId;
 
       // success
-      when(client.get(Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/$examId")))
-        .thenAnswer((realInvocation) async => http.Response.bytes(
+      // HttpClientManager.get 总是会带上 headers（即使为空 map），
+      // 这里使用 anyNamed('headers') 让 mockito 不再因 headers 缺失而抛 MissingStubError。
+      when(client.get(
+        Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/$examId"),
+        headers: anyNamed('headers'),
+      )).thenAnswer((realInvocation) async => http.Response.bytes(
           utf8.encode(jsonEncode(exam.toJson())), 200));
       var result = await ExamQuestionSet.getById(id: examId);
       expect(result, isA<ExamQuestionSet>());
       expect(result?.id, examId);
 
-      // fail
-      when(client.get(Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/$examId")))
-          .thenAnswer((realInvocation) async => http.Response.bytes(
+      // fail：getById 在 404 情况下返回 null（参考 ExamQuestionSet.getById 源码），
+      // 仅在非 404 才会 rethrow，因此 404 这里只校验 null。
+      when(client.get(
+        Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/$examId"),
+        headers: anyNamed('headers'),
+      )).thenAnswer((realInvocation) async => http.Response.bytes(
           utf8.encode("请求的资源不不存在"), 404));
-      expect(() async => await ExamQuestionSet.getById(id: examId), throwsA(isA<HttpRequestException>()));
+      var notFound = await ExamQuestionSet.getById(id: examId);
+      expect(notFound, isNull);
     });
   });
 
@@ -139,16 +158,20 @@ void main() {
     var exam2 = ExamQuestionSet(id:examId2, description: fake.examDesc);
 
     // success
-    when(client.get(Uri.parse("${HttpConstants.backendBaseUrl}/api/doctors/$userId/exams")))
-        .thenAnswer((realInvocation) async => http.Response.bytes(
+    when(client.get(
+      Uri.parse("${HttpConstants.backendBaseUrl}/api/doctors/$userId/exams"),
+      headers: anyNamed('headers'),
+    )).thenAnswer((realInvocation) async => http.Response.bytes(
         utf8.encode(jsonEncode([exam1.toJson(), exam2.toJson()])), 200));
     List<ExamQuestionSet> exams = await ExamQuestionSet.getByDoctorUserId(userId: userId);
     expect(exams[0].id, exam1.id);
     expect(exams[1].id, exam2.id);
 
     // fail
-    when(client.get(Uri.parse("${HttpConstants.backendBaseUrl}/api/doctors/$userId/exams")))
-        .thenAnswer((realInvocation) async => http.Response.bytes(
+    when(client.get(
+      Uri.parse("${HttpConstants.backendBaseUrl}/api/doctors/$userId/exams"),
+      headers: anyNamed('headers'),
+    )).thenAnswer((realInvocation) async => http.Response.bytes(
         utf8.encode("请求的资源不不存在"), 404));
     expect(() async => await ExamQuestionSet.getByDoctorUserId(userId: userId), throwsA(isA<HttpRequestException>()));
   });
@@ -164,8 +187,11 @@ void main() {
     int fakeId = Random(0).nextInt(1000000000);
     var createdExam = ExamQuestionSet(id: fakeId.toString(), name: examName, description: examDesc);
 
-    when(client.post(Uri.parse("${HttpConstants.backendBaseUrl}/api/exams"), body: jsonEncode(ExamQuestionSet(name: examName, description: examDesc).toJson())))
-        .thenAnswer((realInvocation) async => http.Response.bytes(
+    when(client.post(
+      Uri.parse("${HttpConstants.backendBaseUrl}/api/exams"),
+      body: jsonEncode(ExamQuestionSet(name: examName, description: examDesc).toJson()),
+      headers: anyNamed('headers'),
+    )).thenAnswer((realInvocation) async => http.Response.bytes(
         utf8.encode(jsonEncode(createdExam.toJson())), 200));
 
     var newExam = await ExamQuestionSet.createExam(name: examName, description: examDesc);
@@ -183,6 +209,15 @@ void main() {
     var exam = ExamQuestionSet(id: examId, name: fake.examName, description: fake.examDesc);
     var description = "新亚项";
     exam.categories.add(QuestionCategory(description: description));
+
+    // 真正的 addCategory 会向 /api/exams/$examId/category 发 POST，
+    // body 随每次调用变化，因此使用 anyNamed('body') 与 anyNamed('headers') 兜底匹配。
+    when(client.post(
+      Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/$examId/category"),
+      body: anyNamed('body'),
+      headers: anyNamed('headers'),
+    )).thenAnswer((realInvocation) async =>
+        http.Response.bytes(utf8.encode("{}"), 200));
 
     var categoryI = 0;
     expect(() async => await exam.addCategory(description: description, insertAt: -1), throwsA(isA<RangeError>()));
@@ -227,9 +262,15 @@ void main() {
     int fakeId = Random(0).nextInt(1000000000);
     var fakeResponse = AudioQuestion(id: fakeId.toString(), alias: qAlias, questionText: qText, evalRule: EvalAudioQuestionByKeywordsMatchesCount(keywords: ["测试"]));
 
-    when(client.post(Uri.parse("${HttpConstants.backendBaseUrl}/api/exam/$examId/category/$categoryI/subCategory/$subCategoryI/question"),
-        body: jsonEncode(questionToAdd.toJson())))
-        .thenAnswer((realInvocation) async => http.Response.bytes(
+    // ExamQuestionSet.addQuestion 当前发往的真实路径是
+    // /api/exams/$examId/categories/$categoryIndex/subCategories/$subCategoryIndex/question
+    // （注意复数：exams / categories / subCategories）
+    when(client.post(
+      Uri.parse(
+          "${HttpConstants.backendBaseUrl}/api/exams/$examId/categories/$categoryI/subCategories/$subCategoryI/question"),
+      body: jsonEncode(questionToAdd.toJson()),
+      headers: anyNamed('headers'),
+    )).thenAnswer((realInvocation) async => http.Response.bytes(
         utf8.encode(jsonEncode(fakeResponse.toJson())), 200));
 
     var question = await exam.addQuestion(questionToAdd, categoryIndex: categoryI, subCategoryIndex: subCategoryI);

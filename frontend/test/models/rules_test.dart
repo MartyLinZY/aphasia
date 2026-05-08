@@ -182,9 +182,11 @@ void main () {
     var evalRuleDecoded = QuestionEvalRule.fromJson(jsonDecode(jsonStr)) as EvalCommandQuestionByCorrectActionCount;
     expect(evalRule.defaultScore, evalRuleDecoded.defaultScore);
     expect(evalRule.defaultScore, 9);
-    expect(evalRule.slotCount, evalRuleDecoded.slotCount);
+    // 注意：_slotCount 在模型中标注为 @JsonKey(includeFromJson:false, includeToJson:false)，
+    // 反序列化后 slotCount 会回落到构造默认值 10，这里只校验真正会被持久化的 slots。
     expect(evalRule.slots.length, evalRuleDecoded.slots.length);
     expect(evalRule.slots[0].itemName, "测试0");
+    expect(evalRuleDecoded.slots[0].itemName, "测试0");
     expect(evalRule.actions.length, evalRuleDecoded.actions.length);
     expect(evalRule.conditions.length, evalRuleDecoded.conditions.length);
   });
@@ -214,6 +216,9 @@ void main () {
   test("EvalWritingQuestionByCorrectKeywordCount json test", () {
     var evalRule = EvalWritingQuestionByCorrectKeywordCount();
     evalRule.defaultScore = 9;
+    // KeywordList mixin 默认带一个占位关键词 "关键字"，
+    // 这里需要先清空，再写入测试期望值，否则索引会被打乱。
+    evalRule.keywords.clear();
     evalRule.keywords.add("关键词1");
     evalRule.keywords.add("关键词2");
     evalRule.conditions.add(EvalCondition(score: 10)..addRange(0, 1 ));
@@ -228,7 +233,9 @@ void main () {
     expect(evalRule.keywords[1], evalRuleDecoded.keywords[1]);
     expect(evalRule.conditions[0].score, evalRuleDecoded.conditions[0].score);
     expect(evalRule.conditions[0].ranges[0]["lowBound"], 0);
-    expect(evalRule.conditions[0].ranges[0]["includeHigh"], true);
+    // EvalCondition.addRange(num, num) 只写入 lowBound/highBound，不会写入
+    // includeHigh/includeLow，因此这里只校验存在的字段。
+    expect(evalRule.conditions[0].ranges[0]["highBound"], 1);
     expect(evalRule.conditions[0].ranges[0]["lowBound"], evalRuleDecoded.conditions[0].ranges[0]["lowBound"]);
   });
 
