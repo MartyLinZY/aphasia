@@ -13,8 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class InterceptorConfigurer implements WebMvcConfigurer {
-	@Value("${app.cors.allowed-origins:http://localhost:3000}")
-	private String allowedOrigins;
+	@Value("${app.cors.allowed-origin-patterns:http://localhost:*,http://127.0.0.1:*}")
+	private String allowedOriginPatterns;
 
 	@Value("${app.cors.allowed-methods:GET,POST,PUT,PATCH,DELETE,OPTIONS}")
 	private String allowedMethods;
@@ -33,9 +33,10 @@ public class InterceptorConfigurer implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins(splitByComma(allowedOrigins))
+				.allowedOriginPatterns(splitByComma(allowedOriginPatterns))
 				.allowedMethods(splitByComma(allowedMethods))
-				.allowedHeaders("*");
+				.allowedHeaders("*")
+				.exposedHeaders("Token");
 	}
 
 	private String[] splitByComma(String value) {

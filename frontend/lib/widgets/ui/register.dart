@@ -26,7 +26,7 @@ class _RegisterPageState extends State<RegisterPage>
   static const _inputBorderRadius = 8.0;
   static const _buttonPadding = EdgeInsets.symmetric(vertical: 12, horizontal: 24);
   static const _cardElevation = 4.0;
-  Map<String, String> registerInfo = {};
+  final Map<String, dynamic> registerInfo = {};
 
   bool isDoctor = false;
 
@@ -404,24 +404,25 @@ class _RegisterPageState extends State<RegisterPage>
   }
 
   // 优化后的注册处理逻辑
-  Future<void> _handleRegister(CommonStyles? commonStyles) async {  // 添加 Future 返回值
+  Future<void> _handleRegister(CommonStyles? commonStyles) async {
     if (!applyFieldsChangesToModel()) return;
-    
-    registerInfo['role'] = isDoctor ? "2" : "1";
-    
-    try {
-      final userIdentity = await UserIdentity.register(registerInfo);
-      if (!mounted) return;
 
-      if (userIdentity == null) {
-        showErrorToast(context, "注册失败，用户已存在", commonStyles);
-        return;
-      }
-      
-      _navigateToHome(userIdentity, commonStyles);
-    } catch (err) {
+    final payload = <String, dynamic>{
+      'identity': registerInfo['identity'],
+      'password': registerInfo['password'],
+      'role': isDoctor ? 2 : 1,
+    };
+
+    try {
+      final userIdentity = await UserIdentity.register(payload);
       if (!mounted) return;
-      showErrorToast(context, "注册失败: ${err.toString()}", commonStyles);
+      _navigateToHome(userIdentity, commonStyles);
+    } on AuthBusinessException catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, e.message, commonStyles);
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, "注册失败，请检查网络后重试", commonStyles);
     }
   }
 

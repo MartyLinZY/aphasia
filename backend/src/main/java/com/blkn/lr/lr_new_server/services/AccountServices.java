@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
 @Service
 public class AccountServices {
@@ -59,12 +58,9 @@ public class AccountServices {
         String password = dto.getPassword();
 
         User user = new User();
-
-        //add log data
         user.setIdentity(dto.getIdentity());
         user.setRole(dto.getRole());
         user.setPassword(passwordEncoder.encode(password));
-        user.setSalt(null);
 
         User created = userDao.register(user);
         UserDto dtoToReturn = new UserDto(created);
@@ -72,29 +68,11 @@ public class AccountServices {
         return dtoToReturn;
     }
 
-    public String createMD5Password(String password,String salt) {
-        String passwordWithSalt = salt+password+salt;
-        String md5Password = DigestUtils.md5DigestAsHex(passwordWithSalt.getBytes());
-        return md5Password;
-    }
-
     private boolean isPasswordValid(User user, String rawPassword) {
         String encodedPassword = user.getPassword();
         if (encodedPassword == null || rawPassword == null) {
             return false;
         }
-
-        if (isBcryptHash(encodedPassword)) {
-            return passwordEncoder.matches(rawPassword, encodedPassword);
-        }
-
-        String salt = user.getSalt();
-        return salt != null && encodedPassword.equals(createMD5Password(rawPassword, salt));
-    }
-
-    private boolean isBcryptHash(String encodedPassword) {
-        return encodedPassword.startsWith("$2a$")
-                || encodedPassword.startsWith("$2b$")
-                || encodedPassword.startsWith("$2y$");
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }
