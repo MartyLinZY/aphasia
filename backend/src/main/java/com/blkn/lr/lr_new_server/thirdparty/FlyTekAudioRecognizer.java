@@ -3,6 +3,7 @@ package com.blkn.lr.lr_new_server.thirdparty;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import javax.crypto.Mac;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Slf4j
 @NoArgsConstructor
 public class FlyTekAudioRecognizer extends WebSocketListener {
     private static final String hostUrl = "https://iat-api.xfyun.cn/v2/iat"; //中英文，http url 不支持解析 ws/wss schema
@@ -130,12 +132,12 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                             data2.addProperty("encoding", "raw");
                             frame2.add("data", data2);
                             webSocket.send(frame2.toString());
-                            System.out.println("sendlast");
+                            log.debug("sendlast");
                             break end;
                     }
                     Thread.sleep(intervel); //模拟音频采样延时
                 }
-                System.out.println("all data is send");
+                log.debug("all data is send");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -152,8 +154,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         ResponseData resp = json.fromJson(text, ResponseData.class);
         if (resp != null) {
             if (resp.getCode() != 0) {
-                System.out.println( "code=>" + resp.getCode() + " error=>" + resp.getMessage() + " sid=" + resp.getSid());
-                System.out.println( "错误码查询链接：https://www.xfyun.cn/document/error-code");
+                log.error("讯飞识别错误 code={}, error={}, sid={}", resp.getCode(), resp.getMessage(), resp.getSid());
                 return;
             }
             if (resp.getData() != null) {
@@ -162,7 +163,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                     //System.out.println(te.toString());
                     try {
                         decoder.decode(te);
-                        System.out.println("中间识别结果 ==》" + decoder.toString());
+                        log.debug("中间识别结果: {}", decoder);
 
                         // 累计中间结果
 //                        finalResult.append(decoder.toString());
@@ -172,13 +173,9 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                 }
                 if (resp.getData().getStatus() == 2) {
                     // todo  resp.data.status ==2 说明数据全部返回完毕，可以关闭连接，释放资源
-                    System.out.println("session end ");
                     dateEnd = new Date();
-                    System.out.println(sdf.format(dateBegin) + "开始");
-                    System.out.println(sdf.format(dateEnd) + "结束");
-                    System.out.println("耗时:" + (dateEnd.getTime() - dateBegin.getTime()) + "ms");
-                    System.out.println("最终识别结果 ==》" + decoder.toString());
-                    System.out.println("本次识别sid ==》" + resp.getSid());
+                    log.info("识别完成，耗时 {}ms，sid={}, 结果={}",
+                            dateEnd.getTime() - dateBegin.getTime(), resp.getSid(), decoder);
 
                     onComplete.accept(decoder.toString());
 
@@ -198,10 +195,9 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         try {
             if (null != response) {
                 int code = response.code();
-                System.out.println("onFailure code:" + code);
-                System.out.println("onFailure body:" + response.body().string());
+                log.error("讯飞识别连接失败，code={}, body={}", code, response.body().string());
                 if (101 != code) {
-                    System.out.println("connection failed");
+                    log.error("connection failed");
                     System.exit(0);
                 }
             }

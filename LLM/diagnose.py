@@ -8,9 +8,6 @@ from create_prompt import create_prompt_diagnose
 from get_sentences import get_sentences
 from perplexity import calculate_perplexity
 
-# 强制标准输出为UTF-8
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
 # 将对话提供给大模型，得到 “是否患病” “所患类型” “严重程度”。结果会被写入 diagnosis.txt 中
 def diagnose1(conversation):
 
@@ -40,6 +37,8 @@ def diagnose2(conversation):
 
 
 if __name__ == "__main__":
+    # CLI 模式下强制 UTF-8 输出
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     # with open(settings.LLM_PATH+"conversation1.txt", "r", encoding="utf-8") as f:
     #     conversation = f.read().strip()

@@ -18,6 +18,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/proxy")
 public class ProxyController {
@@ -45,8 +47,7 @@ public class ProxyController {
 
     @PostMapping("/text_similarity")
     TextSimilarityResult calTextSimilarity(@RequestParam("text1") String text1, @RequestParam("text2") String text2) {
-        System.out.println(text1);
-        System.out.println(text2);
+        log.debug("text_similarity: text1={}, text2={}", text1, text2);
         Double sim;
         if (text1.equals("")) {
             sim = 0d;
@@ -74,7 +75,7 @@ public class ProxyController {
         try {
             Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
             String audioContent = future.get();
-            System.out.println(audioContent);
+            log.debug("音频识别结果: {}", audioContent);
             if (audioContent.isEmpty()) {
                 return new FluencyResult(0, "患者未说任何内容", audioContent);
             }

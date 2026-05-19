@@ -1,12 +1,10 @@
 package com.blkn.lr.lr_new_server.util.fluency;
 
+import lombok.extern.slf4j.Slf4j;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 
-/**
- * 构造一个队列，用于判断音段是否有效
- */
+@Slf4j
 public class FluencyQueue {
 
     /**
@@ -79,7 +77,7 @@ public class FluencyQueue {
 
 
     public void display(){
-        System.out.println("长度："+length+"有效："+valid);
+        log.debug("长度: {}, 有效: {}", length, valid);
     }
 
     /**

@@ -12,9 +12,7 @@ import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
 import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
@@ -24,6 +22,7 @@ import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
+@Slf4j
 @Service
 public class ExamServices {
     @Autowired
@@ -42,13 +41,14 @@ public class ExamServices {
     }
 
 
-    private <T> void printAsJson (T createdModel) {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
-        try {
-            System.out.println(ow.writeValueAsString(createdModel));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    private <T> void printAsJson(T createdModel) {
+        if (log.isDebugEnabled()) {
+            try {
+                log.debug("{}", new com.fasterxml.jackson.databind.ObjectMapper()
+                        .writer().withDefaultPrettyPrinter().writeValueAsString(createdModel));
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                log.debug("序列化失败: {}", e.getMessage());
+            }
         }
     }
 

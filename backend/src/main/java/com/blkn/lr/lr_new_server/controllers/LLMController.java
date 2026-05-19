@@ -2,13 +2,12 @@ package com.blkn.lr.lr_new_server.controllers;
 
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
-/**
- * 控制器：对话智能诊断接口
- */
+@Slf4j
 @RequireRole({2})
 @RestController
 @RequestMapping("/api")
@@ -29,7 +28,7 @@ public class LLMController {
         if (conversation == null || conversation.trim().isEmpty()) {
             throw new IllegalArgumentException("医患对话内容不能为空");
         }
-        System.out.println("diagnose1 controller called");
+        log.debug("diagnose1 called");
         return llmService.diagnose1(conversation);
     }
 
@@ -46,7 +45,7 @@ public class LLMController {
         if (conversation == null || conversation.trim().isEmpty()) {
             throw new IllegalArgumentException("医患对话内容不能为空");
         }
-        System.out.println("diagnose2 controller called");
+        log.debug("diagnose2 called");
         return llmService.diagnose2(conversation);
     }
 
@@ -63,7 +62,7 @@ public class LLMController {
         if (conversation == null || conversation.trim().isEmpty()) {
             throw new IllegalArgumentException("医患对话内容不能为空");
         }
-        System.out.println("repair controller called");
+        log.debug("repair called");
         return llmService.repair(conversation);
     }
 }

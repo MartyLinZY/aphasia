@@ -9,6 +9,7 @@ import com.blkn.lr.lr_new_server.expection.BaiduAuthorizeFailException;
 import com.blkn.lr.lr_new_server.thirdparty.BaiduHttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 @Component
 public class BaiduApiManager {
 
@@ -56,7 +58,7 @@ public class BaiduApiManager {
             if (accessToken == null) {
                 throw new BaiduAuthorizeFailException();
             }
-            System.out.println("百度api token获取成功");
+            log.info("百度 API token 获取成功");
         }
     }
 
@@ -66,7 +68,7 @@ public class BaiduApiManager {
         if (responseEntity.getStatusCode().value() == 200){
             JSONObject result= responseEntity.getBody();
             if (result.getInteger("error_code") != null) {
-                System.out.println("error_msg:" + result.getString("error_msg"));
+                log.error("百度 API 错误: {}", result.getString("error_msg"));
             }
             return result;
         }
@@ -135,7 +137,7 @@ public class BaiduApiManager {
         } catch (Exception e) {
             throw new BaiduApiFailException("手写识别错误");
         }
-        System.out.println(accessToken);
+        log.debug("使用 accessToken 调用手写识别");
         JSONObject resultObj = JSON.parseObject(result);
 
         JSONArray results;

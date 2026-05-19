@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.HanziToPinyin;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
 
-/**
- * 流畅度处理
- */
+@Slf4j
 @Component
 public class FluencyProcessor {
     @Autowired
@@ -260,8 +259,7 @@ public class FluencyProcessor {
         boolean value=(double)n_count/result.size()>0.8;
         res.put("value",value);
         res.put("counts",result.size());
-        System.out.println("value:" + value);
-        System.out.println("counts:" + result.size());
+        log.debug("telegram value={}, counts={}", value, result.size());
         return res;
 
     }
@@ -323,7 +321,7 @@ public class FluencyProcessor {
         long start=System.currentTimeMillis();
 //        System.out.println(f.get_stop_times());
         long end=System.currentTimeMillis();
-        System.out.println(end-start);
+        log.debug("耗时: {}ms", end - start);
 //        List<String> res=new ArrayList<>();
 //        res.add("dsa");
 //        System.out.println("res="+res);
