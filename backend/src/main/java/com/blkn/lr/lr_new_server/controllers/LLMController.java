@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import java.util.Map;
 /**
  * 控制器：对话智能诊断接口
  */
+@RequireRole({2})
 @RestController
 @RequestMapping("/api")
 public class LLMController {

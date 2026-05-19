@@ -5,11 +5,23 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class TokenUtil {
-    private static final Algorithm algorithm = Algorithm.HMAC256("*#06#114514gkd233666");
+    @Value("${jwt.secret}")
+    private String secretValue;
+
+    private static Algorithm algorithm;
+
+    @PostConstruct
+    public void init() {
+        algorithm = Algorithm.HMAC256(secretValue);
+    }
 
     /**
      *
