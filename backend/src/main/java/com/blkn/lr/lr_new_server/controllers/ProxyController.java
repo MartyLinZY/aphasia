@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -60,7 +62,8 @@ public class ProxyController {
         String result = future.get();
 //        System.out.println("收到一次语音识别请求");
 //        String result = "测试结果";
-        File dest = new File(System.getProperty("user.dir")+ File.separator + file.getOriginalFilename());
+        String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
+        File dest = new File(System.getProperty("user.dir"), safeName);
         file.transferTo(dest);
 
         return new AudioRecognizeResult(result);
@@ -139,7 +142,8 @@ public class ProxyController {
 
 //        System.out.println("收到一次手写识别请求");
 //        String result = "测试结果";
-        File dest = new File(System.getProperty("user.dir")+ File.separator + file.getOriginalFilename());
+        String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
+        File dest = new File(System.getProperty("user.dir"), safeName);
         file.transferTo(dest);
 
         return new HandWritingRecognizeResult(result);
