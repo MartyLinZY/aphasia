@@ -55,6 +55,10 @@ public class FileDao {
         File[] files = dir.listFiles();
 
         List<String> fileNames = new ArrayList<>();
+        if (files == null) {
+            // 目录不存在或读取失败：该用户尚无文件，返回空列表
+            return fileNames;
+        }
         for (File f : files) {
             fileNames.add(f.getName());
         }

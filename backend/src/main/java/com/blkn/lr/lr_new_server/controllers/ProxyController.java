@@ -19,11 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -61,10 +58,6 @@ public class ProxyController {
     AudioRecognizeResult recognizeAudioContent(@RequestParam("file") MultipartFile file) throws Exception {
         Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
         String result = future.get();
-        String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
-        File dest = new File(System.getProperty("user.dir"), safeName);
-        file.transferTo(dest);
-
         return new AudioRecognizeResult(result);
     }
 
@@ -129,11 +122,6 @@ public class ProxyController {
     @PostMapping("/handwrite_recognize")
     HandWritingRecognizeResult recognizeHandleWriting(@RequestParam("file") MultipartFile file) throws Exception {
         String result = baiduApi.handWriteRecognize(file.getBytes());
-
-        String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
-        File dest = new File(System.getProperty("user.dir"), safeName);
-        file.transferTo(dest);
-
         return new HandWritingRecognizeResult(result);
     }
 
