@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
+import com.blkn.lr.lr_new_server.dao.ExamResultDao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import org.bson.types.ObjectId;
@@ -15,7 +16,7 @@ import java.util.List;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Repository
-public class ExamResultDaoImpl {
+public class ExamResultDaoImpl implements ExamResultDao {
     @Autowired
     private MongoTemplate template;
 

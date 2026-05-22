@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.dto.models.exam;
 
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,7 +24,7 @@ public class QuestionCategoryDto {
     List<QuestionSubCategoryDto> subCategories;
     List<ExamCategoryEvalRule> rules;
 
-    QuestionCategoryDto(QuestionCategory category, QuestionDaoImpl questionDao) {
+    QuestionCategoryDto(QuestionCategory category, QuestionDao questionDao) {
         description = category.getDescription();
         subCategories = category.getSubCategories().stream().map(e -> new QuestionSubCategoryDto(e, questionDao)).toList();
         rules = category.getRules();

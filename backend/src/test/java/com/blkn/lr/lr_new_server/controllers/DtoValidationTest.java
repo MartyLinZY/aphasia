@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamResultDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamResultDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.expection.GlobalExceptionHandler;
@@ -32,7 +32,7 @@ class DtoValidationTest {
     private MockMvc examMvc;
     private MockMvc resultMvc;
     private ExamServices examServices;
-    private ExamResultDaoImpl resultDao;
+    private ExamResultDao resultDao;
 
     @BeforeEach
     void setUp() {
@@ -43,10 +43,10 @@ class DtoValidationTest {
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
-        resultDao = Mockito.mock(ExamResultDaoImpl.class);
+        resultDao = Mockito.mock(ExamResultDao.class);
         ResultController resultController = new ResultController();
         ReflectionTestUtils.setField(resultController, "resultDao", resultDao);
-        ReflectionTestUtils.setField(resultController, "questionDao", Mockito.mock(QuestionDaoImpl.class));
+        ReflectionTestUtils.setField(resultController, "questionDao", Mockito.mock(QuestionDao.class));
         resultMvc = MockMvcBuilders.standaloneSetup(resultController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

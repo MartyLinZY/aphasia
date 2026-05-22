@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamResultDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamResultDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
 import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
@@ -21,10 +21,10 @@ import java.util.Objects;
 @RequireRole({1})
 public class ResultController {
     @Autowired
-    ExamResultDaoImpl resultDao;
+    ExamResultDao resultDao;
 
     @Autowired
-    QuestionDaoImpl questionDao;
+    QuestionDao questionDao;
 
     @GetMapping("/patient/{uid}/examRecords")
     List<ExamResultDto> getExamResultsByUserId(@PathVariable("uid") String uid, HttpServletRequest request) {

@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
 
+import com.blkn.lr.lr_new_server.dao.ExamDao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
@@ -22,7 +23,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
-public class ExamDaoImpl {
+public class ExamDaoImpl implements ExamDao {
     @Autowired
     private MongoTemplate template;
 

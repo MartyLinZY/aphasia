@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
@@ -30,7 +30,7 @@ public class ExamController {
     private ExamServices examServices;
 
     @Autowired
-    private ExamDaoImpl examDao;
+    private ExamDao examDao;
 
     @GetMapping("/exams/{examId}")
     @RequireRole({1, 2})
@@ -188,7 +188,7 @@ public class ExamController {
     }
 
     @Autowired
-    private QuestionDaoImpl questionDao;
+    private QuestionDao questionDao;
     @PatchMapping("/questions/{questionId}")
     QuestionDto updateQuestion(@Valid @RequestBody QuestionDto newQuestion,
                             @PathVariable String questionId,

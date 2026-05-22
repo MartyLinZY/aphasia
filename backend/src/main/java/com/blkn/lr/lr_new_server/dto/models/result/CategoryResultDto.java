@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.dto.models.result;
 
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.models.results.CategoryResult;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +21,7 @@ public class CategoryResultDto {
     @Valid
     List<SubCategoryResultDto> subResults;
 
-    public CategoryResultDto(CategoryResult categoryResult, QuestionDaoImpl questionDao) {
+    public CategoryResultDto(CategoryResult categoryResult, QuestionDao questionDao) {
         name = categoryResult.getName();
         finalScore = categoryResult.getFinalScore();
         subResults = categoryResult.getSubResults().stream().map(e -> new SubCategoryResultDto(e, questionDao)).toList();

@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.services;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
@@ -26,10 +26,10 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 @Service
 public class ExamServices {
     @Autowired
-    private ExamDaoImpl examDao;
+    private ExamDao examDao;
 
     @Autowired
-    private QuestionDaoImpl questionDao;
+    private QuestionDao questionDao;
 
     public ExamDto createExam(ExamDto dto, String uid) {
 //        printAsJson(dto);

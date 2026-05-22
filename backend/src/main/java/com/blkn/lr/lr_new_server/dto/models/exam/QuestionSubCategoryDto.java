@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.dto.models.exam;
 
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
@@ -29,7 +29,7 @@ public class QuestionSubCategoryDto {
     List<TerminateRule> terminateRules;
     List<ExamSubCategoryEvalRule> evalRules;
 
-    QuestionSubCategoryDto(QuestionSubCategory subCategory, QuestionDaoImpl questionDao) {
+    QuestionSubCategoryDto(QuestionSubCategory subCategory, QuestionDao questionDao) {
         description = subCategory.getDescription();
 
         questions = subCategory.getQuestions().stream().map(id -> {
