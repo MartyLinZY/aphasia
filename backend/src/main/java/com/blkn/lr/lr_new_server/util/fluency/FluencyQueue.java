@@ -3,6 +3,7 @@ package com.blkn.lr.lr_new_server.util.fluency;
 import lombok.extern.slf4j.Slf4j;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 @Slf4j
 public class FluencyQueue {
