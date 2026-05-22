@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.blkn.lr.lr_new_server.util.TokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.method.HandlerMethod;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+@Slf4j
 public class TokenInterceptor implements HandlerInterceptor {
 	public final static String LOGIN_SYMBOL = "uid";
 
@@ -79,7 +81,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 		try (PrintWriter writer = response.getWriter()) {
 			writer.print(body);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("写入错误响应失败", e);
 		}
 	}
 }

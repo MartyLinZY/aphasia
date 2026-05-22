@@ -64,11 +64,10 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
 
         if (!registry.hasMappingForPattern("/" + IMAGE_DIR + "/**")) {
             try {
-//                System.out.println(imgDir.getCanonicalPath());
                 registry.addResourceHandler("/" + IMAGE_DIR + "/**")
                         .addResourceLocations("file:" + imgDir.getCanonicalPath() + File.separator);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("注册图片资源路径失败", e);
             }
         } else {
             log.warn("图片资源路径已注册，跳过重复注册");
@@ -79,7 +78,7 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
                 registry.addResourceHandler("/" + AUDIO_DIR + "/**")
                         .addResourceLocations("file:" + videoDir.getCanonicalPath() + File.separator);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("注册音频资源路径失败", e);
             }
         }
 

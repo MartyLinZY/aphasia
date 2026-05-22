@@ -4,6 +4,7 @@ import com.blkn.lr.lr_new_server.config.AppSetting;
 import com.blkn.lr.lr_new_server.config.StaticResourcesConfig;
 import com.blkn.lr.lr_new_server.dao.impl.FileDao;
 import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
+@RequireRole({1, 2})
 public class FileController {
     @Autowired
     private FileDao fileDao;

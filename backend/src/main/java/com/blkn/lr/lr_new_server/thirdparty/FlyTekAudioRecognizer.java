@@ -139,11 +139,12 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                 }
                 log.debug("all data is send");
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("音频文件未找到", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("发送音频数据失败", e);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                log.error("音频发送线程被中断", e);
             }
         }).start();
     }
@@ -168,7 +169,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                         // 累计中间结果
 //                        finalResult.append(decoder.toString());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("解析识别结果失败", e);
                     }
                 }
                 if (resp.getData().getStatus() == 2) {
@@ -202,7 +203,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("处理讯飞识别失败响应时出错", e);
         }
     }
     public static void main(String[] args) throws Exception {

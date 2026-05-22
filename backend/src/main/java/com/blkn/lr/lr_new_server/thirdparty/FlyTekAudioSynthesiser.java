@@ -80,13 +80,13 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
                 outputStream.write(textBase64Decode);
                 outputStream.flush();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("写入合成音频数据失败", e);
             }
             if (myJsonParse.data.status == 2) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("关闭音频输出流失败", e);
                 }
                 log.info("合成成功，sid={}, 路径={}", myJsonParse.sid, destFilePath);
                 onComplete.run();
@@ -109,7 +109,7 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("处理讯飞合成失败响应时出错", e);
         }
     }
 

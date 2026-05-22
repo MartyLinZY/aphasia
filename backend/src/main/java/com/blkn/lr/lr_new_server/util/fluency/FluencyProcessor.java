@@ -73,9 +73,9 @@ public class FluencyProcessor {
                 res[index++] = sum/count*320;
             return res;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("音频文件未找到", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("读取音频文件失败", e);
         }
 
         return null;

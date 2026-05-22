@@ -61,8 +61,6 @@ public class ProxyController {
     AudioRecognizeResult recognizeAudioContent(@RequestParam("file") MultipartFile file) throws Exception {
         Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
         String result = future.get();
-//        System.out.println("收到一次语音识别请求");
-//        String result = "测试结果";
         String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
         File dest = new File(System.getProperty("user.dir"), safeName);
         file.transferTo(dest);
@@ -89,7 +87,6 @@ public class ProxyController {
                 // 计算停顿次数
                 try {
                     stopFuture.complete(processor.get_stop_times(file.getBytes()));
-//                    System.out.println("stop finish");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -97,41 +94,33 @@ public class ProxyController {
 
             ThreadPools.fluencyCalculator.submit(() -> {
                 repeatFuture.complete(processor.repeat(audioContent));
-//                System.out.println("repeat finish");
             });
 
             ThreadPools.fluencyCalculator.submit(() -> {
                 try {
                     telegramFuture.complete(processor.Telegram_Language(audioContent));
-//                    System.out.println("telegram finish");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("电报式语言判定失败", e);
                 }
             });
 
             ThreadPools.fluencyCalculator.submit(() -> {
                 try {
                     dnnFuture.complete((double) baiduApi.dnn(audioContent).get("ppl") / audioContent.length());
-//                    System.out.println("dnn finish");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("DNN 困惑度计算失败", e);
                 }
 
             });
 
             boolean repeat = repeatFuture.get();
-//            System.out.println("repeat:" + repeat);
             int stopTimes = stopFuture.get();
-//            System.out.println("stop:" + stopTimes);
             JSONObject telegram = telegramFuture.get();
-//            System.out.println("tele:" + telegram.get("value"));
             double dnn = dnnFuture.get();
-//            System.out.println("dnn" + dnn);
 
             StringBuilder detail = new StringBuilder();
             double fluency = processor.fluency_score(1, stopTimes, repeat,telegram, dnn, detail);
             return new FluencyResult(fluency, detail.toString(), audioContent);
-//            return new FluencyResult(1, "213");
         } catch (Exception e) {
             throw new FlyTekApiException();
         }
@@ -141,8 +130,6 @@ public class ProxyController {
     HandWritingRecognizeResult recognizeHandleWriting(@RequestParam("file") MultipartFile file) throws Exception {
         String result = baiduApi.handWriteRecognize(file.getBytes());
 
-//        System.out.println("收到一次手写识别请求");
-//        String result = "测试结果";
         String safeName = UUID.randomUUID() + "_" + Paths.get(file.getOriginalFilename()).getFileName().toString();
         File dest = new File(System.getProperty("user.dir"), safeName);
         file.transferTo(dest);

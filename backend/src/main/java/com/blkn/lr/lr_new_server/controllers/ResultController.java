@@ -5,6 +5,7 @@ import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
 import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
+@RequireRole({1})
 public class ResultController {
     @Autowired
     ExamResultDaoImpl resultDao;

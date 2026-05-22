@@ -57,7 +57,7 @@ public class TokenUtil {
         } catch (JWTVerificationException e) {
             log.error("Invalid token received: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Token 校验异常", e);
         }
         return null;
     }

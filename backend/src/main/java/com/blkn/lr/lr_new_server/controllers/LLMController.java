@@ -1,7 +1,9 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.dto.request.ConversationRequest;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +25,9 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/diagnose1")
-    public Map<String, Object> diagnose1(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
+    public Map<String, Object> diagnose1(@Valid @RequestBody ConversationRequest req) throws Exception {
         log.debug("diagnose1 called");
-        return llmService.diagnose1(conversation);
+        return llmService.diagnose1(req.getConversation());
     }
 
     /**
@@ -40,13 +38,9 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/diagnose2")
-    public Map<String, Object> diagnose2(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
+    public Map<String, Object> diagnose2(@Valid @RequestBody ConversationRequest req) throws Exception {
         log.debug("diagnose2 called");
-        return llmService.diagnose2(conversation);
+        return llmService.diagnose2(req.getConversation());
     }
 
     /**
@@ -57,12 +51,8 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/repair")
-    public Map<String, Object> repair(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
+    public Map<String, Object> repair(@Valid @RequestBody ConversationRequest req) throws Exception {
         log.debug("repair called");
-        return llmService.repair(conversation);
+        return llmService.repair(req.getConversation());
     }
 }
