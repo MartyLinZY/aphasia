@@ -14,6 +14,7 @@ import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import com.blkn.lr.lr_new_server.services.ExamServices;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,7 +68,7 @@ public class ExamController {
 
 
     @PostMapping("/exams")
-    ExamDto createExam(@RequestBody ExamDto newExam, HttpServletRequest request) {
+    ExamDto createExam(@Valid @RequestBody ExamDto newExam, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
 
         return examServices.createExam(newExam, uid);
@@ -110,12 +111,12 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/category")
-    QuestionCategoryDto addCategory(@RequestBody QuestionCategoryDto newCategory, @PathVariable("examId") String examId) {
+    QuestionCategoryDto addCategory(@Valid @RequestBody QuestionCategoryDto newCategory, @PathVariable("examId") String examId) {
         return examServices.addCategory(newCategory, examId);
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}")
-    Map<String, String> updateCategory(@RequestBody QuestionCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId) {
+    Map<String, String> updateCategory(@Valid @RequestBody QuestionCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId) {
         if (examDao.updateCategory(examId, categoryIndex, newCategory.toModel()) <= 0) {
             throw new BusinessErrorException("在id为" + examId + "的套题中更新亚项"+ categoryIndex + "失败");
         }
@@ -143,13 +144,13 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategory")
-    public Map<String, String> addSubCategoryIntoExam(@PathVariable String examId, @PathVariable int categoryIndex, @RequestBody QuestionSubCategoryDto dto) {
+    public Map<String, String> addSubCategoryIntoExam(@PathVariable String examId, @PathVariable int categoryIndex, @Valid @RequestBody QuestionSubCategoryDto dto) {
         examServices.addSubCategoryIntoExam(examId, categoryIndex, dto);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}")
-    Map<String, String> updateSubCategory(@RequestBody QuestionSubCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId, @PathVariable int subCategoryIndex) {
+    Map<String, String> updateSubCategory(@Valid @RequestBody QuestionSubCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId, @PathVariable int subCategoryIndex) {
         if (examDao.updateSubCategory(examId, categoryIndex, subCategoryIndex, newCategory.toModel()) <= 0) {
             throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下更新子项"+ subCategoryIndex +"失败");
         }
@@ -176,7 +177,7 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{id}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/question")
-    QuestionDto addQuestion(@RequestBody QuestionDto newQuestion,
+    QuestionDto addQuestion(@Valid @RequestBody QuestionDto newQuestion,
                             @PathVariable("id") String examId,
                             @PathVariable("categoryIndex") int cateIndex,
                             @PathVariable("subCategoryIndex") int subCateIndex,
@@ -189,7 +190,7 @@ public class ExamController {
     @Autowired
     private QuestionDaoImpl questionDao;
     @PatchMapping("/questions/{questionId}")
-    QuestionDto updateQuestion(@RequestBody QuestionDto newQuestion,
+    QuestionDto updateQuestion(@Valid @RequestBody QuestionDto newQuestion,
                             @PathVariable String questionId,
                             HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");

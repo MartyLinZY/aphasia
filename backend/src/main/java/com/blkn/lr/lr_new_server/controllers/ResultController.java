@@ -8,6 +8,7 @@ import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class ResultController {
     }
 
     @PostMapping("/examRecord")
-    ExamResultDto saveResult(@RequestBody ExamResultDto resultDto, HttpServletRequest request) {
+    ExamResultDto saveResult(@Valid @RequestBody ExamResultDto resultDto, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
         ExamResult updated = resultDao.save(resultDto.toModel(uid));
         if (updated == null) {

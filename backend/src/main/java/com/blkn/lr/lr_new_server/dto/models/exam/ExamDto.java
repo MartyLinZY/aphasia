@@ -6,6 +6,9 @@ import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.exam.ExamEvalRule;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +22,7 @@ public class ExamDto {
     String id;
 
     // 测评名称
+    @NotBlank(message = "测评名称不能为空")
     String name;
 
     // 测评简介
@@ -33,6 +37,8 @@ public class ExamDto {
     boolean isDisabled;
 
     // 亚项列表
+    @NotNull(message = "categories不能为null")
+    @Valid
     List<QuestionCategoryDto> categories;
 
     // 诊断规则

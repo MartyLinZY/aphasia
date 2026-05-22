@@ -2,6 +2,8 @@ package com.blkn.lr.lr_new_server.dto.models.result;
 
 import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
 import com.blkn.lr.lr_new_server.models.results.SubCategoryResult;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,9 @@ public class SubCategoryResultDto {
     String name;
     Double finalScore;
     String terminateReason;
+
+    @NotNull(message = "questionResults不能为null")
+    @Valid
     List<QuestionResultDto> questionResults;
 
     public SubCategoryResultDto(SubCategoryResult subCategoryResult, QuestionDaoImpl questionDao) {
