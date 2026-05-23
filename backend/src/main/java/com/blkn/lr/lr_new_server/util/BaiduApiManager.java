@@ -48,8 +48,9 @@ public class BaiduApiManager {
                 .addHeader("Accept", "application/json")
                 .build();
         try (Response response = OkHttpManager.getClient().newCall(request).execute()) {
-            assert (response.body() != null);
-            // TODO: 考虑换成gson
+            if (response.body() == null) {
+                throw new BaiduAuthorizeFailException();
+            }
             ObjectMapper mapper = new ObjectMapper();
             Map<?, ?> jsonObject = mapper.readValue(response.body().bytes(), HashMap.class);
             accessToken = (String) jsonObject.get("access_token");

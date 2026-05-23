@@ -87,6 +87,7 @@ public class ProxyController {
                     telegramFuture.complete(processor.Telegram_Language(audioContent));
                 } catch (Exception e) {
                     log.warn("电报式语言判定失败", e);
+                    telegramFuture.completeExceptionally(e);
                 }
             });
 
@@ -95,8 +96,8 @@ public class ProxyController {
                     dnnFuture.complete((double) baiduApi.dnn(audioContent).get("ppl") / audioContent.length());
                 } catch (Exception e) {
                     log.warn("DNN 困惑度计算失败", e);
+                    dnnFuture.completeExceptionally(e);
                 }
-
             });
 
             boolean repeat = repeatFuture.get();
