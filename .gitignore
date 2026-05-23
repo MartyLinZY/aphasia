@@ -56,6 +56,10 @@ LLM/audio_test.wav
 LLM/output.txt
 LLM/diagnosis.txt
 LLM/repair.txt
+LLM/sentences.txt
+LLM/prompt_diagnose_test.txt
+LLM/prompt_repair_test.txt
+LLM/models/
 
 # --------- backend 根目录的本地生成物（不在 backend/.gitignore 中） ---------
 backend/recorded.pcm

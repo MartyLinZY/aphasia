@@ -11,10 +11,12 @@ import okhttp3.WebSocket;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -47,7 +49,7 @@ public class FlyTekManager {
         return future;
     }
 
-    public Future<String> synthesisAudioFromText(String text, String uid, String serverPort) throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException, FileNotFoundException {
+    public Future<String> synthesisAudioFromText(String text, String uid, String serverPort) throws java.io.IOException, NoSuchAlgorithmException, InvalidKeyException {
         String authedUrl = getAuthUrl(
                 flyTekApiConfig.getAudioSynthesisUrl(),
                 flyTekApiConfig.getApiKey(),
@@ -57,9 +59,16 @@ public class FlyTekManager {
         Request request = new Request.Builder().url(authedUrl).build();
         CompletableFuture<String> future = new CompletableFuture<>();
 
-        String fileName = (text.length() > 20 ? text.substring(0, 20) : text) + ".mp3";
+        String safeStem = (text.length() > 20 ? text.substring(0, 20) : text)
+                .replaceAll("[\\\\/:*?\"<>|\\s]", "_");
+        String fileName = safeStem + ".mp3";
         String destFilePath = StaticResourcesConfig.getAudioDirPath(uid) + fileName;
         String fileUrlPath = StaticResourcesConfig.getUrlPrefix(serverPort) + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
+
+        Path destPath = Paths.get(destFilePath);
+        if (destPath.getParent() != null) {
+            Files.createDirectories(destPath.getParent());
+        }
 
         client.newWebSocket(
                 request,
