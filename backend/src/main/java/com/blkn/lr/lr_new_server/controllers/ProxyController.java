@@ -13,12 +13,12 @@ import com.blkn.lr.lr_new_server.util.FlyTekManager;
 import com.blkn.lr.lr_new_server.util.ThreadPools;
 import com.blkn.lr.lr_new_server.util.fluency.FluencyProcessor;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,20 +27,13 @@ import java.util.concurrent.Future;
 @Slf4j
 @RestController
 @RequestMapping("/api/proxy")
+@RequiredArgsConstructor
 public class ProxyController {
 
-    @Autowired
-    private BaiduApiManager baiduApi;
-
-    @Autowired
-    private FluencyProcessor processor;
-
-    @Autowired
-    private FlyTekManager flyTekManager;
-
-
-    @Autowired
-    Environment environment;
+    private final BaiduApiManager baiduApi;
+    private final FluencyProcessor processor;
+    private final FlyTekManager flyTekManager;
+    private final Environment environment;
 
     @PostMapping("/text_similarity")
     TextSimilarityResult calTextSimilarity(@RequestParam("text1") String text1, @RequestParam("text2") String text2) {

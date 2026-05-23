@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -25,8 +24,7 @@ class GlobalExceptionHandlerTest {
     @BeforeEach
     void setUp() {
         accountServices = Mockito.mock(AccountServices.class);
-        AccountController accountController = new AccountController();
-        ReflectionTestUtils.setField(accountController, "service", accountServices);
+        AccountController accountController = new AccountController(accountServices);
 
         mockMvc = MockMvcBuilders.standaloneSetup(accountController)
                 .setControllerAdvice(new GlobalExceptionHandler())

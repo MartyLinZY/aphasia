@@ -7,7 +7,6 @@ import com.blkn.lr.lr_new_server.services.TranslationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -60,8 +59,7 @@ class ControllerSecurityTest {
     @Test
     void diagnose1ShouldReturn400WhenConversationBlank() throws Exception {
         LLMService svc = Mockito.mock(LLMService.class);
-        LLMController controller = new LLMController();
-        ReflectionTestUtils.setField(controller, "llmService", svc);
+        LLMController controller = new LLMController(svc);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -77,8 +75,7 @@ class ControllerSecurityTest {
     void diagnose1ShouldPassWhenConversationPresent() throws Exception {
         LLMService svc = Mockito.mock(LLMService.class);
         when(svc.diagnose1(anyString())).thenReturn(Map.of("type", "运动性失语"));
-        LLMController controller = new LLMController();
-        ReflectionTestUtils.setField(controller, "llmService", svc);
+        LLMController controller = new LLMController(svc);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -92,8 +89,7 @@ class ControllerSecurityTest {
     @Test
     void translateShouldReturn400WhenTextBlank() throws Exception {
         TranslationService svc = Mockito.mock(TranslationService.class);
-        TranslationController controller = new TranslationController();
-        ReflectionTestUtils.setField(controller, "translationService", svc);
+        TranslationController controller = new TranslationController(svc);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

@@ -3,7 +3,7 @@ package com.blkn.lr.lr_new_server.dao.impl;
 import com.blkn.lr.lr_new_server.exception.UserExistException;
 import com.blkn.lr.lr_new_server.models.common.User;
 import com.mongodb.MongoWriteException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +11,9 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
+@RequiredArgsConstructor
 public class UserDaoImpl {
-    @Autowired
-    MongoTemplate template;
+    private final MongoTemplate template;
 
     public User findByIdentity(String identity) {
         return template.query(User.class).matching(query(where("identity").is(identity))).firstValue();

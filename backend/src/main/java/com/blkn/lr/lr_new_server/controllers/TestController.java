@@ -1,8 +1,8 @@
 package com.blkn.lr.lr_new_server.controllers;
 
 import com.blkn.lr.lr_new_server.models.exam.Exam;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +16,9 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class TestController {
-    @Autowired
-    MongoTemplate template;
+    private final MongoTemplate template;
 
 
     @GetMapping("/api/test")

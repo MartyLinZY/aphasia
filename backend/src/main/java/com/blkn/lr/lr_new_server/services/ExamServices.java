@@ -12,9 +12,9 @@ import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
 import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +24,10 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExamServices {
-    @Autowired
-    private ExamDao examDao;
-
-    @Autowired
-    private QuestionDao questionDao;
+    private final ExamDao examDao;
+    private final QuestionDao questionDao;
 
     public ExamDto createExam(ExamDto dto, String uid) {
 //        printAsJson(dto);

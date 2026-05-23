@@ -4,8 +4,8 @@ import com.blkn.lr.lr_new_server.dto.request.ConversationRequest;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -13,9 +13,9 @@ import java.util.Map;
 @RequireRole({2})
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class LLMController {
-    @Autowired
-    private LLMService llmService;
+    private final LLMService llmService;
 
     /**
      * 大模型诊断患病类型与严重程度

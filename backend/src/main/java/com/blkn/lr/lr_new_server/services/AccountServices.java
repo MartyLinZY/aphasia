@@ -6,15 +6,15 @@ import com.blkn.lr.lr_new_server.dto.common.UserDto;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.models.common.User;
 import com.blkn.lr.lr_new_server.util.TokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AccountServices {
-    @Autowired
-    UserDaoImpl userDao;
+    private final UserDaoImpl userDao;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 

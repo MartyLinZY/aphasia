@@ -8,10 +8,10 @@ import com.blkn.lr.lr_new_server.exception.BaiduApiFailException;
 import com.blkn.lr.lr_new_server.exception.BaiduAuthorizeFailException;
 import com.blkn.lr.lr_new_server.thirdparty.BaiduHttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -26,13 +26,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BaiduApiManager {
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private BaiduApiConfig baiduApiConfig;
+    private final RestTemplate restTemplate;
+    private final BaiduApiConfig baiduApiConfig;
 
     String accessToken;
 

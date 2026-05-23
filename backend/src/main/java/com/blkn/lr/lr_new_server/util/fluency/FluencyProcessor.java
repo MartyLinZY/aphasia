@@ -4,8 +4,8 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.HanziToPinyin;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -13,9 +13,9 @@ import java.util.*;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class FluencyProcessor {
-    @Autowired
-    private BaiduApiManager baiduApi;
+    private final BaiduApiManager baiduApi;
 
 //     Set<String> tancis=new HashSet<>(Arrays.asList(new String[]{"en","a","o","dui","shi","ai","pei","ha","ya","hen","yao","ke","wei",""}));
 //
@@ -311,20 +311,5 @@ public class FluencyProcessor {
     }
 
 
-
-    public static void main(String[] args) {
-        FluencyProcessor f=new FluencyProcessor();
-//        System.out.println(f.repeat("你好啊,你好啊，你在干什么"));
-////        double[] data=f.getEnergyMatrix("/Users/hanfei/Documents/毕业设计/自发性II语音文件/1558505639.wav");
-////        double[] data=f.getEnergyMatrix("/Users/hanfei/Documents/毕业设计/自发性II语音文件/1557815793.wav");
-////        double[] data=f.getEnergyMatrix("/Users/hanfei/Documents/毕业设计/自发性II语音文件/1562744821255.wav");
-        long start=System.currentTimeMillis();
-//        System.out.println(f.get_stop_times());
-        long end=System.currentTimeMillis();
-        log.debug("耗时: {}ms", end - start);
-//        List<String> res=new ArrayList<>();
-//        res.add("dsa");
-//        System.out.println("res="+res);
-    }
 
 }

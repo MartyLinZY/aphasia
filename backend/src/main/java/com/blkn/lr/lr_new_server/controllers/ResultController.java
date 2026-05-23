@@ -9,7 +9,7 @@ import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +19,10 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api")
 @RequireRole({1})
+@RequiredArgsConstructor
 public class ResultController {
-    @Autowired
-    ExamResultDao resultDao;
-
-    @Autowired
-    QuestionDao questionDao;
+    private final ExamResultDao resultDao;
+    private final QuestionDao questionDao;
 
     @GetMapping("/patient/{uid}/examRecords")
     List<ExamResultDto> getExamResultsByUserId(@PathVariable("uid") String uid, HttpServletRequest request) {

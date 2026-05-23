@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -22,8 +21,7 @@ class LlmApiAuthInterceptorTest {
     @BeforeEach
     void setUp() {
         llmService = Mockito.mock(LLMService.class);
-        LLMController controller = new LLMController();
-        ReflectionTestUtils.setField(controller, "llmService", llmService);
+        LLMController controller = new LLMController(llmService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .addInterceptors(new TokenInterceptor())
                 .build();

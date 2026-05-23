@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.dao.ExamDao;
 import com.blkn.lr.lr_new_server.dao.ExamResultDao;
 import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -37,16 +37,16 @@ class DtoValidationTest {
     @BeforeEach
     void setUp() {
         examServices = Mockito.mock(ExamServices.class);
-        ExamController examController = new ExamController();
-        ReflectionTestUtils.setField(examController, "examServices", examServices);
+        ExamController examController = new ExamController(
+                examServices,
+                Mockito.mock(ExamDao.class),
+                Mockito.mock(QuestionDao.class));
         examMvc = MockMvcBuilders.standaloneSetup(examController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
         resultDao = Mockito.mock(ExamResultDao.class);
-        ResultController resultController = new ResultController();
-        ReflectionTestUtils.setField(resultController, "resultDao", resultDao);
-        ReflectionTestUtils.setField(resultController, "questionDao", Mockito.mock(QuestionDao.class));
+        ResultController resultController = new ResultController(resultDao, Mockito.mock(QuestionDao.class));
         resultMvc = MockMvcBuilders.standaloneSetup(resultController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

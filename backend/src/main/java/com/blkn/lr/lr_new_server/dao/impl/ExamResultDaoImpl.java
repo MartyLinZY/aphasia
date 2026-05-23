@@ -3,8 +3,8 @@ package com.blkn.lr.lr_new_server.dao.impl;
 import com.blkn.lr.lr_new_server.dao.ExamResultDao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
+import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
@@ -16,9 +16,9 @@ import java.util.List;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Repository
+@RequiredArgsConstructor
 public class ExamResultDaoImpl implements ExamResultDao {
-    @Autowired
-    private MongoTemplate template;
+    private final MongoTemplate template;
 
 
     public ExamResult save(ExamResult model) {

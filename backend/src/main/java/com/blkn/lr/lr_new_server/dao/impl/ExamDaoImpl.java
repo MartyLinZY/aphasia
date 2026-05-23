@@ -10,8 +10,8 @@ import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import com.mongodb.client.result.DeleteResult;
+import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Update;
@@ -23,9 +23,9 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
+@RequiredArgsConstructor
 public class ExamDaoImpl implements ExamDao {
-    @Autowired
-    private MongoTemplate template;
+    private final MongoTemplate template;
 
     public Exam save(Exam newModel) {
         return template.save(newModel);

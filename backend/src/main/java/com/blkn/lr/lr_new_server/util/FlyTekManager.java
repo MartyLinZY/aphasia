@@ -21,15 +21,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class FlyTekManager {
-    @Autowired
-    private FlyTekApiConfig flyTekApiConfig;
-
-    public FlyTekManager() {}
+    private final FlyTekApiConfig flyTekApiConfig;
 
     public Future<String> recognizeAudio(byte[] pcm16bitsData) throws Exception {
         String authedUrl = getAuthUrl(

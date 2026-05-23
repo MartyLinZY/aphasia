@@ -15,7 +15,7 @@ import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import com.blkn.lr.lr_new_server.services.ExamServices;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +25,11 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api")
 @RequireRole({2})
+@RequiredArgsConstructor
 public class ExamController {
-    @Autowired
-    private ExamServices examServices;
-
-    @Autowired
-    private ExamDao examDao;
+    private final ExamServices examServices;
+    private final ExamDao examDao;
+    private final QuestionDao questionDao;
 
     @GetMapping("/exams/{examId}")
     @RequireRole({1, 2})
@@ -187,8 +186,6 @@ public class ExamController {
         return examServices.addQuestion(uid, examId, cateIndex, subCateIndex, newQuestion);
     }
 
-    @Autowired
-    private QuestionDao questionDao;
     @PatchMapping("/questions/{questionId}")
     QuestionDto updateQuestion(@Valid @RequestBody QuestionDto newQuestion,
                             @PathVariable String questionId,

@@ -4,7 +4,7 @@ import com.blkn.lr.lr_new_server.dto.request.TranslateRequest;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.TranslationService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequireRole({1, 2})
+@RequiredArgsConstructor
 public class TranslationController {
 
-    @Autowired
-    private TranslationService translationService;
+    private final TranslationService translationService;
 
     /**
      * 对文本进行补全/猜测含义并翻译，适用于失语症患者不完整表达。
