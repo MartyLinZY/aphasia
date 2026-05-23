@@ -5,23 +5,24 @@ import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
 import com.blkn.lr.lr_new_server.util.WavUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 通过阿里通义千问音频多模态模型（qwen-audio-turbo-latest）
- * 对患者录音做 BDAE 0-10 言语流畅度评估，端到端取代旧的
- * 「停顿次数+重复+电报式+DNN困惑度」规则树。
+ * 通过阿里通义千问 Omni 多模态模型对患者录音做 BDAE 0-10 言语流畅度评估。
+ * Omni 系列在 Dashscope 上只支持 OpenAI 兼容模式 + 流式输出 (stream:true)。
  */
 @Slf4j
 @Service
@@ -81,24 +82,29 @@ public class QwenAudioService {
         }
 
         byte[] wav = WavUtil.pcm16kMonoToWav(rawPcm16kMono);
-        String audioDataUri = "data:audio/wav;base64," + Base64.getEncoder().encodeToString(wav);
+        String audioDataUri = "data:;base64," + Base64.getEncoder().encodeToString(wav);
 
         String body = buildRequestBody(audioDataUri);
         Request request = new Request.Builder()
                 .url(llmApiConfig.getAudioUrl())
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
+                .header("Accept", "text/event-stream")
                 .post(RequestBody.create(body, JSON_MEDIA))
                 .build();
 
         try (Response response = client().newCall(request).execute()) {
             ResponseBody respBody = response.body();
-            String text = respBody == null ? "" : respBody.string();
             if (!response.isSuccessful()) {
-                log.warn("qwen-audio 调用失败: code={} body={}", response.code(), text);
-                throw new IOException("qwen-audio HTTP " + response.code());
+                String errText = respBody == null ? "" : respBody.string();
+                log.warn("qwen-audio 调用失败: code={} body={}", response.code(), errText);
+                throw new IOException("qwen-audio HTTP " + response.code() + ": " + errText);
             }
-            return parseFluencyResult(text);
+            if (respBody == null) {
+                throw new IOException("qwen-audio 响应 body 为空");
+            }
+            String assistantText = readSseStream(respBody);
+            return parseFluencyResult(assistantText);
         }
     }
 
@@ -110,55 +116,82 @@ public class QwenAudioService {
 
         JsonObject systemMsg = new JsonObject();
         systemMsg.addProperty("role", "system");
-        JsonArray systemContent = new JsonArray();
-        JsonObject systemText = new JsonObject();
-        systemText.addProperty("text", SYSTEM_PROMPT);
-        systemContent.add(systemText);
-        systemMsg.add("content", systemContent);
+        systemMsg.addProperty("content", SYSTEM_PROMPT);
         messages.add(systemMsg);
 
         JsonObject userMsg = new JsonObject();
         userMsg.addProperty("role", "user");
         JsonArray userContent = new JsonArray();
+
         JsonObject audioPart = new JsonObject();
-        audioPart.addProperty("audio", audioDataUri);
+        audioPart.addProperty("type", "input_audio");
+        JsonObject inputAudio = new JsonObject();
+        inputAudio.addProperty("data", audioDataUri);
+        inputAudio.addProperty("format", "wav");
+        audioPart.add("input_audio", inputAudio);
         userContent.add(audioPart);
+
         JsonObject textPart = new JsonObject();
+        textPart.addProperty("type", "text");
         textPart.addProperty("text", USER_INSTRUCTION);
         userContent.add(textPart);
+
         userMsg.add("content", userContent);
         messages.add(userMsg);
 
-        JsonObject input = new JsonObject();
-        input.add("messages", messages);
-        root.add("input", input);
+        root.add("messages", messages);
 
-        JsonObject parameters = new JsonObject();
-        parameters.addProperty("result_format", "message");
-        root.add("parameters", parameters);
+        JsonArray modalities = new JsonArray();
+        modalities.add("text");
+        root.add("modalities", modalities);
+
+        root.addProperty("stream", true);
+        JsonObject streamOptions = new JsonObject();
+        streamOptions.addProperty("include_usage", true);
+        root.add("stream_options", streamOptions);
 
         return gson.toJson(root);
     }
 
-    private FluencyResult parseFluencyResult(String responseBody) throws IOException {
-        JsonObject root = gson.fromJson(responseBody, JsonObject.class);
-        if (root == null) {
-            throw new IOException("qwen-audio 响应为空");
+    /**
+     * 读取 SSE 流，把每个 chunk 的 delta.content 拼起来。
+     */
+    private String readSseStream(ResponseBody respBody) throws IOException {
+        StringBuilder full = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(respBody.byteStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty() || !line.startsWith("data:")) {
+                    continue;
+                }
+                String payload = line.substring(5).trim();
+                if ("[DONE]".equals(payload)) {
+                    break;
+                }
+                try {
+                    JsonObject chunk = gson.fromJson(payload, JsonObject.class);
+                    if (chunk == null) continue;
+                    JsonArray choices = chunk.getAsJsonArray("choices");
+                    if (choices == null || choices.size() == 0) continue;
+                    JsonObject delta = choices.get(0).getAsJsonObject().getAsJsonObject("delta");
+                    if (delta == null) continue;
+                    if (delta.has("content") && !delta.get("content").isJsonNull()) {
+                        full.append(delta.get("content").getAsString());
+                    }
+                } catch (Exception e) {
+                    log.debug("跳过无法解析的 SSE 块: {}", payload);
+                }
+            }
         }
-        JsonObject output = root.getAsJsonObject("output");
-        if (output == null) {
-            throw new IOException("qwen-audio 响应缺少 output: " + responseBody);
-        }
-        JsonArray choices = output.getAsJsonArray("choices");
-        if (choices == null || choices.size() == 0) {
-            throw new IOException("qwen-audio 响应缺少 choices: " + responseBody);
-        }
-        JsonObject message = choices.get(0).getAsJsonObject().getAsJsonObject("message");
-        if (message == null) {
-            throw new IOException("qwen-audio 响应缺少 message: " + responseBody);
-        }
+        log.debug("qwen-audio SSE 完整文本: {}", full);
+        return full.toString();
+    }
 
-        String assistantText = extractAssistantText(message);
+    private FluencyResult parseFluencyResult(String assistantText) throws IOException {
+        if (assistantText == null || assistantText.isBlank()) {
+            throw new IOException("qwen-audio 返回空文本");
+        }
         String jsonBlock = extractJsonBlock(assistantText);
         JsonObject result;
         try {
@@ -182,26 +215,6 @@ public class QwenAudioService {
 
         log.debug("qwen-audio 评分: fluency={}, content={}", fluency, content);
         return new FluencyResult(fluency, detail, content);
-    }
-
-    private String extractAssistantText(JsonObject message) {
-        JsonElement content = message.get("content");
-        if (content == null || content.isJsonNull()) {
-            return "";
-        }
-        if (content.isJsonPrimitive()) {
-            return content.getAsString();
-        }
-        if (content.isJsonArray()) {
-            StringBuilder sb = new StringBuilder();
-            for (JsonElement e : content.getAsJsonArray()) {
-                if (e.isJsonObject() && e.getAsJsonObject().has("text")) {
-                    sb.append(e.getAsJsonObject().get("text").getAsString());
-                }
-            }
-            return sb.toString();
-        }
-        return content.toString();
     }
 
     private String extractJsonBlock(String text) {
