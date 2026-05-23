@@ -1,6 +1,5 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.dto.apiproxy.HandWritingRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
@@ -8,10 +7,9 @@ import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.exception.FlyTekApiException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
+import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
-import com.blkn.lr.lr_new_server.util.ThreadPools;
-import com.blkn.lr.lr_new_server.util.fluency.FluencyProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 @Slf4j
@@ -31,7 +27,7 @@ import java.util.concurrent.Future;
 public class ProxyController {
 
     private final BaiduApiManager baiduApi;
-    private final FluencyProcessor processor;
+    private final QwenAudioService qwenAudioService;
     private final FlyTekManager flyTekManager;
     private final Environment environment;
 
@@ -57,58 +53,9 @@ public class ProxyController {
     @PostMapping("/fluency")
     FluencyResult calFluency(@RequestParam("file") MultipartFile file) throws FlyTekApiException {
         try {
-            Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
-            String audioContent = future.get();
-            log.debug("音频识别结果: {}", audioContent);
-            if (audioContent.isEmpty()) {
-                return new FluencyResult(0, "患者未说任何内容", audioContent);
-            }
-
-            CompletableFuture<Boolean> repeatFuture = new CompletableFuture<>();
-            CompletableFuture<Integer> stopFuture = new CompletableFuture<>();
-            CompletableFuture<JSONObject> telegramFuture = new CompletableFuture<>();
-            CompletableFuture<Double> dnnFuture = new CompletableFuture<>();
-
-            ThreadPools.fluencyCalculator.submit(() -> {
-                // 计算停顿次数
-                try {
-                    stopFuture.complete(processor.get_stop_times(file.getBytes()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            ThreadPools.fluencyCalculator.submit(() -> {
-                repeatFuture.complete(processor.repeat(audioContent));
-            });
-
-            ThreadPools.fluencyCalculator.submit(() -> {
-                try {
-                    telegramFuture.complete(processor.Telegram_Language(audioContent));
-                } catch (Exception e) {
-                    log.warn("电报式语言判定失败", e);
-                    telegramFuture.completeExceptionally(e);
-                }
-            });
-
-            ThreadPools.fluencyCalculator.submit(() -> {
-                try {
-                    dnnFuture.complete((double) baiduApi.dnn(audioContent).get("ppl") / audioContent.length());
-                } catch (Exception e) {
-                    log.warn("DNN 困惑度计算失败", e);
-                    dnnFuture.completeExceptionally(e);
-                }
-            });
-
-            boolean repeat = repeatFuture.get();
-            int stopTimes = stopFuture.get();
-            JSONObject telegram = telegramFuture.get();
-            double dnn = dnnFuture.get();
-
-            StringBuilder detail = new StringBuilder();
-            double fluency = processor.fluency_score(1, stopTimes, repeat,telegram, dnn, detail);
-            return new FluencyResult(fluency, detail.toString(), audioContent);
+            return qwenAudioService.analyzeFluency(file.getBytes());
         } catch (Exception e) {
+            log.error("qwen-audio 流畅度评估失败", e);
             throw new FlyTekApiException();
         }
     }

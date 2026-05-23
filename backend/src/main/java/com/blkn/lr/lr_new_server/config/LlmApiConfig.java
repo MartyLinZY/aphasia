@@ -21,6 +21,15 @@ public class LlmApiConfig {
     @Value("${llm.timeout-seconds:30}")
     private int timeoutSeconds;
 
+    @Value("${llm.audio.url:https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation}")
+    private String audioUrl;
+
+    @Value("${llm.audio.model:qwen-audio-turbo-latest}")
+    private String audioModel;
+
+    @Value("${llm.audio.timeout-seconds:60}")
+    private int audioTimeoutSeconds;
+
     public String getApiUrl() {
         return apiUrl;
     }
@@ -35,5 +44,17 @@ public class LlmApiConfig {
 
     public int getTimeoutSeconds() {
         return timeoutSeconds;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public String getAudioModel() {
+        return audioModel;
+    }
+
+    public int getAudioTimeoutSeconds() {
+        return audioTimeoutSeconds;
     }
 }

@@ -74,29 +74,6 @@ public class BaiduApiManager {
         return null;
     }
 
-    @Nullable
-    private JSONObject requestTextService(String text, String url) {
-        try {
-            checkAndSetToken();
-        } catch (IOException e) {
-            throw new RuntimeException("百度API鉴权失败", e);
-        }
-
-        JSONObject param=new JSONObject();
-        param.put("text",text);
-        return requestService(url, param);
-    }
-
-    public JSONObject verbalAnalysis(String text){
-        String verbal_analysiz_url= baiduApiConfig.getLexerUrl() + "&access_token=";
-        return requestTextService(text, verbal_analysiz_url);
-    }
-
-    public JSONObject dnn(String text) {
-        String dnn_url= baiduApiConfig.getDnnUrl() + "&access_token=";
-        return requestTextService(text, dnn_url);
-    }
-
     public Double shortTextSimilarity(String text1, String text2) {
         try {
             checkAndSetToken();

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 public class BaiduApiConfig {
     // 百度云开放平台api相关
     private static final String AUTHORIZE_URL = "https://aip.baidubce.com/oauth/2.0/token";
-    private static final String LEXER_URL = "https://aip.baidubce.com/rpc/2.0/nlp/v1/lexer?charset=UTF-8";
-    private static final String DNN_URL = "https://aip.baidubce.com/rpc/2.0/nlp/v2/dnnlm_cn?charset=UTF-8";
     private static final String SHORT_TEXT_SIM_URL = "https://aip.baidubce.com/rpc/2.0/nlp/v2/simnet?charset=UTF-8";
     private static final String HAND_WRITE_RECOGNIZE_URL = "https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting";
 
@@ -23,14 +21,6 @@ public class BaiduApiConfig {
 
     public String getAuthorizeUrl() {
         return AUTHORIZE_URL;
-    }
-
-    public String getLexerUrl() {
-        return LEXER_URL;
-    }
-
-    public String getDnnUrl() {
-        return DNN_URL;
     }
 
     public String getShortTextSimUrl() {
