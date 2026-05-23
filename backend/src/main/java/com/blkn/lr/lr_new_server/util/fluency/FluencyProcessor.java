@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.util.fluency;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.HanziToPinyin;
 import lombok.extern.slf4j.Slf4j;

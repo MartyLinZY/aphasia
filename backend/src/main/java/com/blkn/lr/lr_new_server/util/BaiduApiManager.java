@@ -1,8 +1,8 @@
 package com.blkn.lr.lr_new_server.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.config.BaiduApiConfig;
 import com.blkn.lr.lr_new_server.expection.BaiduApiFailException;
 import com.blkn.lr.lr_new_server.expection.BaiduAuthorizeFailException;

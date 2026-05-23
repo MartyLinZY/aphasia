@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.dto.apiproxy.HandWritingRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
