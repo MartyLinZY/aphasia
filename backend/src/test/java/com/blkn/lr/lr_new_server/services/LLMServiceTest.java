@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.services;
 
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;

@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.expection.GlobalExceptionHandler;
+import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
 import com.blkn.lr.lr_new_server.services.TranslationService;

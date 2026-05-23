@@ -1,30 +1,30 @@
-package com.blkn.lr.lr_new_server.expection;
+package com.blkn.lr.lr_new_server.exception;
 
-public class FileEmptyException extends FileUploadException {
+public class FileSizeException extends FileUploadException {
 
 	private static final long serialVersionUID = 1L;
 
-	public FileEmptyException() {
+	public FileSizeException() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public FileEmptyException(String arg0, Throwable arg1, boolean arg2, boolean arg3) {
+	public FileSizeException(String arg0, Throwable arg1, boolean arg2, boolean arg3) {
 		super(arg0, arg1, arg2, arg3);
 		// TODO Auto-generated constructor stub
 	}
 
-	public FileEmptyException(String arg0, Throwable arg1) {
+	public FileSizeException(String arg0, Throwable arg1) {
 		super(arg0, arg1);
 		// TODO Auto-generated constructor stub
 	}
 
-	public FileEmptyException(String arg0) {
+	public FileSizeException(String arg0) {
 		super(arg0);
 		// TODO Auto-generated constructor stub
 	}
 
-	public FileEmptyException(Throwable arg0) {
+	public FileSizeException(Throwable arg0) {
 		super(arg0);
 		// TODO Auto-generated constructor stub
 	}

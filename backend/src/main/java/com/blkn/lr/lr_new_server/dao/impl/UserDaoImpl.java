@@ -1,6 +1,6 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
-import com.blkn.lr.lr_new_server.expection.UserExistException;
+import com.blkn.lr.lr_new_server.exception.UserExistException;
 import com.blkn.lr.lr_new_server.models.common.User;
 import com.mongodb.MongoWriteException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,7 +4,7 @@ import com.blkn.lr.lr_new_server.dao.ExamResultDao;
 import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
-import com.blkn.lr.lr_new_server.expection.GlobalExceptionHandler;
+import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.services.ExamServices;
 import org.junit.jupiter.api.BeforeEach;

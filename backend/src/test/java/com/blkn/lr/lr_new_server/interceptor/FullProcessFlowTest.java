@@ -1,7 +1,7 @@
 package com.blkn.lr.lr_new_server.interceptor;
 
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
-import com.blkn.lr.lr_new_server.expection.GlobalExceptionHandler;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
 import com.blkn.lr.lr_new_server.util.TokenUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

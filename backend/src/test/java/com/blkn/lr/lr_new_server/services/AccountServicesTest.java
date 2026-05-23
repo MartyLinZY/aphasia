@@ -2,7 +2,7 @@ package com.blkn.lr.lr_new_server.services;
 
 import com.blkn.lr.lr_new_server.dao.impl.UserDaoImpl;
 import com.blkn.lr.lr_new_server.dto.common.UserDto;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.models.common.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

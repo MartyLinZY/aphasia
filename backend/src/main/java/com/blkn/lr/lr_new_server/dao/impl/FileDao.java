@@ -1,8 +1,8 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
 import com.blkn.lr.lr_new_server.config.StaticResourcesConfig;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
-import com.blkn.lr.lr_new_server.expection.FileIOException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.FileIOException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;

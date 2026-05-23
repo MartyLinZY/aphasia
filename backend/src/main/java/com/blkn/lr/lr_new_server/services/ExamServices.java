@@ -6,7 +6,7 @@ import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;

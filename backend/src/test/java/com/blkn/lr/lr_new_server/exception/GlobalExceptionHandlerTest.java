@@ -1,4 +1,4 @@
-package com.blkn.lr.lr_new_server.expection;
+package com.blkn.lr.lr_new_server.exception;
 
 import com.blkn.lr.lr_new_server.controllers.AccountController;
 import com.blkn.lr.lr_new_server.services.AccountServices;
