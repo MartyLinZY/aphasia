@@ -162,9 +162,12 @@ public class BaiduApiManager {
     ReentrantLock lock = new ReentrantLock();
     void checkAndSetToken() throws IOException {
         lock.lock();
-        if (accessToken == null) {
-            authorize();
+        try {
+            if (accessToken == null) {
+                authorize();
+            }
+        } finally {
+            lock.unlock();
         }
-        lock.unlock();
     }
 }
