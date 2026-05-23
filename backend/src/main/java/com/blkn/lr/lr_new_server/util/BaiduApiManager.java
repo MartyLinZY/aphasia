@@ -154,10 +154,6 @@ public class BaiduApiManager {
         return builder.toString();
     }
 
-    String addTokenToUrl(String url) {
-        return url + "&access_token" + accessToken;
-    }
-
     ReentrantLock lock = new ReentrantLock();
     void checkAndSetToken() throws IOException {
         lock.lock();
