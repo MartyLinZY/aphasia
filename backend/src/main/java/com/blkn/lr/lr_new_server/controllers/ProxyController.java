@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @RestController
@@ -46,8 +48,12 @@ public class ProxyController {
     @PostMapping("/audio_recognize")
     AudioRecognizeResult recognizeAudioContent(@RequestParam("file") MultipartFile file) throws Exception {
         Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
-        String result = future.get();
-        return new AudioRecognizeResult(result);
+        try {
+            return new AudioRecognizeResult(future.get(60, TimeUnit.SECONDS));
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new ProxyServiceException("讯飞 ASR 超时", e);
+        }
     }
 
     @PostMapping("/fluency")
@@ -83,7 +89,13 @@ public class ProxyController {
 
         String port = environment.getProperty("server.port");
         Future<String> future = flyTekManager.synthesisAudioFromText(text, uid, port);
-        String url = future.get();
+        String url;
+        try {
+            url = future.get(30, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new ProxyServiceException("讯飞 TTS 超时", e);
+        }
 
         String[] tokens = url.split("/");
         String fileName = tokens[tokens.length - 1];
