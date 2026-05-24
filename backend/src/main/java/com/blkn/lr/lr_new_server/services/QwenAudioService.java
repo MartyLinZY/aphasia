@@ -82,7 +82,7 @@ public class QwenAudioService {
         }
 
         byte[] wav = WavUtil.pcm16kMonoToWav(rawPcm16kMono);
-        String audioDataUri = "data:;base64," + Base64.getEncoder().encodeToString(wav);
+        String audioDataUri = "data:audio/wav;base64," + Base64.getEncoder().encodeToString(wav);
 
         String body = buildRequestBody(audioDataUri);
         Request request = new Request.Builder()
