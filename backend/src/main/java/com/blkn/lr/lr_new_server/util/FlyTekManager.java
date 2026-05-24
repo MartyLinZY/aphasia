@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.util;
 
+import com.blkn.lr.lr_new_server.config.AppSetting;
 import com.blkn.lr.lr_new_server.config.FlyTekApiConfig;
 import com.blkn.lr.lr_new_server.config.StaticResourcesConfig;
 import com.blkn.lr.lr_new_server.thirdparty.FlyTekAudioRecognizer;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FlyTekManager {
     private final FlyTekApiConfig flyTekApiConfig;
+    private final AppSetting appSetting;
 
     public Future<String> recognizeAudio(byte[] pcm16bitsData) throws Exception {
         String authedUrl = getAuthUrl(
@@ -60,7 +62,8 @@ public class FlyTekManager {
                 .replaceAll("[\\\\/:*?\"<>|\\s]", "_");
         String fileName = safeStem + ".mp3";
         String destFilePath = StaticResourcesConfig.getAudioDirPath(uid) + fileName;
-        String fileUrlPath = StaticResourcesConfig.getUrlPrefix(serverPort) + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
+        String fileUrlPath = StaticResourcesConfig.getUrlPrefix(appSetting.getHost(), serverPort)
+                + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
 
         Path destPath = Paths.get(destFilePath);
         if (destPath.getParent() != null) {
