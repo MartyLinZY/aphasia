@@ -72,7 +72,11 @@ public class FlyTekManager {
 
         client.newWebSocket(
                 request,
-                new FlyTekAudioSynthesiser(flyTekApiConfig.getAppId(), text, destFilePath, () -> future.complete(fileUrlPath))
+                new FlyTekAudioSynthesiser(
+                        flyTekApiConfig.getAppId(), text, destFilePath,
+                        () -> future.complete(fileUrlPath),
+                        future::completeExceptionally
+                )
         );
         return future;
     }
