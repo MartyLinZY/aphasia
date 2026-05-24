@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.thirdparty;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -46,28 +47,30 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
         super.onOpen(webSocket, response);
         log.info("ws 建立连接成功，发送文本...");
-        new Thread(()->{
-            //连接成功，开始发送数据
-            String requestJson = "{\n" +
-                    "  \"common\": {\n" +
-                    "    \"app_id\": \"" + appId + "\"\n" +
-                    "  },\n" +
-                    "  \"business\": {\n" +
-                    "    \"aue\": \"lame\",\n" +
-                    "    \"sfl\": 1,\n" +
-                    "    \"tte\": \"" + TTE + "\",\n" +
-                    "    \"ent\": \"intp65\",\n" +
-                    "    \"vcn\": \"" + VCN + "\",\n" +
-                    "    \"pitch\": 45,\n" +
-                    "    \"speed\": 44\n" +
-                    "  },\n" +
-                    "  \"data\": {\n" +
-                    "    \"status\": 2,\n" +
-                    "    \"text\": \"" + Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8)) + "\"\n" +
-                    //"    \"text\": \"" + Base64.getEncoder().encodeToString(TEXT.getBytes("UTF-16LE")) + "\"\n" +
-                    "  }\n" +
-                    "}";
-            webSocket.send(requestJson);
+        new Thread(() -> {
+            JsonObject common = new JsonObject();
+            common.addProperty("app_id", appId);
+
+            JsonObject business = new JsonObject();
+            business.addProperty("aue", "lame");
+            business.addProperty("sfl", 1);
+            business.addProperty("tte", TTE);
+            business.addProperty("ent", "intp65");
+            business.addProperty("vcn", VCN);
+            business.addProperty("pitch", 45);
+            business.addProperty("speed", 44);
+
+            JsonObject data = new JsonObject();
+            data.addProperty("status", 2);
+            data.addProperty("text",
+                    Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8)));
+
+            JsonObject root = new JsonObject();
+            root.add("common", common);
+            root.add("business", business);
+            root.add("data", data);
+
+            webSocket.send(gson.toJson(root));
         }).start();
     }
 
