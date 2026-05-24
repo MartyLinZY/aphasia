@@ -1,8 +1,8 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
 import com.blkn.lr.lr_new_server.config.StaticResourcesConfig;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
-import com.blkn.lr.lr_new_server.expection.FileIOException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.FileIOException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +55,10 @@ public class FileDao {
         File[] files = dir.listFiles();
 
         List<String> fileNames = new ArrayList<>();
+        if (files == null) {
+            // 目录不存在或读取失败：该用户尚无文件，返回空列表
+            return fileNames;
+        }
         for (File f : files) {
             fileNames.add(f.getName());
         }

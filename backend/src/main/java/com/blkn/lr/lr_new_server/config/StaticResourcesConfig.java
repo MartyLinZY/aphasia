@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.config;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 @Configuration
 public class StaticResourcesConfig implements WebMvcConfigurer {
     public static final String IMAGE_DIR = "images";
@@ -62,14 +64,13 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
 
         if (!registry.hasMappingForPattern("/" + IMAGE_DIR + "/**")) {
             try {
-//                System.out.println(imgDir.getCanonicalPath());
                 registry.addResourceHandler("/" + IMAGE_DIR + "/**")
                         .addResourceLocations("file:" + imgDir.getCanonicalPath() + File.separator);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("注册图片资源路径失败", e);
             }
         } else {
-            System.err.println();
+            log.warn("图片资源路径已注册，跳过重复注册");
         }
 
         if (!registry.hasMappingForPattern("/" + AUDIO_DIR + "/**")) {
@@ -77,7 +78,7 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
                 registry.addResourceHandler("/" + AUDIO_DIR + "/**")
                         .addResourceLocations("file:" + videoDir.getCanonicalPath() + File.separator);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("注册音频资源路径失败", e);
             }
         }
 

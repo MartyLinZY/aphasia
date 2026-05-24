@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:aphasia_recovery/exceptions/http_exceptions.dart';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/settings.dart';
+import 'package:aphasia_recovery/utils/http/http_manager.dart';
 
 class LLMRepairPage extends StatefulWidget {
   final TextStyle? bodyStyle;
@@ -53,22 +54,21 @@ class _LLMRepairPageState extends State<LLMRepairPage> with UseCommonStyles {
       return;
     }
     try {
-      final resp = await http.post(
-        Uri.parse('${HttpConstants.backendBaseUrl}/api/repair'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'conversation': conversation}),
-      );
-      if (resp.statusCode == 200) {
-        final data = jsonDecode(resp.body);
-        setState(() {
-          repairedConversation = data['repairedConversation']?.toString() ?? resp.body;
-          repairDone = true;
-        });
-      } else {
-        setState(() {
-          errorMsg = '修复接口错误: ${resp.body}';
-        });
-      }
+      // 走 HttpClientManager，自动带上登录后保存的 Token 头，
+      // 避免裸 http.post 因没带 token 而被后端拦截器以 401 拒绝。
+      final data = await HttpClientManager().post(
+            url: '${HttpConstants.backendBaseUrl}/api/repair',
+            body: jsonEncode({'conversation': conversation}),
+          ) as Map<String, dynamic>;
+      setState(() {
+        repairedConversation =
+            data['repairedConversation']?.toString() ?? jsonEncode(data);
+        repairDone = true;
+      });
+    } on HttpRequestException catch (e) {
+      setState(() {
+        errorMsg = '修复接口错误: ${_extractMessage(e)}';
+      });
     } catch (e) {
       setState(() {
         errorMsg = e.toString();
@@ -78,6 +78,22 @@ class _LLMRepairPageState extends State<LLMRepairPage> with UseCommonStyles {
         loading = false;
       });
     }
+  }
+
+  String _extractMessage(HttpRequestException e) {
+    final code = e.response?.statusCode ?? e.streamedResponse?.statusCode;
+    if (code == 401) return '登录状态已失效，请重新登录后再试';
+    if (code == 403) return '当前账号无权限访问该功能';
+    final raw = e.message;
+    if (raw == null || raw.isEmpty) return '未知错误';
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map && decoded['message'] is String) {
+        final msg = decoded['message'] as String;
+        return msg.isEmpty ? raw : msg;
+      }
+    } catch (_) {/* 旧接口不是 ApiResponse 包装，直接返回原文 */}
+    return raw;
   }
 
   @override

@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.thirdparty;
 
+import lombok.extern.slf4j.Slf4j;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -8,9 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-/**
- * http 工具类
- */
+@Slf4j
 public class BaiduHttpUtil {
 
     public static String post(String requestUrl, String accessToken, String params)
@@ -71,7 +70,7 @@ public class BaiduHttpUtil {
             result += getLine;
         }
         in.close();
-        System.err.println("result:" + result);
+        log.debug("百度 HTTP 响应: {}", result);
         return result;
     }
 }

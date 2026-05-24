@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.thirdparty;
 
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -10,6 +11,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 public class FlyTekAudioSynthesiser extends WebSocketListener {
     // 合成文本编码格式
     public static final String TTE = "UTF8"; // 小语种必须使用UNICODE编码作为值
@@ -39,7 +41,7 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
         super.onOpen(webSocket, response);
-        System.out.println("ws建立连接成功，发送文本...");
+        log.info("ws 建立连接成功，发送文本...");
         new Thread(()->{
             //连接成功，开始发送数据
             String requestJson = "{\n" +
@@ -70,8 +72,7 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
         super.onMessage(webSocket, text);
         JsonParse myJsonParse = gson.fromJson(text, JsonParse.class);
         if (myJsonParse.code != 0) {
-            System.out.println("发生错误，错误码为：" + myJsonParse.code);
-            System.out.println("本次请求的sid为：" + myJsonParse.sid);
+            log.error("讯飞合成错误，code={}, sid={}", myJsonParse.code, myJsonParse.sid);
         }
         if (myJsonParse.data != null) {
             try {
@@ -79,16 +80,15 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
                 outputStream.write(textBase64Decode);
                 outputStream.flush();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("写入合成音频数据失败", e);
             }
             if (myJsonParse.data.status == 2) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("关闭音频输出流失败", e);
                 }
-                System.out.println("本次请求的sid==>" + myJsonParse.sid);
-                System.out.println("合成成功，文件保存路径为==>" + destFilePath);
+                log.info("合成成功，sid={}, 路径={}", myJsonParse.sid, destFilePath);
                 onComplete.run();
                 // 可以关闭连接，释放资源
                 webSocket.close(1000, "");
@@ -102,15 +102,14 @@ public class FlyTekAudioSynthesiser extends WebSocketListener {
         try {
             if (null != response) {
                 int code = response.code();
-                System.out.println("onFailure code:" + code);
-                System.out.println("onFailure body:" + response.body().string());
+                log.error("讯飞合成连接失败，code={}, body={}", code, response.body().string());
                 if (101 != code) {
-                    System.out.println("connection failed");
+                    log.error("connection failed");
                     System.exit(0);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("处理讯飞合成失败响应时出错", e);
         }
     }
 

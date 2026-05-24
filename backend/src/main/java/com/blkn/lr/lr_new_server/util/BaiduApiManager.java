@@ -1,22 +1,22 @@
 package com.blkn.lr.lr_new_server.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.blkn.lr.lr_new_server.config.BaiduApiConfig;
-import com.blkn.lr.lr_new_server.expection.BaiduApiFailException;
-import com.blkn.lr.lr_new_server.expection.BaiduAuthorizeFailException;
+import com.blkn.lr.lr_new_server.exception.BaiduApiFailException;
+import com.blkn.lr.lr_new_server.exception.BaiduAuthorizeFailException;
 import com.blkn.lr.lr_new_server.thirdparty.BaiduHttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -24,20 +24,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class BaiduApiManager {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final BaiduApiConfig baiduApiConfig;
 
     String accessToken;
 
     public void authorize() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create("", mediaType);
-        String url = BaiduApiConfig.authorizeUrl;
-        String api_key = BaiduApiConfig.apiKey;
-        String secret = BaiduApiConfig.clientSecrete;
+        String url = baiduApiConfig.getAuthorizeUrl();
+        String api_key = baiduApiConfig.getApiKey();
+        String secret = baiduApiConfig.getClientSecret();
 
         Request request = new Request.Builder()
                 .url(url + "?grant_type=client_credentials&client_id=" + api_key + "&client_secret="+secret)
@@ -45,17 +47,17 @@ public class BaiduApiManager {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json")
                 .build();
-        Response execute = OkHttpManager.getClient().newCall(request).execute();
         try (Response response = OkHttpManager.getClient().newCall(request).execute()) {
-            assert (response.body() != null);
-            // TODO: 考虑换成gson
+            if (response.body() == null) {
+                throw new BaiduAuthorizeFailException();
+            }
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> jsonObject = mapper.readValue(response.body().bytes(), HashMap.class);
-            accessToken = jsonObject.get("access_token");
+            Map<?, ?> jsonObject = mapper.readValue(response.body().bytes(), HashMap.class);
+            accessToken = (String) jsonObject.get("access_token");
             if (accessToken == null) {
                 throw new BaiduAuthorizeFailException();
             }
-            System.out.println("百度api token获取成功");
+            log.info("百度 API token 获取成功");
         }
     }
 
@@ -65,34 +67,11 @@ public class BaiduApiManager {
         if (responseEntity.getStatusCode().value() == 200){
             JSONObject result= responseEntity.getBody();
             if (result.getInteger("error_code") != null) {
-                System.out.println("error_msg:" + result.getString("error_msg"));
+                log.error("百度 API 错误: {}", result.getString("error_msg"));
             }
             return result;
         }
         return null;
-    }
-
-    @Nullable
-    private JSONObject requestTextService(String text, String url) {
-        try {
-            checkAndSetToken();
-        } catch (IOException e) {
-            throw new RuntimeException("百度API鉴权失败", e);
-        }
-
-        JSONObject param=new JSONObject();
-        param.put("text",text);
-        return requestService(url, param);
-    }
-
-    public JSONObject verbalAnalysis(String text){
-        String verbal_analysiz_url= BaiduApiConfig.lexerUrl + "&access_token=";
-        return requestTextService(text, verbal_analysiz_url);
-    }
-
-    public JSONObject dnn(String text) {
-        String dnn_url= BaiduApiConfig.dnnUrl + "&access_token=";
-        return requestTextService(text, dnn_url);
     }
 
     public Double shortTextSimilarity(String text1, String text2) {
@@ -102,7 +81,7 @@ public class BaiduApiManager {
             throw new RuntimeException("百度API鉴权失败", e);
         }
 
-        String url = BaiduApiConfig.shortTextSimUrl + "&access_token=";
+        String url = baiduApiConfig.getShortTextSimUrl() + "&access_token=";
         JSONObject param=new JSONObject();
         param.put("text_1",text1);
         param.put("text_2",text2);
@@ -130,11 +109,11 @@ public class BaiduApiManager {
 
         String result;
         try {
-            result = BaiduHttpUtil.post(BaiduApiConfig.handWriteRecognizeUrl, accessToken, param);
+            result = BaiduHttpUtil.post(baiduApiConfig.getHandWriteRecognizeUrl(), accessToken, param);
         } catch (Exception e) {
             throw new BaiduApiFailException("手写识别错误");
         }
-        System.out.println(accessToken);
+        log.debug("使用 accessToken 调用手写识别");
         JSONObject resultObj = JSON.parseObject(result);
 
         JSONArray results;
@@ -152,16 +131,15 @@ public class BaiduApiManager {
         return builder.toString();
     }
 
-    String addTokenToUrl(String url) {
-        return url + "&access_token" + accessToken;
-    }
-
     ReentrantLock lock = new ReentrantLock();
     void checkAndSetToken() throws IOException {
         lock.lock();
-        if (accessToken == null) {
-            authorize();
+        try {
+            if (accessToken == null) {
+                authorize();
+            }
+        } finally {
+            lock.unlock();
         }
-        lock.unlock();
     }
 }

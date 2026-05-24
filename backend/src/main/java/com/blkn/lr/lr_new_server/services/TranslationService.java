@@ -4,8 +4,8 @@ import com.blkn.lr.lr_new_server.config.LlmApiConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import lombok.RequiredArgsConstructor;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  * 翻译服务：通过 LLM 对输入文本进行补全/猜测含义并输出翻译结果。
  */
 @Service
+@RequiredArgsConstructor
 public class TranslationService {
 
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -36,8 +37,7 @@ public class TranslationService {
                     + "  输入：下雨太阳  输出：今天下雨了，没有太阳。（或：一会儿下雨一会儿出太阳。）\n"
                     + "  输入：狗 飞 天上  输出：狗在地上跑。（或根据患者可能想表达的意思改为合理句子）\n";
 
-    @Autowired
-    private LlmApiConfig llmApiConfig;
+    private final LlmApiConfig llmApiConfig;
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)

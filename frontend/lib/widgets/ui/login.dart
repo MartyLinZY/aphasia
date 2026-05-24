@@ -342,23 +342,30 @@ class _LoginFormState extends State<LoginForm> with UseCommonStyles {
   // 登录处理逻辑
   void _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
-    
-    final userIdentity = await UserIdentity.login(
-      identity: usernameController.text,
-      password: validateCodeController.text,
-    );
+
+    UserIdentity userIdentity;
+    try {
+      userIdentity = await UserIdentity.login(
+        identity: usernameController.text,
+        password: validateCodeController.text,
+      );
+    } on AuthBusinessException catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      showErrorToast(context, e.message);
+      return;
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      showErrorToast(context, "登录失败，请检查网络后重试");
+      return;
+    }
 
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (userIdentity == null) {
-      showErrorToast(context, "用户名或密码错误");
-      return;
-    }
-
-    // 添加导航逻辑
     if (widget.isEntry) {
       Navigator.pushReplacement(
         context,

@@ -1,44 +1,68 @@
 package com.blkn.lr.lr_new_server.services;
 
-import com.blkn.lr.lr_new_server.util.PythonInvoker;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 服务类：封装对话诊断业务逻辑，调用Python诊断脚本
+ * LLM 诊断/修复服务：通过 HTTP 调用 FastAPI 微服务（LLM/app.py）。
  */
+@Slf4j
 @Service
 public class LLMService {
-    /**
-     * 大模型诊断患病类型与严重程度(diagnose1)
-     * 
-     * @param conversation 医患对话内容
-     * @return 包含type(患病类型)和severity(严重程度)的Map
-     * @throws Exception 调用异常
-     */
+
+    private static final MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
+    private static final TypeReference<Map<String, Object>> MAP_REF = new TypeReference<>() {};
+
+    @Value("${llm.service.url:http://127.0.0.1:8001}")
+    private String llmServiceUrl;
+
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build();
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public Map<String, Object> diagnose1(String conversation) throws Exception {
-        return PythonInvoker.invokeDiagnose("diagnose1", conversation);
+        return call("/diagnose1", conversation);
     }
 
-    /**
-     * 大模型计算患者话的困惑度(diagnose2)
-     * 
-     * @param conversation 医患对话内容
-     * @return 包含perplexity(困惑度)的Map
-     * @throws Exception 调用异常
-     */
     public Map<String, Object> diagnose2(String conversation) throws Exception {
-        return PythonInvoker.invokeDiagnose("diagnose2", conversation);
+        return call("/diagnose2", conversation);
     }
 
-    /**
-     * 大模型修复患者的话(repair)
-     *
-     * @param conversation 医患对话内容
-     * @return 包含repairedConversation(修复后的话)的Map
-     * @throws Exception 调用异常
-     */
     public Map<String, Object> repair(String conversation) throws Exception {
-        return PythonInvoker.invokeRepair(conversation);
+        return call("/repair", conversation);
+    }
+
+    private Map<String, Object> call(String path, String conversation) throws Exception {
+        String bodyJson = objectMapper.writeValueAsString(Map.of("conversation", conversation));
+        Request request = new Request.Builder()
+                .url(llmServiceUrl + path)
+                .post(RequestBody.create(bodyJson, JSON_TYPE))
+                .build();
+
+        log.debug("调用 LLM 服务: {}", path);
+        try (Response response = client.newCall(request).execute()) {
+            ResponseBody body = response.body();
+            if (body == null) {
+                throw new BusinessErrorException("LLM 服务无响应");
+            }
+            String responseStr = body.string();
+            if (!response.isSuccessful()) {
+                log.error("LLM 服务返回错误 {}: {}", response.code(), responseStr);
+                throw new BusinessErrorException("LLM 服务调用失败（HTTP " + response.code() + "）");
+            }
+            return objectMapper.readValue(responseStr, MAP_REF);
+        }
     }
 }

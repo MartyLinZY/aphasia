@@ -1,18 +1,21 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.dto.request.ConversationRequest;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.LLMService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
-/**
- * 控制器：对话智能诊断接口
- */
+@Slf4j
+@RequireRole({2})
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class LLMController {
-    @Autowired
-    private LLMService llmService;
+    private final LLMService llmService;
 
     /**
      * 大模型诊断患病类型与严重程度
@@ -22,13 +25,9 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/diagnose1")
-    public Map<String, Object> diagnose1(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
-        System.out.println("diagnose1 controller called");
-        return llmService.diagnose1(conversation);
+    public Map<String, Object> diagnose1(@Valid @RequestBody ConversationRequest req) throws Exception {
+        log.debug("diagnose1 called");
+        return llmService.diagnose1(req.getConversation());
     }
 
     /**
@@ -39,13 +38,9 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/diagnose2")
-    public Map<String, Object> diagnose2(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
-        System.out.println("diagnose2 controller called");
-        return llmService.diagnose2(conversation);
+    public Map<String, Object> diagnose2(@Valid @RequestBody ConversationRequest req) throws Exception {
+        log.debug("diagnose2 called");
+        return llmService.diagnose2(req.getConversation());
     }
 
     /**
@@ -56,12 +51,8 @@ public class LLMController {
      * @throws Exception 调用异常
      */
     @PostMapping("/repair")
-    public Map<String, Object> repair(@RequestBody Map<String, String> jsonConversation) throws Exception {
-        String conversation = jsonConversation.get("conversation");
-        if (conversation == null || conversation.trim().isEmpty()) {
-            throw new IllegalArgumentException("医患对话内容不能为空");
-        }
-        System.out.println("repair controller called");
-        return llmService.repair(conversation);
+    public Map<String, Object> repair(@Valid @RequestBody ConversationRequest req) throws Exception {
+        log.debug("repair called");
+        return llmService.repair(req.getConversation());
     }
 }

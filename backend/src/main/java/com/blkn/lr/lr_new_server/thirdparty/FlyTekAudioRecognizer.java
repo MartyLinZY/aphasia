@@ -1,27 +1,23 @@
 package com.blkn.lr.lr_new_server.thirdparty;
 
-import com.blkn.lr.lr_new_server.config.FlyTekApiConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.yaml.snakeyaml.util.ArrayUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
+@Slf4j
 @NoArgsConstructor
 public class FlyTekAudioRecognizer extends WebSocketListener {
     private static final String hostUrl = "https://iat-api.xfyun.cn/v2/iat"; //中英文，http url 不支持解析 ws/wss schema
@@ -43,10 +39,22 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     private byte[] pcm16bitsData;
 
     private Consumer<String> onComplete;
+    private String appId;
 
     public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete) {
         this.pcm16bitsData = pcm16bitsData;
         this.onComplete = onComplete;
+        this.appId = "";
+    }
+
+    public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete, String appId) {
+        this.pcm16bitsData = pcm16bitsData;
+        this.onComplete = onComplete;
+        this.appId = appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
 
@@ -75,7 +83,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                             JsonObject common = new JsonObject();  //第一帧必须发送
                             JsonObject data = new JsonObject();  //每一帧都要发送
                             // 填充common
-                            common.addProperty("app_id", FlyTekApiConfig.appId);
+                            common.addProperty("app_id", appId);
                             //填充business
                             business.addProperty("language", "zh_cn");
                             //business.addProperty("language", "en_us");//英文
@@ -124,18 +132,19 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                             data2.addProperty("encoding", "raw");
                             frame2.add("data", data2);
                             webSocket.send(frame2.toString());
-                            System.out.println("sendlast");
+                            log.debug("sendlast");
                             break end;
                     }
                     Thread.sleep(intervel); //模拟音频采样延时
                 }
-                System.out.println("all data is send");
+                log.debug("all data is send");
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("音频文件未找到", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("发送音频数据失败", e);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                log.error("音频发送线程被中断", e);
             }
         }).start();
     }
@@ -146,8 +155,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         ResponseData resp = json.fromJson(text, ResponseData.class);
         if (resp != null) {
             if (resp.getCode() != 0) {
-                System.out.println( "code=>" + resp.getCode() + " error=>" + resp.getMessage() + " sid=" + resp.getSid());
-                System.out.println( "错误码查询链接：https://www.xfyun.cn/document/error-code");
+                log.error("讯飞识别错误 code={}, error={}, sid={}", resp.getCode(), resp.getMessage(), resp.getSid());
                 return;
             }
             if (resp.getData() != null) {
@@ -156,23 +164,19 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                     //System.out.println(te.toString());
                     try {
                         decoder.decode(te);
-                        System.out.println("中间识别结果 ==》" + decoder.toString());
+                        log.debug("中间识别结果: {}", decoder);
 
                         // 累计中间结果
 //                        finalResult.append(decoder.toString());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("解析识别结果失败", e);
                     }
                 }
                 if (resp.getData().getStatus() == 2) {
                     // todo  resp.data.status ==2 说明数据全部返回完毕，可以关闭连接，释放资源
-                    System.out.println("session end ");
                     dateEnd = new Date();
-                    System.out.println(sdf.format(dateBegin) + "开始");
-                    System.out.println(sdf.format(dateEnd) + "结束");
-                    System.out.println("耗时:" + (dateEnd.getTime() - dateBegin.getTime()) + "ms");
-                    System.out.println("最终识别结果 ==》" + decoder.toString());
-                    System.out.println("本次识别sid ==》" + resp.getSid());
+                    log.info("识别完成，耗时 {}ms，sid={}, 结果={}",
+                            dateEnd.getTime() - dateBegin.getTime(), resp.getSid(), decoder);
 
                     onComplete.accept(decoder.toString());
 
@@ -192,20 +196,23 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         try {
             if (null != response) {
                 int code = response.code();
-                System.out.println("onFailure code:" + code);
-                System.out.println("onFailure body:" + response.body().string());
+                log.error("讯飞识别连接失败，code={}, body={}", code, response.body().string());
                 if (101 != code) {
-                    System.out.println("connection failed");
+                    log.error("connection failed");
                     System.exit(0);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("处理讯飞识别失败响应时出错", e);
         }
     }
     public static void main(String[] args) throws Exception {
         // 构建鉴权url
-        String authUrl = getAuthUrl(hostUrl, FlyTekApiConfig.apiKey, FlyTekApiConfig.clientSecrete);
+        String authUrl = getAuthUrl(
+                hostUrl,
+                System.getenv().getOrDefault("FLYTEK_API_KEY", ""),
+                System.getenv().getOrDefault("FLYTEK_CLIENT_SECRET", "")
+        );
         OkHttpClient client = new OkHttpClient.Builder().build();
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
         String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
@@ -213,7 +220,7 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         Request request = new Request.Builder().url(url).build();
         // System.out.println(client.newCall(request).execute());
         //System.out.println("url===>" + url);
-        WebSocket webSocket = client.newWebSocket(request, new FlyTekAudioRecognizer());
+        client.newWebSocket(request, new FlyTekAudioRecognizer());
     }
     public static String getAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {
         URL url = new URL(hostUrl);

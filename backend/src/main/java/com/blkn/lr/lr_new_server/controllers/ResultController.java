@@ -1,13 +1,15 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamResultDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamResultDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +18,11 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
+@RequireRole({1})
+@RequiredArgsConstructor
 public class ResultController {
-    @Autowired
-    ExamResultDaoImpl resultDao;
-
-    @Autowired
-    QuestionDaoImpl questionDao;
+    private final ExamResultDao resultDao;
+    private final QuestionDao questionDao;
 
     @GetMapping("/patient/{uid}/examRecords")
     List<ExamResultDto> getExamResultsByUserId(@PathVariable("uid") String uid, HttpServletRequest request) {
@@ -36,7 +37,7 @@ public class ResultController {
     }
 
     @PostMapping("/examRecord")
-    ExamResultDto saveResult(@RequestBody ExamResultDto resultDto, HttpServletRequest request) {
+    ExamResultDto saveResult(@Valid @RequestBody ExamResultDto resultDto, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
         ExamResult updated = resultDao.save(resultDto.toModel(uid));
         if (updated == null) {

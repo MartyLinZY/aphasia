@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 
@@ -7,7 +8,7 @@ import settings
 def text_conversation(model="Pro/deepseek-ai/DeepSeek-V3", content="say hello", output_file=settings.LLM_PATH+"output.txt", mode="a"):
 
     url = "https://api.siliconflow.cn/v1/chat/completions"
-    api_key = "sk-akpehvphtuqghygmpjolclwwygbkblxjuopbcyjbroypgsrj"
+    api_key = os.environ.get("SILICONFLOW_API_KEY", "")
     headers = {
         "Authorization": "Bearer " + api_key,
         "Content-Type": "application/json"
@@ -37,7 +38,7 @@ def text_conversation(model="Pro/deepseek-ai/DeepSeek-V3", content="say hello", 
 def audio_to_text(model="FunAudioLLM/SenseVoiceSmall", audio_path=settings.LLM_PATH+"audio_test.wav", output_file=settings.LLM_PATH+"output.txt", mode="a"):
 
     url = "https://api.siliconflow.cn/v1/audio/transcriptions"
-    api_key = "sk-akpehvphtuqghygmpjolclwwygbkblxjuopbcyjbroypgsrj"
+    api_key = os.environ.get("SILICONFLOW_API_KEY", "")
     boundary = "-----011000010111000001101001"
     headers = {
         "Authorization": "Bearer " + api_key,

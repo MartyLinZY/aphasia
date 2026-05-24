@@ -1,22 +1,20 @@
 package com.blkn.lr.lr_new_server.services;
 
-import com.blkn.lr.lr_new_server.dao.impl.ExamDaoImpl;
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.ExamDao;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
-import com.blkn.lr.lr_new_server.expection.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
 import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +22,12 @@ import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExamServices {
-    @Autowired
-    private ExamDaoImpl examDao;
-
-    @Autowired
-    private QuestionDaoImpl questionDao;
+    private final ExamDao examDao;
+    private final QuestionDao questionDao;
 
     public ExamDto createExam(ExamDto dto, String uid) {
 //        printAsJson(dto);
@@ -42,13 +39,14 @@ public class ExamServices {
     }
 
 
-    private <T> void printAsJson (T createdModel) {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
-        try {
-            System.out.println(ow.writeValueAsString(createdModel));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    private <T> void printAsJson(T createdModel) {
+        if (log.isDebugEnabled()) {
+            try {
+                log.debug("{}", new com.fasterxml.jackson.databind.ObjectMapper()
+                        .writer().withDefaultPrettyPrinter().writeValueAsString(createdModel));
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                log.debug("序列化失败: {}", e.getMessage());
+            }
         }
     }
 

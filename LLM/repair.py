@@ -6,9 +6,6 @@ from create_prompt import create_prompt_repair
 import settings
 from siliconflow import text_conversation
 
-# 强制标准输出为UTF-8
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
 # 将对话提供给大模型，修复患者的话
 def repair(conversation):
 
@@ -21,6 +18,8 @@ def repair(conversation):
     return {"repairedConversation": result}
     
 if __name__ == "__main__":
+    # CLI 模式下强制 UTF-8 输出
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     # with open(settings.LLM_PATH+"conversation4.txt", "r", encoding="utf-8") as f:
     #     conversation = f.read().strip()

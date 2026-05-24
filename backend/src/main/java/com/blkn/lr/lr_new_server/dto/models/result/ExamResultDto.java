@@ -1,7 +1,9 @@
 package com.blkn.lr.lr_new_server.dto.models.result;
 
-import com.blkn.lr.lr_new_server.dao.impl.QuestionDaoImpl;
+import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,9 +23,12 @@ public class ExamResultDto {
     Boolean isRecovery;
     Boolean isDisabled;
     String examName;
+
+    @NotNull(message = "categoryResults不能为null")
+    @Valid
     List<CategoryResultDto> categoryResults;
 
-    public ExamResultDto(ExamResult examResult, QuestionDaoImpl questionDao) {
+    public ExamResultDto(ExamResult examResult, QuestionDao questionDao) {
         id = examResult.getId();
         resultText = examResult.getResultText();
         finalScore = examResult.getFinalScore();

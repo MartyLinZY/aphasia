@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:aphasia_recovery/exceptions/http_exceptions.dart';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/settings.dart';
+import 'package:aphasia_recovery/utils/http/http_manager.dart';
 
 class LLMDiagnosePage extends StatefulWidget {
   final TextStyle? bodyStyle;
@@ -60,23 +61,21 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
       return;
     }
     try {
-      final resp1 = await http.post(
-        Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose1'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'conversation': conversation}),
-      );
-      if (resp1.statusCode == 200) {
-        final data = jsonDecode(resp1.body);
-        setState(() {
-          type = data['type']?.toString();
-          severity = data['severity']?.toString();
-          diagnose1Done = true;
-        });
-      } else {
-        setState(() {
-          errorMsg = '诊断类型接口错误: ${resp1.body}';
-        });
-      }
+      // 走 HttpClientManager 是为了自动带上登录后保存的 Token 头；
+      // 之前裸 http.post 没有 Token，会被拦截器以 401 拒绝。
+      final data = await HttpClientManager().post(
+            url: '${HttpConstants.backendBaseUrl}/api/diagnose1',
+            body: jsonEncode({'conversation': conversation}),
+          ) as Map<String, dynamic>;
+      setState(() {
+        type = data['type']?.toString();
+        severity = data['severity']?.toString();
+        diagnose1Done = true;
+      });
+    } on HttpRequestException catch (e) {
+      setState(() {
+        errorMsg = '诊断类型接口错误: ${_extractMessage(e)}';
+      });
     } catch (e) {
       setState(() {
         errorMsg = e.toString();
@@ -103,22 +102,18 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
       return;
     }
     try {
-      final resp2 = await http.post(
-        Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose2'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'conversation': conversation}),
-      );
-      if (resp2.statusCode == 200) {
-        final data = jsonDecode(resp2.body);
-        setState(() {
-          perplexity = (data['perplexity'] as num?)?.toDouble();
-          diagnose2Done = true;
-        });
-      } else {
-        setState(() {
-          errorMsg = '诊断严重程度接口错误: ${resp2.body}';
-        });
-      }
+      final data = await HttpClientManager().post(
+            url: '${HttpConstants.backendBaseUrl}/api/diagnose2',
+            body: jsonEncode({'conversation': conversation}),
+          ) as Map<String, dynamic>;
+      setState(() {
+        perplexity = (data['perplexity'] as num?)?.toDouble();
+        diagnose2Done = true;
+      });
+    } on HttpRequestException catch (e) {
+      setState(() {
+        errorMsg = '诊断严重程度接口错误: ${_extractMessage(e)}';
+      });
     } catch (e) {
       setState(() {
         errorMsg = e.toString();
@@ -128,6 +123,24 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
         loading2 = false;
       });
     }
+  }
+
+  /// 优先取后端 ApiResponse.message 字段；解析不出来就退回原始 message。
+  /// 401/403 等鉴权错误时给出更友好的提示。
+  String _extractMessage(HttpRequestException e) {
+    final code = e.response?.statusCode ?? e.streamedResponse?.statusCode;
+    if (code == 401) return '登录状态已失效，请重新登录后再试';
+    if (code == 403) return '当前账号无权限访问该功能';
+    final raw = e.message;
+    if (raw == null || raw.isEmpty) return '未知错误';
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map && decoded['message'] is String) {
+        final msg = decoded['message'] as String;
+        return msg.isEmpty ? raw : msg;
+      }
+    } catch (_) {/* 旧接口不是 ApiResponse 包装，直接返回原文 */}
+    return raw;
   }
 
   @override

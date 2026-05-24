@@ -5,11 +5,25 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Slf4j
+@Component
 public class TokenUtil {
-    private static final Algorithm algorithm = Algorithm.HMAC256("*#06#114514gkd233666");
+    @Value("${jwt.secret}")
+    private String secretValue;
+
+    private static Algorithm algorithm;
+
+    @PostConstruct
+    public void init() {
+        algorithm = Algorithm.HMAC256(secretValue);
+    }
 
     /**
      *
@@ -41,10 +55,9 @@ public class TokenUtil {
 
             return verifier.verify(token);
         } catch (JWTVerificationException e) {
-            System.err.println("Invalid token received");
-            System.err.println(e.getMessage());
+            log.error("Invalid token received: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Token 校验异常", e);
         }
         return null;
     }
