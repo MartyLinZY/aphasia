@@ -9,6 +9,8 @@ def text_conversation(model="Pro/deepseek-ai/DeepSeek-V3", content="say hello", 
 
     url = "https://api.siliconflow.cn/v1/chat/completions"
     api_key = os.environ.get("SILICONFLOW_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("SILICONFLOW_API_KEY 未配置，无法调用 siliconflow text_conversation")
     headers = {
         "Authorization": "Bearer " + api_key,
         "Content-Type": "application/json"
@@ -39,6 +41,8 @@ def audio_to_text(model="FunAudioLLM/SenseVoiceSmall", audio_path=settings.LLM_P
 
     url = "https://api.siliconflow.cn/v1/audio/transcriptions"
     api_key = os.environ.get("SILICONFLOW_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("SILICONFLOW_API_KEY 未配置，无法调用 siliconflow audio_to_text")
     boundary = "-----011000010111000001101001"
     headers = {
         "Authorization": "Bearer " + api_key,
