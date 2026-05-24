@@ -56,8 +56,9 @@ class LLMServiceTest {
             respond(exchange, 200, "{\"repairedConversation\":\"我想喝水。\"}");
         });
 
-        // 模拟服务端 500
-        server.createContext("/boom", exchange -> respond(exchange, 500, "{\"detail\":\"模型加载失败\"}"));
+        // 模拟服务端 500：注册到精确路径，避免依赖 HttpContext 前缀匹配
+        server.createContext("/boom/diagnose1",
+                exchange -> respond(exchange, 500, "{\"detail\":\"模型加载失败\"}"));
 
         server.start();
 
@@ -105,13 +106,14 @@ class LLMServiceTest {
 
     @Test
     void shouldThrowBusinessErrorWhenServiceReturns500() {
-        // 将服务地址指向 /boom 上层（用一个会命中 500 的路径）
+        // 将 baseUrl 指向 /boom，使 diagnose1() 拼出 /boom/diagnose1 命中桩 500 路径
         String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
         ReflectionTestUtils.setField(llmService, "llmServiceUrl", baseUrl + "/boom");
 
         BusinessErrorException ex = assertThrows(BusinessErrorException.class,
                 () -> llmService.diagnose1("任意"));
-        assertTrue(ex.getMessage().contains("HTTP 500"));
+        assertTrue(ex.getMessage().contains("HTTP 500"),
+                "异常 message 应明确包含 HTTP 500 状态：" + ex.getMessage());
     }
 
     private static String readBody(InputStream in) {
