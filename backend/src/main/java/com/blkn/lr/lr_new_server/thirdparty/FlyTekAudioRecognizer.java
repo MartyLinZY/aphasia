@@ -39,11 +39,18 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     private byte[] pcm16bitsData;
 
     private Consumer<String> onComplete;
+    // 默认 noop，保证 @NoArgsConstructor（main 调试入口）和老 2 参构造不传时也安全
+    private Consumer<Throwable> onError = t -> {};
     private String appId;
 
     public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete) {
+        this(pcm16bitsData, onComplete, t -> {});
+    }
+
+    public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete, Consumer<Throwable> onError) {
         this.pcm16bitsData = pcm16bitsData;
         this.onComplete = onComplete;
+        this.onError = onError;
         this.appId = "";
     }
 
@@ -156,6 +163,9 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
         if (resp != null) {
             if (resp.getCode() != 0) {
                 log.error("讯飞识别错误 code={}, error={}, sid={}", resp.getCode(), resp.getMessage(), resp.getSid());
+                onError.accept(new IOException(
+                        "讯飞识别错误 code=" + resp.getCode() + " sid=" + resp.getSid()));
+                webSocket.close(1000, "");
                 return;
             }
             if (resp.getData() != null) {
@@ -193,18 +203,18 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         super.onFailure(webSocket, t, response);
-        try {
-            if (null != response) {
-                int code = response.code();
-                log.error("讯飞识别连接失败，code={}, body={}", code, response.body().string());
-                if (101 != code) {
-                    log.error("connection failed");
-                    System.exit(0);
-                }
+        int code = -1;
+        String body = "";
+        if (null != response) {
+            code = response.code();
+            try {
+                body = response.body() != null ? response.body().string() : "";
+            } catch (IOException e) {
+                log.warn("读取讯飞识别失败响应 body 出错", e);
             }
-        } catch (IOException e) {
-            log.error("处理讯飞识别失败响应时出错", e);
         }
+        log.error("讯飞识别连接失败，code={}, body={}", code, body, t);
+        onError.accept(t != null ? t : new IOException("讯飞识别连接失败 code=" + code));
     }
     public static void main(String[] args) throws Exception {
         // 构建鉴权url

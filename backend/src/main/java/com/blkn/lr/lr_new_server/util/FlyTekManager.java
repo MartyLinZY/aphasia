@@ -7,7 +7,6 @@ import com.blkn.lr.lr_new_server.thirdparty.FlyTekAudioSynthesiser;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.WebSocket;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -40,12 +39,10 @@ public class FlyTekManager {
         OkHttpClient client = OkHttpManager.getClient();
         Request request = new Request.Builder().url(authedUrl).build();
         CompletableFuture<String> future = new CompletableFuture<>();
-        FlyTekAudioRecognizer recognizer = new FlyTekAudioRecognizer(pcm16bitsData, future::complete);
+        FlyTekAudioRecognizer recognizer = new FlyTekAudioRecognizer(
+                pcm16bitsData, future::complete, future::completeExceptionally);
         recognizer.setAppId(flyTekApiConfig.getAppId());
-        WebSocket webSocket = client.newWebSocket(
-                request,
-                recognizer
-        );
+        client.newWebSocket(request, recognizer);
         return future;
     }
 
