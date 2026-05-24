@@ -2,6 +2,7 @@ package com.blkn.lr.lr_new_server.interceptor;
 
 import com.blkn.lr.lr_new_server.controllers.LLMController;
 import com.blkn.lr.lr_new_server.services.LLMService;
+import com.blkn.lr.lr_new_server.util.TokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,7 +24,7 @@ class LlmApiAuthInterceptorTest {
         llmService = Mockito.mock(LLMService.class);
         LLMController controller = new LLMController(llmService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .addInterceptors(new TokenInterceptor())
+                .addInterceptors(new TokenInterceptor(TokenUtil.forSecret("test-secret")))
                 .build();
     }
 

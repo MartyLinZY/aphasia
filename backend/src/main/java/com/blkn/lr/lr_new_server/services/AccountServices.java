@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AccountServices {
     private final UserDaoImpl userDao;
+    private final TokenUtil tokenUtil;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserDto login(String token, String identity, String password) {
         User user = null;
         if (token != null) {
-            DecodedJWT decodedJWT = TokenUtil.verifyToken(token);
+            DecodedJWT decodedJWT = tokenUtil.verifyToken(token);
             if (decodedJWT == null) {
                 throw new BusinessErrorException("token过期");
             }
@@ -49,7 +50,7 @@ public class AccountServices {
         }
 
         UserDto dto = new UserDto(user);
-        dto.setToken(TokenUtil.getToken(user.getId(), user.getRole()));
+        dto.setToken(tokenUtil.getToken(user.getId(), user.getRole()));
         return dto;
     }
 
@@ -64,7 +65,7 @@ public class AccountServices {
 
         User created = userDao.register(user);
         UserDto dtoToReturn = new UserDto(created);
-        dtoToReturn.setToken(TokenUtil.getToken(created.getId(), user.getRole()));
+        dtoToReturn.setToken(tokenUtil.getToken(created.getId(), user.getRole()));
         return dtoToReturn;
     }
 

@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.interceptor;
 
+import com.blkn.lr.lr_new_server.util.TokenUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,9 +20,15 @@ public class InterceptorConfigurer implements WebMvcConfigurer {
 	@Value("${app.cors.allowed-methods:GET,POST,PUT,PATCH,DELETE,OPTIONS}")
 	private String allowedMethods;
 
+	private final TokenUtil tokenUtil;
+
+	public InterceptorConfigurer(TokenUtil tokenUtil) {
+		this.tokenUtil = tokenUtil;
+	}
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		HandlerInterceptor loginInterceptor = new TokenInterceptor();
+		HandlerInterceptor loginInterceptor = new TokenInterceptor(tokenUtil);
 		registry.addInterceptor(loginInterceptor)
 			.addPathPatterns("/api/**")
 			.excludePathPatterns("/api/auth")

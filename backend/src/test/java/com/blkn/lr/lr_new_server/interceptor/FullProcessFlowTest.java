@@ -25,19 +25,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FullProcessFlowTest {
 
     private MockMvc mockMvc;
+    private TokenUtil tokenUtil;
 
     @BeforeEach
     void setUp() {
+        tokenUtil = TokenUtil.forSecret("test-secret");
         mockMvc = MockMvcBuilders.standaloneSetup(new FullProcessController())
                 .setControllerAdvice(new GlobalExceptionHandler())
-                .addInterceptors(new TokenInterceptor())
+                .addInterceptors(new TokenInterceptor(tokenUtil))
                 .build();
     }
 
     @Test
     void shouldPassThroughFullFlowFromAuthToBusinessHandling() throws Exception {
-        String patientToken = TokenUtil.getToken("patient-uid", 1);
-        String doctorToken = TokenUtil.getToken("doctor-uid", 2);
+        String patientToken = tokenUtil.getToken("patient-uid", 1);
+        String doctorToken = tokenUtil.getToken("doctor-uid", 2);
 
         // 1) 无 token，先被鉴权拦截（401）
         executeDoctorAction(null, "{\"content\":\"hello\"}")
