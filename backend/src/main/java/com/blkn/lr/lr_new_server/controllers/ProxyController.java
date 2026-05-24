@@ -5,7 +5,7 @@ import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
-import com.blkn.lr.lr_new_server.exception.FlyTekApiException;
+import com.blkn.lr.lr_new_server.exception.ProxyServiceException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
@@ -51,12 +51,12 @@ public class ProxyController {
     }
 
     @PostMapping("/fluency")
-    FluencyResult calFluency(@RequestParam("file") MultipartFile file) throws FlyTekApiException {
+    FluencyResult calFluency(@RequestParam("file") MultipartFile file) throws ProxyServiceException {
         try {
             return qwenAudioService.analyzeFluency(file.getBytes());
         } catch (Exception e) {
             log.error("qwen-audio 流畅度评估失败", e);
-            throw new FlyTekApiException();
+            throw new ProxyServiceException("流畅度评估失败", e);
         }
     }
 

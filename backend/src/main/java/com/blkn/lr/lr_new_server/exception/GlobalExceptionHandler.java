@@ -40,11 +40,12 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(404, "接口不存在: " + ex.getResourcePath()));
     }
 
-    @ExceptionHandler(FlyTekApiException.class)
-    public ResponseEntity<ApiResponse<Object>> handleFlyTekApi(FlyTekApiException ex) {
-        log.warn("FlyTek API exception", ex);
+    @ExceptionHandler(ProxyServiceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleProxyService(ProxyServiceException ex) {
+        log.warn("Proxy service exception", ex);
+        String msg = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ApiResponse.error(502, "讯飞接口调用失败"));
+                .body(ApiResponse.error(502, msg == null || msg.isBlank() ? "代理服务调用失败" : msg));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
