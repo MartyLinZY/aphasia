@@ -22,7 +22,6 @@ public class TokenInterceptor implements HandlerInterceptor {
 		this.tokenUtil = tokenUtil;
 	}
 
-	// TODO: potential security problem, after login, the user has access to all url
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		if (request.getMethod().equals("OPTIONS")) {
