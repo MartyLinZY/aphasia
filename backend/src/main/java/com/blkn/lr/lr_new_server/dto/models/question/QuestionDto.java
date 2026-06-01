@@ -1,6 +1,5 @@
 package com.blkn.lr.lr_new_server.dto.models.question;
 
-import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.question.QuestionEvalRule;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -27,42 +26,4 @@ public class QuestionDto {
     String typeName;
 
     QuestionEvalRule evalRule;
-
-    public QuestionDto(Question q) {
-        if (q != null) {
-            id = q.getId();
-            alias = q.getAlias();
-            questionText = q.getQuestionText();
-            audioUrl = q.getAudioUrl();
-            imageUrl = q.getImageUrl();
-            omitImageAfterSeconds = q.getOmitImageAfterSeconds();
-            typeName = q.getTypeName();
-            evalRule = q.getEvalRule();
-        } else {
-            alias = "原问题已删除";
-            questionText = "";
-            omitImageAfterSeconds = -1;
-            typeName = "AudioQuestion";
-        }
-    }
-
-    public Question toModel(String ownerId) {
-        Question model = new Question();
-
-        if (id != null) {
-            model.setId(id);
-        }
-
-        model.setOwnerId(ownerId);
-
-        model.setAlias(alias);
-        model.setQuestionText(questionText);
-        model.setAudioUrl(audioUrl);
-        model.setImageUrl(imageUrl);
-        model.setOmitImageAfterSeconds(omitImageAfterSeconds);
-        model.setTypeName(typeName);
-        model.setEvalRule(evalRule);
-
-        return model;
-    }
 }

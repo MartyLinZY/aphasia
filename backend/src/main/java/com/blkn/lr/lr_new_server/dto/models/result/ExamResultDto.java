@@ -1,7 +1,5 @@
 package com.blkn.lr.lr_new_server.dto.models.result;
 
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
-import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,31 +25,4 @@ public class ExamResultDto {
     @NotNull(message = "categoryResults不能为null")
     @Valid
     List<CategoryResultDto> categoryResults;
-
-    public ExamResultDto(ExamResult examResult, QuestionDao questionDao) {
-        id = examResult.getId();
-        resultText = examResult.getResultText();
-        finalScore = examResult.getFinalScore();
-        startTime = examResult.getStartTime();
-        finishTime = examResult.getFinishTime();
-        isRecovery = examResult.getIsRecovery();
-        isDisabled = examResult.getIsDisabled();
-        examName = examResult.getExamName();
-        categoryResults = examResult.getCategoryResults().stream().map(e -> new CategoryResultDto(e, questionDao)).toList();
-    }
-
-    public ExamResult toModel(String ownerId) {
-        ExamResult model = new ExamResult();
-        model.setId(id);
-        model.setOwnerId(ownerId);
-        model.setResultText(resultText);
-        model.setFinalScore(finalScore);
-        model.setStartTime(startTime);
-        model.setFinishTime(finishTime);
-        model.setIsRecovery(isRecovery);
-        model.setIsDisabled(isDisabled);
-        model.setExamName(examName);
-        model.setCategoryResults(categoryResults.stream().map(CategoryResultDto::toModel).toList());
-        return model;
-    }
 }

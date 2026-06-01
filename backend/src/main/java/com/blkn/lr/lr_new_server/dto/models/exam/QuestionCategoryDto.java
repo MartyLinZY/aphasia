@@ -1,7 +1,5 @@
 package com.blkn.lr.lr_new_server.dto.models.exam;
 
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
-import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
@@ -23,20 +21,4 @@ public class QuestionCategoryDto {
     @Valid
     List<QuestionSubCategoryDto> subCategories;
     List<ExamCategoryEvalRule> rules;
-
-    QuestionCategoryDto(QuestionCategory category, QuestionDao questionDao) {
-        description = category.getDescription();
-        subCategories = category.getSubCategories().stream().map(e -> new QuestionSubCategoryDto(e, questionDao)).toList();
-        rules = category.getRules();
-    }
-
-    public QuestionCategory toModel() {
-        QuestionCategory category = new QuestionCategory();
-
-        category.setDescription(description);
-        category.setSubCategories(subCategories.stream().map(QuestionSubCategoryDto::toModel).toList());
-        category.setRules(rules);
-
-        return category;
-    }
 }

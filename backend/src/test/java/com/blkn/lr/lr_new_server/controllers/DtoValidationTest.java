@@ -1,13 +1,11 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.ExamDao;
-import com.blkn.lr.lr_new_server.dao.ExamResultDao;
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
+import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
 import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
-import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.services.ExamServices;
+import com.blkn.lr.lr_new_server.services.ResultServices;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,21 +30,18 @@ class DtoValidationTest {
     private MockMvc examMvc;
     private MockMvc resultMvc;
     private ExamServices examServices;
-    private ExamResultDao resultDao;
+    private ResultServices resultServices;
 
     @BeforeEach
     void setUp() {
         examServices = Mockito.mock(ExamServices.class);
-        ExamController examController = new ExamController(
-                examServices,
-                Mockito.mock(ExamDao.class),
-                Mockito.mock(QuestionDao.class));
+        ExamController examController = new ExamController(examServices);
         examMvc = MockMvcBuilders.standaloneSetup(examController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
-        resultDao = Mockito.mock(ExamResultDao.class);
-        ResultController resultController = new ResultController(resultDao, Mockito.mock(QuestionDao.class));
+        resultServices = Mockito.mock(ResultServices.class);
+        ResultController resultController = new ResultController(resultServices);
         resultMvc = MockMvcBuilders.standaloneSetup(resultController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -121,9 +116,9 @@ class DtoValidationTest {
 
     @Test
     void saveResultShouldPassWithEmptyCategoryResults() throws Exception {
-        ExamResult saved = new ExamResult();
+        ExamResultDto saved = new ExamResultDto();
         saved.setCategoryResults(List.of());
-        when(resultDao.save(any())).thenReturn(saved);
+        when(resultServices.saveResult(any(), any())).thenReturn(saved);
 
         resultMvc.perform(post("/api/examRecord")
                         .contentType(MediaType.APPLICATION_JSON)

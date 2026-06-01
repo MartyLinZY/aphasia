@@ -7,20 +7,18 @@ import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
+import com.blkn.lr.lr_new_server.exception.NotFoundException;
+import com.blkn.lr.lr_new_server.mapper.ExamMapper;
+import com.blkn.lr.lr_new_server.mapper.QuestionMapper;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
-import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
-import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
 import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Slf4j
 @Service
@@ -28,44 +26,61 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 public class ExamServices {
     private final ExamDao examDao;
     private final QuestionDao questionDao;
+    private final ExamMapper examMapper;
+    private final QuestionMapper questionMapper;
 
-    public ExamDto createExam(ExamDto dto, String uid) {
-//        printAsJson(dto);
-        Exam created = examDao.save(dto.toModel(uid));
-
-//        printAsJson(created);
-
-        return new ExamDto(created, questionDao);
+    public ExamDto getExamById(String examId) {
+        Exam exam = examDao.findPublishedExamById(examId);
+        if (exam == null) {
+            throw new NotFoundException();
+        }
+        return examMapper.toDto(exam);
     }
 
-
-    private <T> void printAsJson(T createdModel) {
-        if (log.isDebugEnabled()) {
-            try {
-                log.debug("{}", new com.fasterxml.jackson.databind.ObjectMapper()
-                        .writer().withDefaultPrettyPrinter().writeValueAsString(createdModel));
-            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-                log.debug("序列化失败: {}", e.getMessage());
-            }
-        }
+    public ExamDto createExam(ExamDto dto, String uid) {
+        Exam created = examDao.save(examMapper.toModel(dto, uid));
+        return examMapper.toDto(created);
     }
 
     public List<ExamDto> getExamsByDoctorId(String targetUID, boolean isRecovery) {
-        List<Exam> exams = examDao.getExamsByDoctorId(targetUID, isRecovery);
-//        printAsJson(exams);
-
-        return exams.stream().map(e -> new ExamDto(e, questionDao)).toList();
+        return examDao.getExamsByDoctorId(targetUID, isRecovery).stream()
+                .map(examMapper::toDto)
+                .toList();
     }
 
     public long deleteExam(String examId) {
         return examDao.deleteExam(examId);
     }
 
+    public void updateExamName(String examId, String newName) {
+        if (examDao.updateExamName(examId, newName) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中更新套题名称失败");
+        }
+    }
+
+    public void updateExamDesc(String examId, String desc) {
+        if (examDao.updateExamDesc(examId, desc) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中更新套题简介失败");
+        }
+    }
+
+    public void publishExam(String examId) {
+        if (examDao.publishExam(examId) <= 0) {
+            throw new BusinessErrorException("发布id为" + examId + "的套题失败");
+        }
+    }
+
     public QuestionCategoryDto addCategory(QuestionCategoryDto newCategory, String examId) {
-        if (examDao.addCategoryIntoExam(examId, newCategory.toModel()) > 0) {
+        if (examDao.addCategoryIntoExam(examId, examMapper.categoryToModel(newCategory)) > 0) {
             return newCategory;
         } else {
             throw new BusinessErrorException("在id为" + examId + "的套题中新增亚项失败");
+        }
+    }
+
+    public void updateCategory(String examId, int categoryIndex, QuestionCategoryDto newCategory) {
+        if (examDao.updateCategory(examId, categoryIndex, examMapper.categoryToModel(newCategory)) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中更新亚项"+ categoryIndex + "失败");
         }
     }
 
@@ -88,12 +103,16 @@ public class ExamServices {
     }
 
     public QuestionSubCategoryDto addSubCategoryIntoExam(String examId, int categoryIndex, QuestionSubCategoryDto dto) {
-        if (examDao.addSubCategoryIntoExam(examId, categoryIndex, dto.toModel()) > 0) {
+        if (examDao.addSubCategoryIntoExam(examId, categoryIndex, examMapper.subCategoryToModel(dto)) > 0) {
             return dto;
         }
-
         throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下新增子项失败");
+    }
 
+    public void updateSubCategory(String examId, int categoryIndex, int subCategoryIndex, QuestionSubCategoryDto newSubCategory) {
+        if (examDao.updateSubCategory(examId, categoryIndex, subCategoryIndex, examMapper.subCategoryToModel(newSubCategory)) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下更新子项"+ subCategoryIndex +"失败");
+        }
     }
 
     public void deleteSubCategoryFromExam(String examId, int categoryIndex, int subCategoryIndex) {
@@ -108,41 +127,25 @@ public class ExamServices {
         }
     }
 
-
     public void moveSubCategoryDown(String examId, int categoryIndex, int subCategoryIndex) {
         if (examDao.moveSubCategoryDown(examId, categoryIndex, subCategoryIndex) <= 0) {
             throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下下移子项" + subCategoryIndex + "失败");
         }
     }
 
-    public QuestionDto addQuestionIntoExam(String examId, int categoryIndex, int subCategoryIndex, QuestionDto newQuestion, String uid) {
-        Question newModel = newQuestion.toModel(uid);
-
-        Question created = questionDao.save(newModel);
-        if (created == null) {
-            throw new BusinessErrorException("创建题目失败");
-        }
-
-        String questionId = created.getId();
-        examDao.addQuestionIntoExam(examId, categoryIndex, subCategoryIndex, questionId);
-
-        return new QuestionDto(created);
-    }
-
     public QuestionDto addQuestion(String uid, String examId, int cateIndex, int subCateIndex, QuestionDto dto) {
-        // 保存问题
-        Question newModel = dto.toModel(uid);
-        Question createdModel = questionDao.save(newModel);
+        Question created = questionDao.save(questionMapper.toModel(dto, uid));
 
-//        printAsJson(createdModel);
-
-        // 将问题加入到指定的套题中
-
-        if (examDao.addQuestionIntoExam(examId, cateIndex, subCateIndex, createdModel.getId()) <= 0) {
+        if (examDao.addQuestionIntoExam(examId, cateIndex, subCateIndex, created.getId()) <= 0) {
             throw new BusinessErrorException("将问题插入套题失败，请检查");
         }
 
-        return new QuestionDto(createdModel);
+        return questionMapper.toDto(created);
+    }
+
+    public QuestionDto updateQuestion(QuestionDto dto, String uid) {
+        Question saved = questionDao.save(questionMapper.toModel(dto, uid));
+        return questionMapper.toDto(saved);
     }
 
     public void deleteQuestion(String examId, int categoryIndex, int subCategoryIndex, int questionIndex) {
@@ -166,4 +169,39 @@ public class ExamServices {
         }
     }
 
+    public void addDiagnoseRule(String examId, DiagnosisRule rule) {
+        if (examDao.addDiagnosisRule(examId, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中新增诊断规则失败");
+        }
+    }
+
+    public void updateDiagnoseRule(String examId, int ruleIndex, DiagnosisRule rule) {
+        if (examDao.updateDiagnosisRule(examId, ruleIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中更新第"+ ruleIndex+ "个诊断规则失败");
+        }
+    }
+
+    public void deleteDiagnoseRule(String examId, int ruleIndex) {
+        if (examDao.deleteDiagnosisRule(examId, ruleIndex) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中删除第"+ ruleIndex+ "个诊断规则失败");
+        }
+    }
+
+    public void addTerminateRule(String examId, int categoryIndex, int subCategoryIndex, TerminateRule rule) {
+        if (examDao.addTerminateRule(examId, categoryIndex, subCategoryIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下新增中止规则失败");
+        }
+    }
+
+    public void updateTerminateRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex, TerminateRule rule) {
+        if (examDao.updateTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下更新第" + ruleIndex + "个中止规则失败");
+        }
+    }
+
+    public void deleteTerminateRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex) {
+        if (examDao.deleteTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下删除第" + ruleIndex + "个中止规则失败");
+        }
+    }
 }
