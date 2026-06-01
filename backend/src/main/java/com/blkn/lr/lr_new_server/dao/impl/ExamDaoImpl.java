@@ -5,11 +5,8 @@ import com.blkn.lr.lr_new_server.dao.ExamDao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
-import com.blkn.lr.lr_new_server.models.question.Question;
-import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
-import com.mongodb.client.result.DeleteResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,6 +14,7 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -77,7 +75,7 @@ public class ExamDaoImpl implements ExamDao {
             return 1;
         }
 
-        swap(exam.getCategories(), categoryIndex, categoryIndex - 1);
+        Collections.swap(exam.getCategories(), categoryIndex, categoryIndex - 1);
 
         template.save(exam);
         return 1;
@@ -95,7 +93,7 @@ public class ExamDaoImpl implements ExamDao {
             return 1;
         }
 
-        swap(categories, categoryIndex, categoryIndex + 1);
+        Collections.swap(categories, categoryIndex, categoryIndex + 1);
 
         template.save(exam);
         return 1;
@@ -132,7 +130,7 @@ public class ExamDaoImpl implements ExamDao {
 
         List<QuestionSubCategory> subCategories = exam.getCategories().get(categoryIndex).getSubCategories();
 
-        swap(subCategories, subCategoryIndex, subCategoryIndex - 1);
+        Collections.swap(subCategories, subCategoryIndex, subCategoryIndex - 1);
 
         template.save(exam);
         return 1;
@@ -151,7 +149,7 @@ public class ExamDaoImpl implements ExamDao {
             return 1;
         }
 
-        swap(subCategories, subCategoryIndex, subCategoryIndex + 1);
+        Collections.swap(subCategories, subCategoryIndex, subCategoryIndex + 1);
 
         template.save(exam);
         return 1;
@@ -188,7 +186,7 @@ public class ExamDaoImpl implements ExamDao {
             return 1;
         }
 
-        swap(questions, questionIndex, questionIndex - 1);
+        Collections.swap(questions, questionIndex, questionIndex - 1);
 
         template.save(exam);
         return 1;
@@ -206,16 +204,10 @@ public class ExamDaoImpl implements ExamDao {
             return 1;
         }
 
-        swap(questions, questionIndex, questionIndex + 1);
+        Collections.swap(questions, questionIndex, questionIndex + 1);
 
         template.save(exam);
         return 1;
-    }
-
-    static void swap(List list, int index1, int index2) {
-        Object tmp = list.get(index1);
-        list.set(index1, list.get(index2));
-        list.set(index2, tmp);
     }
 
     public long updateCategory(String examId, int categoryIndex, QuestionCategory newCategory) {
