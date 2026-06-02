@@ -10,7 +10,8 @@ import 'package:aphasia_recovery/widgets/ui/common/common.dart';
 import 'package:flutter/material.dart';
 
 import '../../../mixin/eval_rule_mixin.dart';
-import 'doctor_exam_question_edit_dialogs.dart';
+import 'doctor_audio_setting_dialog.dart';
+import 'doctor_hint_rule_edit_dialog.dart';
 import 'doctor_exam_question_rule_edit.dart';
 
 class DoctorExamQuestionEditPage extends StatefulWidget {
