@@ -3,14 +3,12 @@ import 'dart:math';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/rules.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
-import 'package:aphasia_recovery/widgets/ui/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/exam/category.dart';
 import '../../../utils/common_widget_function.dart';
 import 'doctor_exam_edit.dart';
-import 'doctor_exam_edit_dialogs.dart';
 
 class QuestionCategoryEditSubPage extends StatefulWidget {
   final QuestionCategory category;
