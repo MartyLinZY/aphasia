@@ -300,10 +300,10 @@ class DoctorExamEditPage extends StatefulWidget {
   const DoctorExamEditPage({super.key});
 
   @override
-  State<DoctorExamEditPage> createState() => _DoctorExamEditPageState();
+  State<DoctorExamEditPage> createState() => DoctorExamEditPageState();
 }
 
-class _DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonStyles {
+class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonStyles {
   double _menuWidth = 240.0;
   // final double _menuItemHeight = 50;
   double listTileCommonHeight = 32;
@@ -812,9 +812,9 @@ class _DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonS
 
 class ExamSettingEditSubPage extends StatefulWidget {
   final ExamQuestionSet exam;
-  final _DoctorExamEditPageState _parentState;
+  final DoctorExamEditPageState _parentState;
   const ExamSettingEditSubPage(this.exam, {super.key, required State parentState})
-    : _parentState = parentState as _DoctorExamEditPageState;
+    : _parentState = parentState as DoctorExamEditPageState;
 
   @override
   State<ExamSettingEditSubPage> createState() => _ExamSettingEditSubPageState();
@@ -1300,11 +1300,11 @@ class _ExamSettingEditSubPageState extends State<ExamSettingEditSubPage> with Us
 class QuestionCategoryEditSubPage extends StatefulWidget {
   final QuestionCategory category;
   final int categoryIndex;
-  final _DoctorExamEditPageState _parentState;
+  final DoctorExamEditPageState _parentState;
 
   QuestionCategoryEditSubPage(this.category, {super.key, required this.categoryIndex, required State parentState})
-    : assert(parentState.runtimeType == _DoctorExamEditPageState),
-        _parentState = parentState as _DoctorExamEditPageState;
+    : assert(parentState.runtimeType == DoctorExamEditPageState),
+        _parentState = parentState as DoctorExamEditPageState;
 
   @override
   State<QuestionCategoryEditSubPage> createState() => _QuestionCategoryEditSubPageState();
@@ -1653,11 +1653,11 @@ class QuestionSubCategoryEditSubPage extends StatefulWidget {
   final QuestionSubCategory subCategory;
   final int categoryIndex;
   final int subCategoryIndex;
-  final _DoctorExamEditPageState _parentState;
+  final DoctorExamEditPageState _parentState;
 
   QuestionSubCategoryEditSubPage(this.subCategory, {super.key, required this.categoryIndex, required this.subCategoryIndex, required State parentState})
-    : assert(parentState.runtimeType == _DoctorExamEditPageState),
-      _parentState = parentState as _DoctorExamEditPageState;
+    : assert(parentState.runtimeType == DoctorExamEditPageState),
+      _parentState = parentState as DoctorExamEditPageState;
 
 
   @override
