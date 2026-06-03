@@ -16,6 +16,7 @@ import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../fake_data.dart' as fake;
 import '../../TestBase.dart';
@@ -159,6 +160,136 @@ void main() {
       expect(editBtn, findsNWidgets(6));
 
 
+    });
+  });
+
+  // ===== #14b 重构前的回归测试 =====
+  // 锁定 DoctorExamEditPageState 在"删除当前编辑项 / editingItem 守卫切换"两条业务流
+  // 的现有行为。后续 #14b 把 5 个状态字段（editItem / 3 个 index / editingItem）提到
+  // ExamEditSelectionState ChangeNotifier 后，本组用例必须持续全绿。
+  //
+  // 暂未覆盖（待 #14b 重构后用 ChangeNotifier 方法直接单测）：
+  // 1) 删前置位置 category 时 `editCategoryIndex -= 1` 的下移逻辑。
+  //    根因：现 prod 的 onConfirm 写法是 `.then((_) { setState; Navigator.pop(ctx); })`
+  //    —— ctx 是 dialog ctx，但 buildSimpleActionDialog 的 wrapper 已先 pop 过一次，
+  //    导致这条延迟 pop 落到 page route 上把整页弹掉。在 widget 测试里这条 bug-pop
+  //    会污染下个 case 的异步链（连续两次 delete-confirm，第二次的 Future 不被 settle）。
+  //    重构成 ChangeNotifier 上的纯方法 `onCategoryDeleted(int deletedIndex)` 后可直接
+  //    单测，不再涉及 dialog 路由。
+  // 2) 删 subCategory / question 时下标后处理（subCate 路径有疑似 latent bug：用 i 比较
+  //    而非 j，见 doctor_exam_edit.dart:583），同样留到重构后单测。
+  group("DoctorExamEditPage selection state regression (for #14b)", () {
+    setUpAll(() {
+      // 一次性给 SharedPreferences 注入空 mock，避免 HttpClientManager.delete 在
+      // setTokenToHeaders → WrappedSharedPref().retrieveToken() 路径上 stall
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    ExamQuestionSet buildExamWith(int numCategories) {
+      var exam = ExamQuestionSet(id: "test-exam-id");
+      for (int i = 0; i < numCategories; i++) {
+        exam.categories.add(QuestionCategory(description: "亚项$i"));
+      }
+      return exam;
+    }
+
+    Finder editBtnOf(int categoryIndex) => find.descendant(
+        of: find.byKey(Key("category$categoryIndex")),
+        matching: find.widgetWithIcon(TextButton, Icons.edit));
+
+    Finder deleteBtnOf(int categoryIndex) => find.descendant(
+        of: find.byKey(Key("category$categoryIndex")),
+        matching: find.widgetWithIcon(TextButton, Icons.delete_outline));
+
+    testWidgets("删除当前正在编辑的 category 后 editItem/editCategoryIndex 应清空", (tester) async {
+      var exam = buildExamWith(2);
+      await TestBase.testWithFullGlobalStates(tester,
+        ChangeNotifierProvider<ExamState>(
+          create: (_) => ExamState(exam),
+          child: const DoctorExamEditPage(),
+        ), () async {
+          var client = HttpClientManager().testClient!;
+          when(client.delete(
+                  Uri.parse("${HttpConstants.backendBaseUrl}/api/exams/test-exam-id/categories/0"),
+                  headers: anyNamed("headers")))
+              .thenAnswer((_) async => Response('', 200));
+          await tester.pumpAndSettle();
+
+          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+
+          // 进入编辑 category[0]
+          await tester.tap(editBtnOf(0).first, warnIfMissed: false);
+          await tester.pumpAndSettle();
+          expect(state.editItem, isA<QuestionCategory>());
+          expect(state.editCategoryIndex, 0);
+
+          // 删除 category[0]
+          await tester.tap(deleteBtnOf(0).first, warnIfMissed: false);
+          await tester.pumpAndSettle();
+          expect(find.text("删除亚项"), findsOneWidget);
+          await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
+          await tester.pumpAndSettle();
+
+          // editItem / 下标必须清空
+          expect(state.editItem, isNull);
+          expect(state.editCategoryIndex, isNull);
+          expect(state.editingItem, isFalse);
+          expect(exam.categories.length, 1);
+        }
+      );
+    });
+
+    testWidgets("editingItem=true 时点 category 编辑按钮应弹丢弃确认对话框", (tester) async {
+      var exam = buildExamWith(2);
+      await TestBase.testWithFullGlobalStates(tester,
+        ChangeNotifierProvider<ExamState>(
+          create: (_) => ExamState(exam),
+          child: const DoctorExamEditPage(),
+        ), () async {
+          await tester.pumpAndSettle();
+          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+
+          // 模拟子页正在编辑：直接置 editingItem = true
+          state.editingItem = true;
+
+          await tester.tap(editBtnOf(0).first, warnIfMissed: false);
+          await tester.pumpAndSettle();
+
+          // 应出现丢弃确认 dialog；editItem 未立即变
+          expect(find.text("当前有未保存的编辑内容，是否丢弃这些内容并继续打开亚项编辑页面？"),
+              findsOneWidget);
+          expect(state.editItem, isNull);
+          expect(state.editCategoryIndex, isNull);
+
+          // 点 "确认" 后才切
+          await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
+          await tester.pumpAndSettle();
+          expect(state.editItem, isA<QuestionCategory>());
+          expect(state.editCategoryIndex, 0);
+        }
+      );
+    });
+
+    testWidgets("editingItem=false 时点 category 编辑按钮应直接切换 editItem 无对话框", (tester) async {
+      var exam = buildExamWith(2);
+      await TestBase.testWithFullGlobalStates(tester,
+        ChangeNotifierProvider<ExamState>(
+          create: (_) => ExamState(exam),
+          child: const DoctorExamEditPage(),
+        ), () async {
+          await tester.pumpAndSettle();
+          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+          expect(state.editingItem, isFalse);
+
+          await tester.tap(editBtnOf(1).first, warnIfMissed: false);
+          await tester.pumpAndSettle();
+
+          expect(find.text("当前有未保存的编辑内容，是否丢弃这些内容并继续打开亚项编辑页面？"),
+              findsNothing);
+          expect(state.editItem, isA<QuestionCategory>());
+          expect(state.editCategoryIndex, 1);
+        }
+      );
     });
   });
 
