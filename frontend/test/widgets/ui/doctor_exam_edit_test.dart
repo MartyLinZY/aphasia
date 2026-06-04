@@ -7,9 +7,11 @@ import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/models/exam/exam_recovery.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
 import 'package:aphasia_recovery/models/rules.dart';
+import 'package:aphasia_recovery/states/exam_edit_selection_state.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
 import 'package:aphasia_recovery/utils/http/http_manager.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/doctor_exam_edit.dart';
+import 'package:aphasia_recovery/widgets/ui/doctor/exam_edit_left_menu/exam_category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
@@ -164,9 +166,9 @@ void main() {
   });
 
   // ===== #14b 重构前的回归测试 =====
-  // 锁定 DoctorExamEditPageState 在"删除当前编辑项 / editingItem 守卫切换"两条业务流
-  // 的现有行为。后续 #14b 把 5 个状态字段（editItem / 3 个 index / editingItem）提到
-  // ExamEditSelectionState ChangeNotifier 后，本组用例必须持续全绿。
+  // 锁定 ExamEditSelectionState 在"删除当前编辑项 / editingItem 守卫切换"两条业务流
+  // 的现有行为。T2 引入 ChangeNotifier、T7 后 State 改私有，本组用例改用 Provider.of
+  // 从 ExamCategoryList 这个 InheritedProvider 下挂的 Widget 拿 selectionState 实例。
   //
   // 暂未覆盖（待 #14b 重构后用 ChangeNotifier 方法直接单测）：
   // 1) 删前置位置 category 时 `editCategoryIndex -= 1` 的下移逻辑。
@@ -201,6 +203,13 @@ void main() {
         of: find.byKey(Key("category$categoryIndex")),
         matching: find.widgetWithIcon(TextButton, Icons.delete_outline));
 
+    /// T7: State 改私有后，测试不能再 `tester.state<DoctorExamEditPageState>`。
+    /// 改从 InheritedProvider 下挂的 `ExamCategoryList` 元素拿 selectionState。
+    ExamEditSelectionState selectionOf(WidgetTester tester) =>
+        Provider.of<ExamEditSelectionState>(
+            tester.element(find.byType(ExamCategoryList)),
+            listen: false);
+
     testWidgets("删除当前正在编辑的 category 后 editItem/editCategoryIndex 应清空", (tester) async {
       var exam = buildExamWith(2);
       await TestBase.testWithFullGlobalStates(tester,
@@ -215,7 +224,7 @@ void main() {
               .thenAnswer((_) async => Response('', 200));
           await tester.pumpAndSettle();
 
-          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+          var state = selectionOf(tester);
 
           // 进入编辑 category[0]
           await tester.tap(editBtnOf(0).first, warnIfMissed: false);
@@ -247,7 +256,7 @@ void main() {
           child: const DoctorExamEditPage(),
         ), () async {
           await tester.pumpAndSettle();
-          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+          var state = selectionOf(tester);
 
           // 模拟子页正在编辑：直接置 editingItem = true
           state.editingItem = true;
@@ -278,7 +287,7 @@ void main() {
           child: const DoctorExamEditPage(),
         ), () async {
           await tester.pumpAndSettle();
-          var state = tester.state<DoctorExamEditPageState>(find.byType(DoctorExamEditPage));
+          var state = selectionOf(tester);
           expect(state.editingItem, isFalse);
 
           await tester.tap(editBtnOf(1).first, warnIfMissed: false);

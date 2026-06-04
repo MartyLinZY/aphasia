@@ -300,10 +300,10 @@ class DoctorExamEditPage extends StatefulWidget {
   const DoctorExamEditPage({super.key});
 
   @override
-  State<DoctorExamEditPage> createState() => DoctorExamEditPageState();
+  State<DoctorExamEditPage> createState() => _DoctorExamEditPageState();
 }
 
-class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonStyles {
+class _DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonStyles {
   double _menuWidth = 240.0;
   // final double _menuItemHeight = 50;
   double listTileCommonHeight = 32;
@@ -311,37 +311,21 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
   late double tileLeadingWidth;
   late double tileContentWidth;
 
-  /// T2: 4 个 selection 字段 + `editQuestionIndex` 已迁至 [ExamEditSelectionState]。
-  /// State 上保留同名 getter/setter 作为适配层，所有现有读写点（包括子页
-  /// `widget._parentState.editingItem = X` 与本文件内的 `setState(() { editItem = X; })`）
-  /// 行为完全不变；setter 通过 ChangeNotifier 的 `notifyListeners()` 让后续
-  /// (T3+) 直接订阅的 Widget 也能感知。适配层将在 T7 删除。
+  /// 选中态 ChangeNotifier。T2 引入、T3 起子页/左栏 widgets 通过 Provider 订阅；
+  /// 本 State 直接持有 instance，build 中读 `_selectionState.editItem` 等渲染
+  /// `_buildSettingTile`（"通用设置"标签 Icon）与 `_buildActionArea`（右栏 sub
+  /// page 路由）。变化通过 `_onSelectionChanged` listener 触发 setState。
   final ExamEditSelectionState _selectionState = ExamEditSelectionState();
-
-  dynamic get editItem => _selectionState.editItem;
-  set editItem(dynamic v) => _selectionState.editItem = v;
-
-  int? get editCategoryIndex => _selectionState.editCategoryIndex;
-  set editCategoryIndex(int? v) => _selectionState.editCategoryIndex = v;
-
-  int? get editSubCategoryIndex => _selectionState.editSubCategoryIndex;
-  set editSubCategoryIndex(int? v) => _selectionState.editSubCategoryIndex = v;
-
-  int? get editQuestionIndex => _selectionState.editQuestionIndex;
-  set editQuestionIndex(int? v) => _selectionState.editQuestionIndex = v;
-
-  bool get editingItem => _selectionState.editingItem;
-  set editingItem(bool v) => _selectionState.editingItem = v;
 
   @override
   void initState() {
     super.initState();
-    // T5: 左栏拆出的 SubCategoryList 自带 selectionState 写入路径（用户在子项
-    // 层级切换/删除时），父 State 不再通过显式 setState 链路得到通知。父 State
-    // 的 _buildQuestionTile 里 category-level "编辑中" 指示符（notEditCurrentTile
-    // 计算 `editItem.runtimeType` / `editCategoryIndex`）仍内联读 selection 字段，
-    // 因此必须订阅 ChangeNotifier 才能在 SubCategoryList/T6 ExamCategoryList 写入
-    // 后及时重画。T7 等左栏整树拆出后此 listener 可删。
+    // 左栏菜单树（T4–T6 拆出的 3 个 widget）自带 selectionState 写入路径，
+    // 父 State 不再通过显式 setState 链路得到通知。但 `_buildSettingTile`
+    // 仍读 `_selectionState.editItem` 决定"通用设置" Icon，`_buildActionArea`
+    // 仍读 editItem / editCategoryIndex / editSubCategoryIndex 路由右栏 sub
+    // page，因此必须订阅 ChangeNotifier 才能在左栏写入选中态后及时重画。
+    // 想彻底删此 listener 需进一步把上述两段也拆成 Provider descendant。
     _selectionState.addListener(_onSelectionChanged);
   }
 
@@ -435,11 +419,11 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
         firstBtnAction: () {
           continueAction() {
             setState(() {
-              editItem = examState.exam;
+              _selectionState.editItem = examState.exam;
             });
           }
 
-          if (editingItem) {
+          if (_selectionState.editingItem) {
             confirm(context,
               title: "确认",
               body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开通用设置？",
@@ -453,7 +437,7 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
             continueAction();
           }
         },
-        firstBtnIcon: editItem.runtimeType == ExamQuestionSet ? const Icon(Icons.edit_document): const Icon(Icons.edit),
+        firstBtnIcon: _selectionState.editItem.runtimeType == ExamQuestionSet ? const Icon(Icons.edit_document): const Icon(Icons.edit),
         firstBtnTooltipMsg: "编辑"
       ),
       contentPadding: const EdgeInsets.only(left: 44),
@@ -462,16 +446,17 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
 
   Widget _buildActionArea() {
     Widget child;
+    var editItem = _selectionState.editItem;
 
     if (editItem == null) {
       child = const SizedBox.shrink();
     } else if (editItem.runtimeType == ExamQuestionSet) {
       child = ExamSettingEditSubPage(editItem);
     } else if (editItem.runtimeType == QuestionCategory) {
-      assert(editCategoryIndex != null);
-      child = QuestionCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!);
+      assert(_selectionState.editCategoryIndex != null);
+      child = QuestionCategoryEditSubPage(editItem, categoryIndex: _selectionState.editCategoryIndex!);
     } else if (editItem.runtimeType == QuestionSubCategory) {
-      child = QuestionSubCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!, subCategoryIndex: editSubCategoryIndex!);
+      child = QuestionSubCategoryEditSubPage(editItem, categoryIndex: _selectionState.editCategoryIndex!, subCategoryIndex: _selectionState.editSubCategoryIndex!);
     } else {
       throw UnimplementedError("unexpected editItem");
     }
