@@ -1,3 +1,4 @@
+import 'package:aphasia_recovery/models/exam/sub_category.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -51,6 +52,27 @@ class ExamEditSelectionState extends ChangeNotifier {
   set editingItem(bool v) {
     if (_editingItem == v) return;
     _editingItem = v;
+    _safeNotify();
+  }
+
+  /// 当某个 subCategory 被删除时调用，调整当前 selection 字段。
+  ///
+  /// T5：把原 `_buildQuestionTile` 中"删除子项"分支的 setState 内联块迁过来，
+  /// 行为**逐字保留**——包括 `editSubCategoryIndex! > categoryIndex` 这条
+  /// 历史 prod 写法（疑似 latent bug：层级上应为 `> subCategoryIndex`）。
+  /// T8 会在此处统一 fix 并补单测。
+  void onSubCategoryDeleted(int categoryIndex, int subCategoryIndex) {
+    if (_editItem.runtimeType == QuestionSubCategory) {
+      assert(_editSubCategoryIndex != null);
+      if (_editSubCategoryIndex == subCategoryIndex) {
+        _editItem = null;
+        _editCategoryIndex = null;
+        _editSubCategoryIndex = null;
+        _editingItem = false;
+      } else if (_editSubCategoryIndex! > categoryIndex) {
+        _editSubCategoryIndex = _editSubCategoryIndex! - 1;
+      }
+    }
     _safeNotify();
   }
 

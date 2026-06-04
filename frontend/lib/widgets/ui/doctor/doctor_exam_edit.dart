@@ -14,7 +14,7 @@ import '../../../utils/common_widget_function.dart';
 import 'doctor_exam_setting_edit_sub_page.dart';
 import 'doctor_question_category_edit_sub_page.dart';
 import 'doctor_question_sub_category_edit_sub_page.dart';
-import 'exam_edit_left_menu/question_list.dart';
+import 'exam_edit_left_menu/sub_category_list.dart';
 
 
 /// 新建套题引导页
@@ -336,10 +336,22 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
   @override
   void initState() {
     super.initState();
+    // T5: 左栏拆出的 SubCategoryList 自带 selectionState 写入路径（用户在子项
+    // 层级切换/删除时），父 State 不再通过显式 setState 链路得到通知。父 State
+    // 的 _buildQuestionTile 里 category-level "编辑中" 指示符（notEditCurrentTile
+    // 计算 `editItem.runtimeType` / `editCategoryIndex`）仍内联读 selection 字段，
+    // 因此必须订阅 ChangeNotifier 才能在 SubCategoryList/T6 ExamCategoryList 写入
+    // 后及时重画。T7 等左栏整树拆出后此 listener 可删。
+    _selectionState.addListener(_onSelectionChanged);
+  }
+
+  void _onSelectionChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _selectionState.removeListener(_onSelectionChanged);
     _selectionState.dispose();
     super.dispose();
   }
@@ -450,118 +462,6 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
     var categoryWidgets = <Widget>[];
     for (int i = 0;i < editingExam.categories.length;i++) {
       var category = editingExam.categories[i];
-      var subCategoryWidgets = <Widget>[];
-      for (int j = 0;j < category.subCategories.length;j++) {
-        var subCategory = category.subCategories[j];
-
-        bool editCurrentTile = editCategoryIndex == i && editSubCategoryIndex == j && editItem.runtimeType == QuestionSubCategory;
-        subCategoryWidgets.add(ExpansionTile(
-          backgroundColor: commonStyles!.theme.focusColor.withAlpha(40),
-          tilePadding: EdgeInsets.only(left: 7 * listTilePaddingBase),
-          controlAffinity: ListTileControlAffinity.leading,
-          title: buildListTileContentWithActionButtons(
-            body: Text(subCategory.description, style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-            textAreaMaxHeight: listTileCommonHeight,
-            textAreaMaxWidth: tileContentWidth,
-            commonStyles: commonStyles,
-            firstBtnIcon: editCurrentTile ? Icon(Icons.edit_document, color: commonStyles?.primaryColor,) : const Icon(Icons.edit),
-            firstBtnTooltipMsg: editCurrentTile ? "编辑中" : "编辑",
-            firstBtnAction: editCurrentTile ? null : () {
-              continueAction() {
-                setState(() {
-                  editItem = subCategory;
-                  editCategoryIndex = i;
-                  editSubCategoryIndex = j;
-                });
-              }
-
-              if (editingItem) {
-                confirm(context,
-                    title: "确认",
-                    body: '当前有未保存的编辑内容，是否丢弃这些内容并继续打开子项编辑页面？',
-                    commonStyles: commonStyles,
-                    onConfirm: (context) {
-                      continueAction();
-                      // 关闭dialog
-                      Navigator.pop(context);
-                    }
-                );
-              } else {
-                continueAction();
-              }
-            },
-            secondBtnIcon: Icon(Icons.delete_outline, color: commonStyles?.errorColor,),
-            secondBtnTooltipMsg: "删除",
-            secondBtnAction: () {
-              confirm(context,
-                  title: "删除子项",
-                  body: '确认要删除子项："${subCategory.description}" 吗，删除后不可恢复。',
-                  commonStyles: commonStyles,
-                  onConfirm: (context) {
-                    examState.deleteSubCategory(categoryIndex: i, subCategoryIndex: j).then((_) {
-                      Navigator.pop(context);
-                      setState(() {
-                        if (editItem.runtimeType == QuestionSubCategory) {
-                          assert(editSubCategoryIndex != null);
-                          if (editSubCategoryIndex == j) {
-                            editItem = null;
-                            editCategoryIndex = null;
-                            editSubCategoryIndex = null;
-                            editingItem = false;
-                          } else if (editSubCategoryIndex! > i) {
-                            editSubCategoryIndex = editSubCategoryIndex! - 1;
-                          }
-                        }
-                      });
-                    }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                  }
-              );
-            }
-          ),
-          children: [
-            QuestionList(
-              categoryIndex: i,
-              subCategoryIndex: j,
-              commonStyles: commonStyles!,
-              listTileCommonHeight: listTileCommonHeight,
-              listTilePaddingBase: listTilePaddingBase,
-              tileContentWidth: tileContentWidth,
-            ),
-          ],
-        ));
-      }
-
-      subCategoryWidgets.insert(0, Align(
-        alignment: Alignment.center,
-        child: _buildNewItemButton("新增子项", onPressed: () {
-          if (editingItem) {
-            confirm(context,
-              title: "确认",
-              body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开子项新增页？",
-              commonStyles: commonStyles,
-              onConfirm: (context) {
-                editingExam.addSubCategory(categoryIndex: i).then((subCate) {
-                  setState(() {
-                    editItem = subCate;
-                    editCategoryIndex = i;
-                    editSubCategoryIndex = editingExam.categories[i].subCategories.length - 1;
-                  });
-                  // 关闭dialog
-                  Navigator.pop(context);
-                }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-              }
-            );
-          } else {
-            editingExam.addSubCategory(categoryIndex: i).then((subCate) {
-              setState(() {
-                editItem = subCate;
-                editCategoryIndex = i;
-                editSubCategoryIndex = editingExam.categories[i].subCategories.length - 1;
-              });
-            }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-          }
-        }),
-      ));
 
       categoryWidgets.add(Builder(
         builder: (context) {
@@ -632,7 +532,13 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
             ),
             children: [
               // _buildCategoryRuleTile(),
-              ...subCategoryWidgets,
+              SubCategoryList(
+                categoryIndex: i,
+                commonStyles: commonStyles!,
+                listTileCommonHeight: listTileCommonHeight,
+                listTilePaddingBase: listTilePaddingBase,
+                tileContentWidth: tileContentWidth,
+              ),
             ],
           );
         }
