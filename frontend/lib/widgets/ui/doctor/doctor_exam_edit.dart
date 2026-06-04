@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/exam/exam_recovery.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
+import 'package:aphasia_recovery/states/exam_edit_selection_state.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -311,15 +312,37 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
   late double tileLeadingWidth;
   late double tileContentWidth;
 
-  dynamic editItem;
-  int? editCategoryIndex;
-  int? editSubCategoryIndex;
-  int? editQuestionIndex;
-  bool editingItem = false;
+  /// T2: 4 个 selection 字段 + `editQuestionIndex` 已迁至 [ExamEditSelectionState]。
+  /// State 上保留同名 getter/setter 作为适配层，所有现有读写点（包括子页
+  /// `widget._parentState.editingItem = X` 与本文件内的 `setState(() { editItem = X; })`）
+  /// 行为完全不变；setter 通过 ChangeNotifier 的 `notifyListeners()` 让后续
+  /// (T3+) 直接订阅的 Widget 也能感知。适配层将在 T7 删除。
+  final ExamEditSelectionState _selectionState = ExamEditSelectionState();
+
+  dynamic get editItem => _selectionState.editItem;
+  set editItem(dynamic v) => _selectionState.editItem = v;
+
+  int? get editCategoryIndex => _selectionState.editCategoryIndex;
+  set editCategoryIndex(int? v) => _selectionState.editCategoryIndex = v;
+
+  int? get editSubCategoryIndex => _selectionState.editSubCategoryIndex;
+  set editSubCategoryIndex(int? v) => _selectionState.editSubCategoryIndex = v;
+
+  int? get editQuestionIndex => _selectionState.editQuestionIndex;
+  set editQuestionIndex(int? v) => _selectionState.editQuestionIndex = v;
+
+  bool get editingItem => _selectionState.editingItem;
+  set editingItem(bool v) => _selectionState.editingItem = v;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _selectionState.dispose();
+    super.dispose();
   }
 
   @override
@@ -335,7 +358,12 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
     return Scaffold(
       appBar: AppBar(title: Text("编辑套题方案", style: commonStyles?.titleStyle,),),
       body: SafeArea(
-        child: Padding(
+        // T2: 将 [_selectionState] 暴露给整棵子树，便于 T3+ 的子页与左栏拆出
+        // 的 Widget 用 `context.read/watch<ExamEditSelectionState>()` 订阅，
+        // 而无需再经由 `widget._parentState` / `parentState: this` 这条桥。
+        child: ChangeNotifierProvider<ExamEditSelectionState>.value(
+          value: _selectionState,
+          child: Padding(
           padding: EdgeInsets.all(paddingWidth),
           child: LayoutBuilder(
               builder: (context, constraints) {
@@ -375,6 +403,7 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
                 );
               }
           ),
+        ),
         ),
       ),
     );
