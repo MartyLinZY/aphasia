@@ -14,7 +14,7 @@ import '../../../utils/common_widget_function.dart';
 import 'doctor_exam_setting_edit_sub_page.dart';
 import 'doctor_question_category_edit_sub_page.dart';
 import 'doctor_question_sub_category_edit_sub_page.dart';
-import 'exam_edit_left_menu/sub_category_list.dart';
+import 'exam_edit_left_menu/exam_category_list.dart';
 
 
 /// 新建套题引导页
@@ -398,7 +398,12 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
                                 const Divider(),
                                 _buildSettingTile(examState),
                                 const Divider(),
-                                _buildQuestionTile(examState),
+                                ExamCategoryList(
+                                  commonStyles: commonStyles!,
+                                  listTileCommonHeight: listTileCommonHeight,
+                                  listTilePaddingBase: listTilePaddingBase,
+                                  tileContentWidth: tileContentWidth,
+                                ),
                                 const Divider(),
                               ],
                             ),
@@ -452,173 +457,6 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
         firstBtnTooltipMsg: "编辑"
       ),
       contentPadding: const EdgeInsets.only(left: 44),
-    );
-  }
-
-  bool questionTileExpanded = false;
-
-  Widget _buildQuestionTile(ExamState examState) {
-    var editingExam = examState.exam;
-    var categoryWidgets = <Widget>[];
-    for (int i = 0;i < editingExam.categories.length;i++) {
-      var category = editingExam.categories[i];
-
-      categoryWidgets.add(Builder(
-        builder: (context) {
-          bool notEditCurrentTile = editCategoryIndex != i || editItem.runtimeType != QuestionCategory;
-
-          return ExpansionTile(
-            backgroundColor: commonStyles?.theme.focusColor,
-            key: Key("category$i"),
-            tilePadding: EdgeInsets.only(left: 4 * listTilePaddingBase),
-            controlAffinity: ListTileControlAffinity.leading,
-            title: buildListTileContentWithActionButtons(
-                body: Text(category.description, style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis),
-                textAreaMaxHeight: listTileCommonHeight,
-                textAreaMaxWidth: tileContentWidth,
-                commonStyles: commonStyles,
-                firstBtnIcon: notEditCurrentTile ? const Icon(Icons.edit) : Icon(Icons.edit_document, color: commonStyles?.primaryColor,),
-                firstBtnTooltipMsg: notEditCurrentTile ? "编辑" : "编辑中",
-                firstBtnAction: notEditCurrentTile ? () {
-                  continueAction() {
-                    setState(() {
-                      // debugPrint("${editingExam.toJson()}\n${context.read<ExamState>().exam.toJson()}");
-                      editItem = category;
-                      editCategoryIndex = i;
-                    });
-                  }
-                  if (editingItem) {
-                    confirm(context,
-                        title: "确认",
-                        body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开亚项编辑页面？",
-                        commonStyles: commonStyles,
-                        onConfirm: (context) {
-                          continueAction();
-                          // 关闭dialog
-                          Navigator.pop(context);
-                        }
-                    );
-                  } else {
-                    continueAction();
-                  }
-                } : null,
-                secondBtnIcon: Icon(Icons.delete_outline, color: commonStyles?.errorColor,),
-                secondBtnTooltipMsg: "删除",
-                secondBtnAction: () {
-                  confirm(context,
-                      title: '删除亚项',
-                      body: '确认要删除亚项："${category.description}" 吗，删除后不可恢复',
-                      commonStyles: commonStyles,
-                      onConfirm: (context) {
-                        examState.deleteCategory(categoryIndex: i).then((_) {
-                          setState(() {
-                            if (editItem.runtimeType == QuestionCategory) {
-                              assert(editCategoryIndex != null);
-                              if (editCategoryIndex == i) {
-                                editItem = null;
-                                editCategoryIndex = null;
-                                editingItem = false;
-                              } else if (editCategoryIndex! > i) {
-                                editCategoryIndex = editCategoryIndex! - 1;
-                              }
-                            }
-                          });
-                          // 关闭dialog
-                          Navigator.pop(context);
-                        }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                      }
-                  );
-                }
-            ),
-            children: [
-              // _buildCategoryRuleTile(),
-              SubCategoryList(
-                categoryIndex: i,
-                commonStyles: commonStyles!,
-                listTileCommonHeight: listTileCommonHeight,
-                listTilePaddingBase: listTilePaddingBase,
-                tileContentWidth: tileContentWidth,
-              ),
-            ],
-          );
-        }
-      )
-      );
-    }
-
-    categoryWidgets.insert(0, Align(
-      alignment: Alignment.center,
-      child: _buildNewItemButton("新增亚项", onPressed: () {
-        if (editingItem) {
-          confirm(context,
-              title: "确认",
-              body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开新增亚项页面？",
-              commonStyles: commonStyles,
-              onConfirm: (context) {
-                editingExam.addCategory().then((category) {
-                  setState(() {
-                    editItem = category;
-                    editCategoryIndex = editingExam.categories.length - 1;
-                  });
-                  // 关闭dialog
-                  Navigator.pop(context);
-                }).catchError((err) {requestResultErrorHandler(context, error: err); return err;});
-              }
-          );
-        } else {
-          editingExam.addCategory().then((category) {
-            setState(() {
-              editItem = category;
-              editCategoryIndex = editingExam.categories.length - 1;
-            });
-          }).catchError((err) {requestResultErrorHandler(context, error: err); return err;});
-        }
-      }),
-    ));
-
-    categoryWidgets = categoryWidgets.isEmpty ? [Text("无", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)] : categoryWidgets;
-
-    return ExpansionTile(
-      tilePadding: EdgeInsets.only(left: listTilePaddingBase),
-      initiallyExpanded: true,
-      title: buildListTileContentWithActionButtons(
-        body: Text("套题目录", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-        textAreaMaxHeight: listTileCommonHeight,
-        textAreaMaxWidth: tileContentWidth + 60,
-        commonStyles: commonStyles,
-      ),
-      controlAffinity: ListTileControlAffinity.leading,
-      children: categoryWidgets.isEmpty ?
-        [Text("无", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)] : categoryWidgets,
-    );
-  }
-
-  Widget _buildItemName({required Widget child}) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: listTileCommonHeight,
-        maxWidth: tileContentWidth,
-      ),
-      child: OverflowBox(
-        alignment: AlignmentDirectional.centerStart,
-        child: child,
-      ),
-    );
-  }
-
-  TextButton _buildNewItemButton(String text, {required void Function() onPressed}) {
-    return TextButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 2.0)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.add),
-            Text(text, style: commonStyles?.bodyStyle,
-              overflow: TextOverflow.ellipsis,),
-          ],
-        )
     );
   }
 
