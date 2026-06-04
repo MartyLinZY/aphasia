@@ -5,14 +5,18 @@ import 'package:flutter/scheduler.dart';
 
 /// 套题编辑页面的"当前选中/编辑项"状态。
 ///
-/// 承载原本散落在 [DoctorExamEditPageState] 上的 4 个 selection 字段
-/// （`editItem` / `editCategoryIndex` / `editSubCategoryIndex` / `editingItem`），
-/// 以及暂存的 `editQuestionIndex`。
+/// 承载原本散落在父 State 上的 4 个 selection 字段（`editItem` /
+/// `editCategoryIndex` / `editSubCategoryIndex` / `editingItem`），以及暂存的
+/// `editQuestionIndex`。
 ///
-/// T2 阶段：State 通过 getter/setter 代理到这里，行为不变；后续 T3 起子页与
-/// 左栏树拆出的 Widget 会直接 `context.read/watch` 此 Notifier，实现真正解耦。
-/// T8 会在此类上加入 `onCategoryDeleted` / `onSubCategoryDeleted` 等业务方法
-/// 并补单测。
+/// 父 State (`_DoctorExamEditPageState`) 持有 instance 并通过
+/// `ChangeNotifierProvider.value` 暴露给整棵子树；子页与左栏 3 个 widget
+/// (`ExamCategoryList` / `SubCategoryList` / `QuestionList`) 都通过
+/// `context.read` 或 `context.watch` 读写。
+///
+/// 业务方法 `onCategoryDeleted` / `onSubCategoryDeleted` 用于删除后调整选中
+/// 索引——历史上散落在父 setState 内联块里，#14b 集中到此处后由单元测试
+/// 锁定行为。
 class ExamEditSelectionState extends ChangeNotifier {
   dynamic _editItem;
   int? _editCategoryIndex;
@@ -58,10 +62,14 @@ class ExamEditSelectionState extends ChangeNotifier {
 
   /// 当某个 category 被删除时调用，调整当前 selection 字段。
   ///
-  /// T6：把原 `_buildQuestionTile` 中"删除亚项"分支的 setState 内联块迁过来，
-  /// 行为**逐字保留**——注意原代码也不会清理 `editSubCategoryIndex`，因此
-  /// 如果删 category 前用户曾经停在某 subCategory 上（editSubCategoryIndex
-  /// 残留），删完仍会残留。该行为是否符合预期由 T8 单测时一并审视。
+  /// 仅当：当前正在编辑某个 category 时才需调整——若编辑的就是被删那一项
+  /// 则清空 (editItem / editCategoryIndex / editingItem)；若编辑的是被删项
+  /// 之后的 category 则下移 editCategoryIndex。
+  ///
+  /// 注意：方法**不会清理** `editSubCategoryIndex` 的残留。这条历史细节
+  /// 在 `_buildActionArea` 当前路由逻辑下是无害的——editItem == null 时
+  /// `_buildActionArea` 直接返回空，永远不会读 editSubCategoryIndex；下次
+  /// 用户进入某 subCategory 编辑也会覆盖之。单测中显式锁定此行为。
   void onCategoryDeleted(int categoryIndex) {
     if (_editItem.runtimeType == QuestionCategory) {
       assert(_editCategoryIndex != null);
@@ -78,19 +86,26 @@ class ExamEditSelectionState extends ChangeNotifier {
 
   /// 当某个 subCategory 被删除时调用，调整当前 selection 字段。
   ///
-  /// T5：把原 `_buildQuestionTile` 中"删除子项"分支的 setState 内联块迁过来，
-  /// 行为**逐字保留**——包括 `editSubCategoryIndex! > categoryIndex` 这条
-  /// 历史 prod 写法（疑似 latent bug：层级上应为 `> subCategoryIndex`）。
-  /// T8 会在此处统一 fix 并补单测。
+  /// 仅当：当前正在编辑某个 subCategory，且**属于同一 category** 时，才需
+  /// 调整索引——若编辑的就是被删那一项则清空；若编辑的是被删项之后的同
+  /// category 子项则下移。**不同 category 的 subCategory 索引互相独立，
+  /// 不能跨 category 比较 / 调整。**
+  ///
+  /// T5 阶段曾把原 `_buildQuestionTile` 中"删除子项"分支的 setState 内联块
+  /// 逐字迁过来，含两条历史 prod 缺陷：① 没检查 `editCategoryIndex ==
+  /// categoryIndex`，跨 category 误清空；② 用 `editSubCategoryIndex! >
+  /// categoryIndex` 比较，层级错位（应比 subCategoryIndex）。T8 一并 fix
+  /// 并补单测锁定正确行为。
   void onSubCategoryDeleted(int categoryIndex, int subCategoryIndex) {
-    if (_editItem.runtimeType == QuestionSubCategory) {
+    if (_editItem.runtimeType == QuestionSubCategory &&
+        _editCategoryIndex == categoryIndex) {
       assert(_editSubCategoryIndex != null);
       if (_editSubCategoryIndex == subCategoryIndex) {
         _editItem = null;
         _editCategoryIndex = null;
         _editSubCategoryIndex = null;
         _editingItem = false;
-      } else if (_editSubCategoryIndex! > categoryIndex) {
+      } else if (_editSubCategoryIndex! > subCategoryIndex) {
         _editSubCategoryIndex = _editSubCategoryIndex! - 1;
       }
     }
