@@ -3,20 +3,18 @@ import 'dart:math';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/exam/exam_recovery.dart';
 import 'package:aphasia_recovery/models/rules.dart';
+import 'package:aphasia_recovery/states/exam_edit_selection_state.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
 import 'package:aphasia_recovery/widgets/ui/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utils/common_widget_function.dart';
-import 'doctor_exam_edit.dart';
 import 'doctor_exam_edit_dialogs.dart';
 
 class ExamSettingEditSubPage extends StatefulWidget {
   final ExamQuestionSet exam;
-  final DoctorExamEditPageState _parentState;
-  const ExamSettingEditSubPage(this.exam, {super.key, required State parentState})
-    : _parentState = parentState as DoctorExamEditPageState;
+  const ExamSettingEditSubPage(this.exam, {super.key});
 
   @override
   State<ExamSettingEditSubPage> createState() => _ExamSettingEditSubPageState();
@@ -71,13 +69,13 @@ class _ExamSettingEditSubPageState extends State<ExamSettingEditSubPage> with Us
 
   void _trySetNotEditing() {
     if (!editingName && !editingDesc) {
-      widget._parentState.editingItem = false;
+      context.read<ExamEditSelectionState>().editingItem = false;
     }
   }
 
   void enterNameEdit() {
     editingName = true;
-    widget._parentState.editingItem = true;
+    context.read<ExamEditSelectionState>().editingItem = true;
   }
 
   void quitNameEdit() {
@@ -87,7 +85,7 @@ class _ExamSettingEditSubPageState extends State<ExamSettingEditSubPage> with Us
 
   void enterDescEdit() {
     editingDesc = true;
-    widget._parentState.editingItem = true;
+    context.read<ExamEditSelectionState>().editingItem = true;
   }
 
   void quitDescEdit() {

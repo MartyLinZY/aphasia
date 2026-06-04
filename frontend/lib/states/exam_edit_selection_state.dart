@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 
 /// 套题编辑页面的"当前选中/编辑项"状态。
 ///
@@ -24,27 +25,51 @@ class ExamEditSelectionState extends ChangeNotifier {
   bool get editingItem => _editingItem;
 
   set editItem(dynamic v) {
+    if (identical(_editItem, v)) return;
     _editItem = v;
-    notifyListeners();
+    _safeNotify();
   }
 
   set editCategoryIndex(int? v) {
+    if (_editCategoryIndex == v) return;
     _editCategoryIndex = v;
-    notifyListeners();
+    _safeNotify();
   }
 
   set editSubCategoryIndex(int? v) {
+    if (_editSubCategoryIndex == v) return;
     _editSubCategoryIndex = v;
-    notifyListeners();
+    _safeNotify();
   }
 
   set editQuestionIndex(int? v) {
+    if (_editQuestionIndex == v) return;
     _editQuestionIndex = v;
-    notifyListeners();
+    _safeNotify();
   }
 
   set editingItem(bool v) {
+    if (_editingItem == v) return;
     _editingItem = v;
-    notifyListeners();
+    _safeNotify();
+  }
+
+  /// 在 build / layout / paint 阶段被写入时，延迟通知到下一帧再 fire，
+  /// 避免 InheritedProviderScope 在祖先 build 已完成后被 markNeedsBuild
+  /// 触发 "setState/markNeedsBuild called during build" 断言。
+  ///
+  /// 触发场景：子页 `initState` / `_resetState` 里写 `editingItem = false`
+  /// 把上一份子页遗留的全局编辑态归零（T3 之后子页改读 Provider，写路径上
+  /// 链路是 `setter → notifyListeners → InheritedProvider.markNeedsBuild`）。
+  void _safeNotify() {
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle ||
+        phase == SchedulerPhase.postFrameCallbacks) {
+      notifyListeners();
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
   }
 }

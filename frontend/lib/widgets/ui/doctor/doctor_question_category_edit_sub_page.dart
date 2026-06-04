@@ -2,22 +2,19 @@ import 'dart:math';
 
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/rules.dart';
+import 'package:aphasia_recovery/states/exam_edit_selection_state.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/exam/category.dart';
 import '../../../utils/common_widget_function.dart';
-import 'doctor_exam_edit.dart';
 
 class QuestionCategoryEditSubPage extends StatefulWidget {
   final QuestionCategory category;
   final int categoryIndex;
-  final DoctorExamEditPageState _parentState;
 
-  QuestionCategoryEditSubPage(this.category, {super.key, required this.categoryIndex, required State parentState})
-    : assert(parentState.runtimeType == DoctorExamEditPageState),
-        _parentState = parentState as DoctorExamEditPageState;
+  const QuestionCategoryEditSubPage(this.category, {super.key, required this.categoryIndex});
 
   @override
   State<QuestionCategoryEditSubPage> createState() => _QuestionCategoryEditSubPageState();
@@ -44,13 +41,13 @@ class _QuestionCategoryEditSubPageState extends State<QuestionCategoryEditSubPag
 
   void _enableDescInput () {
     editingDesc = true;
-    widget._parentState.editingItem = true;
+    context.read<ExamEditSelectionState>().editingItem = true;
     descController.text = currCategory.description;
   }
 
   void _disableDescInput () {
     editingDesc = false;
-    widget._parentState.editingItem = false;
+    context.read<ExamEditSelectionState>().editingItem = false;
   }
 
   void _showCategoryRuleEditDialog({

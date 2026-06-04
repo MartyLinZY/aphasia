@@ -814,12 +814,12 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
     if (editItem == null) {
       child = const SizedBox.shrink();
     } else if (editItem.runtimeType == ExamQuestionSet) {
-      child = ExamSettingEditSubPage(editItem, parentState: this,);
+      child = ExamSettingEditSubPage(editItem);
     } else if (editItem.runtimeType == QuestionCategory) {
       assert(editCategoryIndex != null);
-      child = QuestionCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!, parentState: this,);
+      child = QuestionCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!);
     } else if (editItem.runtimeType == QuestionSubCategory) {
-      child = QuestionSubCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!, parentState: this, subCategoryIndex: editSubCategoryIndex!);
+      child = QuestionSubCategoryEditSubPage(editItem, categoryIndex: editCategoryIndex!, subCategoryIndex: editSubCategoryIndex!);
     } else {
       throw UnimplementedError("unexpected editItem");
     }
