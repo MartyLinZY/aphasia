@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/exam/exam_recovery.dart';
-import 'package:aphasia_recovery/models/question/question.dart';
 import 'package:aphasia_recovery/states/exam_edit_selection_state.dart';
 import 'package:aphasia_recovery/states/question_set_states.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +11,10 @@ import 'package:provider/provider.dart';
 import '../../../models/exam/category.dart';
 import '../../../models/exam/sub_category.dart';
 import '../../../utils/common_widget_function.dart';
-import 'doctor_exam_question_edit.dart';
 import 'doctor_exam_setting_edit_sub_page.dart';
 import 'doctor_question_category_edit_sub_page.dart';
 import 'doctor_question_sub_category_edit_sub_page.dart';
+import 'exam_edit_left_menu/question_list.dart';
 
 
 /// 新建套题引导页
@@ -454,106 +453,6 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
       var subCategoryWidgets = <Widget>[];
       for (int j = 0;j < category.subCategories.length;j++) {
         var subCategory = category.subCategories[j];
-        var questionWidgets = <Widget>[];
-        for (int k = 0;k < subCategory.questions.length;k++) {
-          var question = subCategory.questions[k];
-          questionWidgets.add(ListTile(
-            contentPadding: EdgeInsets.only(left: 10 * listTilePaddingBase),
-            title: buildListTileContentWithActionButtons(
-              body: Text(question.alias ?? question.defaultQuestionName(), style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-              firstBtnAction: () {
-                continueAction() {
-
-                  Navigator.push<Question>(context, MaterialPageRoute(builder: (context) => DoctorExamQuestionEditPage(question: question,))).then((updated) {
-                    setState(() {
-                      if (updated != null) {
-                        editingExam.updateQuestion(updated, categoryIndex: i,
-                            subCategoryIndex: j,
-                            questionIndex: k).then((value) {
-
-                          setState(() {
-                            editItem = editingExam.categories[i].subCategories[j];
-                            editCategoryIndex = i;
-                            editSubCategoryIndex = j;
-                          });
-                        }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-
-                      }
-                    });
-                  });
-                }
-                if (editingItem) {
-                  confirm(context,
-                    title: "确认",
-                    body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开题目编辑页面？",
-                    commonStyles: commonStyles,
-                    onConfirm: (context) {
-                      Navigator.pop(context);
-                      continueAction();
-                    }
-                  );
-                } else {
-                  continueAction();
-                }
-              },
-              firstBtnTooltipMsg: "查看（编辑）题目详情",
-              firstBtnIcon: const Icon(Icons.edit),
-              secondBtnAction: () {
-                confirm(context,
-                    title: '删除问题',
-                    body: '确认要删除问题："${question.alias ?? question.defaultQuestionName()}" 吗，删除后不可恢复',
-                    commonStyles: commonStyles,
-                    onConfirm: (context) {
-                      // 关闭dialog
-                      Navigator.pop(context);
-                      examState.deleteQuestion(categoryIndex: i, subCategoryIndex: j, questionIndex: k)
-                          .catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                    }
-                );
-              },
-              secondBtnTooltipMsg: "删除",
-              secondBtnIcon: Icon(Icons.delete_outline, color: commonStyles?.errorColor,),
-              textAreaMaxHeight: listTileCommonHeight,
-              textAreaMaxWidth: tileContentWidth,
-              commonStyles: commonStyles
-            ),
-          ));
-        }
-
-        // 加入新增按钮
-        questionWidgets.insert(0, Align(
-          alignment: Alignment.center,
-          child: _buildNewItemButton("新增题目", onPressed: () {
-            commonAction() {
-              Navigator.push<Question?>(context, MaterialPageRoute(builder: (context) => const DoctorExamQuestionEditPage())).then((newQuestion) {
-                if (newQuestion != null) {
-                  // debugPrint(jsonEncode(newQuestion.toJson()));
-                  editingExam.addQuestion(newQuestion, categoryIndex: i, subCategoryIndex: j).then((addedQuestion) {
-                    // debugPrint(jsonEncode(addedQuestion.toJson()));
-                    setState(() {
-                      editItem = editingExam.categories[i].subCategories[j];
-                      editCategoryIndex = i;
-                      editSubCategoryIndex = j;
-                    });
-                  }).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                }
-              });
-            }
-            if (editingItem) {
-              confirm(context,
-                  title: "确认",
-                  body: "当前有未保存的编辑内容，是否丢弃这些内容并继续打开新增题目页面？",
-                  commonStyles: commonStyles,
-                  onConfirm: (context) {
-                    Navigator.pop(context);
-                    commonAction();
-                  }
-              );
-            } else {
-              commonAction();
-            }
-          }),
-        ));
 
         bool editCurrentTile = editCategoryIndex == i && editSubCategoryIndex == j && editItem.runtimeType == QuestionSubCategory;
         subCategoryWidgets.add(ExpansionTile(
@@ -619,7 +518,16 @@ class DoctorExamEditPageState extends State<DoctorExamEditPage> with UseCommonSt
               );
             }
           ),
-          children: questionWidgets,
+          children: [
+            QuestionList(
+              categoryIndex: i,
+              subCategoryIndex: j,
+              commonStyles: commonStyles!,
+              listTileCommonHeight: listTileCommonHeight,
+              listTilePaddingBase: listTilePaddingBase,
+              tileContentWidth: tileContentWidth,
+            ),
+          ],
         ));
       }
 
