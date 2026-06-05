@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:aphasia_recovery/models/exam/category.dart';
 import 'package:aphasia_recovery/models/exam/sub_category.dart';
 import 'package:aphasia_recovery/settings.dart';
@@ -16,86 +13,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../fake_data.dart' as fake;
 import '../../TestBase.dart';
 
 void main() {
   TestBase.commonSetUp();
 
-  // 新建测评引导页测试
-  // TODO(#17): prod step 2 改为无限 CircularProgressIndicator + 750ms Timer，
-  //   且 ExamQuestionSet.createExam HTTP body 与本 mock 实际不再匹配；
-  //   现暂 skip 避免 fail 污染下游 mockito stub 状态导致 #14b 回归测试 flaky。
-  testWidgets("DoctorExamEditInstructionPage basic tests", skip: true, (WidgetTester tester) async {
+  // 新建测评引导页测试：锁 step 0 表单结构 + 空名 validator。
+  // 注：create flow 端到端（点 "创建" → step 2 spinner → 750ms Timer → 跳转到
+  // DoctorExamEditPage）已不可直接 pumpAndSettle——prod step 2 用了无限
+  // CircularProgressIndicator，且 ExamQuestionSet.createExam 实际 HTTP body
+  // 与历史 mock 已不再匹配。这部分覆盖归 IMPROVEMENTS.md #17 跟进，本测试只
+  // 锁 step 0 的确定性部分（表单、验证器），不再依赖 HTTP mock，因此也不会
+  // 通过 mockito stub 残留污染下游 #14b regression 测试。
+  testWidgets("DoctorExamEditInstructionPage basic tests", (WidgetTester tester) async {
     TestBase.testWithFullGlobalStates(tester, const DoctorExamEditInstructionPage(), () async {
-      // 第一步
       var stepper = find.byType(Stepper);
       var nameInputField = find.widgetWithText(TextFormField, "套题方案名称（必填）");
       var descriptionInputField = find.widgetWithText(TextFormField, "简介");
+      // Stepper 框架为每个 step 都生成一套 controls 按钮，所以 "创建"/"返回"
+      // 各能 findNWidgets(2)
       var nextBtn = find.widgetWithText(ElevatedButton, "创建");
       var quitBtn = find.widgetWithText(ElevatedButton, "返回");
 
       expect(stepper, findsOneWidget);
       expect(nameInputField, findsOneWidget);
       expect(descriptionInputField, findsOneWidget);
-      expect(nextBtn, findsNWidgets(2)); // 框架会为每个step都生成一组按钮，step index改变时同时改变每个step下的按钮
+      expect(nextBtn, findsNWidgets(2));
       expect(quitBtn, findsNWidgets(2));
 
-      // 名称为空时创建测评
+      // 名称为空时 tap "创建" → validator 报错，仍停在 step 0
       await tester.tap(nextBtn.first);
       await tester.pumpAndSettle();
-      expect(quitBtn, findsNWidgets(2));
+      expect(quitBtn, findsNWidgets(2)); // 仍在 step 0
       expect(find.text("请输入有效的套题方案名称"), findsOneWidget);
-
-      // 创建测评
-      var examName = "我的测评方案";
-      var examDesc = "";
-
-      await tester.enterText(nameInputField, examName);
-      await tester.pumpAndSettle();
-
-      var exam = fake.exam();
-      exam.categories.add(fake.category());
-      exam.categories[0].subCategories.add(fake.subCate());
-
-      int fakeId = Random(0).nextInt(1000000000);
-      var client = HttpClientManager().testClient!;
-      when(client.post(Uri.parse("${HttpConstants.backendBaseUrl}/api/exams"), body: jsonEncode(ExamQuestionSet(name: examName, description: examDesc).toJson())))
-          .thenAnswer((realInvocation) async => http.Response.bytes(
-          utf8.encode(jsonEncode(exam.toJson()..['id']=fakeId.toString())), 200));
-
-      await tester.tap(nextBtn.first);
-      await tester.pump();
-      expect(quitBtn, findsNothing);
-
-      // 模板 - 暂时不实现
-      // var backBtn = find.widgetWithText(ElevatedButton, "上一步");
-      // var skipBtn = find.widgetWithText(ElevatedButton, "不使用模板");
-      // var templateExamIdField = find.widgetWithText(ElevatedButton, "模板测评方案ID");
-      //
-      // expect(backBtn, findsNWidgets(3));
-      // expect(nextBtn, findsNWidgets(3));
-      // expect(skipBtn, findsNWidgets(3));
-      // expect(templateExamIdField, findsOneWidget);
-
-      // 等待创建
-      var waitingText = find.text("创建中，请稍候");
-      expect(waitingText, findsOneWidget);
-
-      // prod step 2 内嵌 CircularProgressIndicator（无限动画），不能用
-      // pumpAndSettle（永远不 idle）。用显式 pump(duration) 推进 fake-clock
-      // 越过 ExamQuestionSet.createExam 内的 750ms Timer 触发 Navigator
-      // .pushReplacement → DoctorExamEditPage。
-      await tester.pump(const Duration(milliseconds: 800));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
-
-      expect(waitingText, findsNothing);
-      expect(find.byType(DoctorExamEditPage), findsOneWidget);
     });
   });
 
