@@ -7,6 +7,7 @@
 # --------- 项目内分析/规划文档（本地参考，不入库） ---------
 IMPROVEMENTS.md
 PROJECT_ANALYSIS.md
+CLAUDE.md
 
 # --------- 操作系统 ---------
 .DS_Store
@@ -44,11 +45,29 @@ logs/
 .env.*.local
 *.local.properties
 **/application-local.properties
+**/application-prod.properties
+**/application-secret*.properties
+
+# --------- 凭证 / 密钥 / 证书（绝对勿提交） ---------
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials.json
+service-account*.json
+.npmrc
+.pypirc
 
 # --------- LLM/ 目录（Python 脚本与本地产物） ---------
 LLM/__pycache__/
 LLM/**/__pycache__/
 LLM/*.pyc
+LLM/.pytest_cache/
+LLM/.mypy_cache/
+LLM/.ruff_cache/
+LLM/*.egg-info/
 LLM/.venv/
 LLM/venv/
 LLM/.ipynb_checkpoints/
@@ -66,6 +85,18 @@ backend/recorded.pcm
 backend/handWrite.png
 backend/*.pcm
 backend/*.wav
+
+# --------- JVM 崩溃 / 堆 dump ---------
+*.hprof
+hs_err_pid*.log
+replay_pid*.log
+
+# --------- 测试覆盖率产物 ---------
+*.lcov
+lcov.info
+jacoco.exec
+jacoco-it.exec
+.nyc_output/
 
 # --------- 其他常见构建/缓存产物 ---------
 node_modules/
