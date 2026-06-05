@@ -26,12 +26,12 @@ class TestBase {
   }
 
   // final String placeholder = "";
-  static Future<void> runTest(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody) async {
+  static Future<void> runTest(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody, {bool? skip}) async {
     setUp(() {
       _enableTestMode();
     });
 
-    testWidgets(description, (widgetTester) async {
+    testWidgets(description, skip: skip, (widgetTester) async {
       await widgetTester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -44,12 +44,12 @@ class TestBase {
     });
   }
 
-  static Future<void> runTestWithFullGlobalStates(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody) async {
+  static Future<void> runTestWithFullGlobalStates(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody, {bool? skip}) async {
     setUp(() {
       _enableTestMode();
     });
 
-    testWidgets(description, (widgetTester) async {
+    testWidgets(description, skip: skip, (widgetTester) async {
       await widgetTester.pumpWidget(
           GlobalStatesProviders(
             child: MaterialApp(
