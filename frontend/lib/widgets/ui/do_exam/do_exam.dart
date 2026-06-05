@@ -234,7 +234,7 @@ class _DoExamPageState extends State<DoExamPage> with UseCommonStyles {
           preferredSize: const Size.fromHeight(_progressBarHeight),
           child: LinearProgressIndicator(
             value: (categoryIndex + 1) / exam.categories.length,
-            backgroundColor: commonStyles?.onPrimaryColor?.withOpacity(0.2),
+            backgroundColor: commonStyles?.onPrimaryColor?.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
                 commonStyles?.primaryColor ?? Colors.blueAccent),
           ),
@@ -254,9 +254,9 @@ class _DoExamPageState extends State<DoExamPage> with UseCommonStyles {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      commonStyles?.primaryColor?.withOpacity(0.03) ??
+                      commonStyles?.primaryColor?.withValues(alpha: 0.03) ??
                           Colors.white,
-                      commonStyles?.onPrimaryColor?.withOpacity(0.05) ??
+                      commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ??
                           Colors.white,
                     ]),
               ),
@@ -352,7 +352,7 @@ class _DoExamPageState extends State<DoExamPage> with UseCommonStyles {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
+              color: Colors.white.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(_cardRadius - 4),
             ),
             child: Padding(

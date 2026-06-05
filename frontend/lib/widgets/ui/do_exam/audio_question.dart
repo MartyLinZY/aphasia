@@ -478,8 +478,8 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
-                commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                commonStyles?.primaryColor?.withValues(alpha: 0.03) ?? Colors.white,
+                commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ?? Colors.white,
               ],
             ),
           ),
@@ -659,7 +659,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
       child: Icon(
         Icons.mic_none,
         size: 120,
-        color: commonStyles?.primaryColor?.withOpacity(0.2),
+        color: commonStyles?.primaryColor?.withValues(alpha: 0.2),
       ),
     );
   }
@@ -672,7 +672,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
         borderRadius: BorderRadius.circular(_cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -703,7 +703,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
         borderRadius: BorderRadius.circular(4),
         gradient: LinearGradient(
           colors: [
-            commonStyles?.primaryColor?.withOpacity(0.6) ?? Colors.blue,
+            commonStyles?.primaryColor?.withValues(alpha: 0.6) ?? Colors.blue,
             commonStyles?.errorColor ?? Colors.red,
           ],
         ),

@@ -505,7 +505,7 @@ class _HintRuleEditDialogState extends State<HintRuleEditDialog>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
@@ -612,7 +612,7 @@ class _HintRuleEditDialogState extends State<HintRuleEditDialog>
         label: Text(label),
         style: ElevatedButton.styleFrom(
           foregroundColor: color ?? commonStyles?.primaryColor,
-          backgroundColor: color?.withOpacity(0.1),
+          backgroundColor: color?.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         onPressed: onPressed,

@@ -695,7 +695,7 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
                     style: commonStyles?.bodyStyle?.copyWith(
                       color: value != null 
                         ? commonStyles?.primaryColor 
-                        : commonStyles?.primaryColor?.withOpacity(0.5)
+                        : commonStyles?.primaryColor?.withValues(alpha: 0.5)
                     )
                   ),
                 ),
@@ -735,7 +735,7 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
         label: Text(label),
         style: TextButton.styleFrom(
           foregroundColor: color ?? commonStyles?.primaryColor,
-          backgroundColor: color?.withOpacity(0.1),
+          backgroundColor: color?.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         onPressed: onPressed,

@@ -82,9 +82,9 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
                               return Table(
                                 border: TableBorder(
                                   horizontalInside: BorderSide(
-                                      color: Colors.grey.withOpacity(0.2)),
+                                      color: Colors.grey.withValues(alpha: 0.2)),
                                   verticalInside: BorderSide(
-                                      color: Colors.grey.withOpacity(0.2)),
+                                      color: Colors.grey.withValues(alpha: 0.2)),
                                 ),
                                 columnWidths: const <int, TableColumnWidth>{
                                   0: FixedColumnWidth(60),
@@ -199,7 +199,7 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
   TableRow _buildEnhancedHeader() {
     return TableRow(
       decoration: BoxDecoration(
-        color: Colors.blueAccent.withOpacity(0.08),
+        color: Colors.blueAccent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       children: [
@@ -235,7 +235,7 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
 
     return Table(
       border: TableBorder(
-        horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.1)),
+        horizontalInside: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       columnWidths: const <int, TableColumnWidth>{
         0: FixedColumnWidth(60),
@@ -250,7 +250,7 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
           decoration: BoxDecoration(
             color: Colors.white,
             border:
-                Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.1))),
+                Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1))),
           ),
           children: [
             _buildDataCell("${result.id}", isCenter: true),
@@ -395,7 +395,7 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
             duration: const Duration(milliseconds: 200),
             child: IconButton(
               icon: const Icon(Icons.delete_outline, size: 20),
-              color: Colors.redAccent.withOpacity(0.8),
+              color: Colors.redAccent.withValues(alpha: 0.8),
               onPressed: () => _confirmDelete(result),
             ),
           ),
@@ -422,7 +422,7 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
             padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.blueAccent.withOpacity(0.1),
+              color: Colors.blueAccent.withValues(alpha: 0.1),
             ),
             child: Text(
               '第 ${_currentPage + 1} 页',
@@ -453,8 +453,8 @@ class _ExamRecordHistoryPageState extends State<ExamRecordHistoryPage>
   Widget _buildEmptyState() {
     return Table(
       border: TableBorder(
-        horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-        verticalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
+        horizontalInside: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+        verticalInside: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
       ),
       columnWidths: const <int, TableColumnWidth>{
         0: FixedColumnWidth(60),

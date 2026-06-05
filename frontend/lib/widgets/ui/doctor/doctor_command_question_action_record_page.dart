@@ -164,11 +164,12 @@ class _CommandQuestionActionRecordPageState extends State<CommandQuestionActionR
                 } else {
                   content = const SizedBox.shrink();
                 }
-                return DragTarget(
+                return DragTarget<StackableItemSlot>(
                   builder: (BuildContext context, List<Object?> candidateData, List<dynamic> rejectedData) {
                     return content;
                   },
-                  onAccept: (StackableItemSlot incomingSlot) {
+                  onAcceptWithDetails: (DragTargetDetails<StackableItemSlot> details) {
+                    final incomingSlot = details.data;
                     assert(incomingSlot.items.isNotEmpty && currAction?.sourceSlotIndex != null);
                     final actionType = slot.items.isNotEmpty ? PutDownAction.putDown : PutDownAction.cover;
 

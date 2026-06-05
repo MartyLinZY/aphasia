@@ -210,8 +210,8 @@ class _RecorderState extends State<Recorder> with AudioRecorderMixin {
         gradient: RadialGradient(
           colors: [
             _recordState != RecordState.stop 
-              ? Colors.redAccent.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.1),
+              ? Colors.redAccent.withValues(alpha: 0.2)
+              : Colors.grey.withValues(alpha: 0.1),
             Colors.transparent
           ],
           stops: const [0.5, 1.0]
@@ -309,11 +309,11 @@ class _RecorderState extends State<Recorder> with AudioRecorderMixin {
 
     // if (_recordState == RecordState.record) {
     //   icon = const Icon(Icons.pause, color: Colors.red, size: 30);
-    //   color = Colors.red.withOpacity(0.1);
+    //   color = Colors.red.withValues(alpha: 0.1);
     // } else {
     //   final theme = Theme.of(context);
     //   icon = const Icon(Icons.play_arrow, color: Colors.red, size: 30);
-    //   color = theme.primaryColor.withOpacity(0.1);
+    //   color = theme.primaryColor.withValues(alpha: 0.1);
     // }
     if (_recordState == RecordState.record) {
       icon = const Icon(Icons.pause, color: Colors.white, size: 30);
@@ -410,7 +410,7 @@ class _WaveformPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final gradient = LinearGradient(
-      colors: [color, color.withOpacity(0.5)],
+      colors: [color, color.withValues(alpha: 0.5)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter
     ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));

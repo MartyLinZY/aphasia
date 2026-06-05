@@ -120,8 +120,8 @@ class _AudioQuestionAnswerAreaState extends State<ChoiceQuestionAnswerArea>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                widget.commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
-                widget.commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                widget.commonStyles?.primaryColor?.withValues(alpha: 0.03) ?? Colors.white,
+                widget.commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ?? Colors.white,
               ]
             ),
           ),
@@ -220,7 +220,7 @@ class _AudioQuestionAnswerAreaState extends State<ChoiceQuestionAnswerArea>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isSelected ? 0.1 : 0.05),
+              color: Colors.black.withValues(alpha: isSelected ? 0.1 : 0.05),
               blurRadius: 8,
               offset: Offset(0, isSelected ? 4 : 2)
             )

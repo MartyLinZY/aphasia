@@ -269,7 +269,7 @@ class _DoctorExamEditInstructionPageState extends State<DoctorExamEditInstructio
         minWidth: 300
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8)
       ),
       child: Row(
@@ -285,7 +285,7 @@ class _DoctorExamEditInstructionPageState extends State<DoctorExamEditInstructio
             child: Switch(
               value: isRecovery,
               onChanged: (bool value) => setState(() => isRecovery = value),
-              activeColor: commonStyles?.primaryColor,
+              activeThumbColor: commonStyles?.primaryColor,
             )
           )
         ],
