@@ -82,6 +82,77 @@ void main() {
     expect(find.text("题干图片设置"), findsOneWidget);
   });
 
-  // 本文件其余 step 覆盖（Step 2 ImageOmitTimeField 显隐 / Step 4
-  // HintRuleStep 表格 + 删除）在后续 commit 增量补充。
+  testWidgets(
+      "Step 2: 传入带 imageUrl 的 Question → ImageOmitTimeField 应可见 + 提示文案",
+      (tester) async {
+    final q = AudioQuestion()
+      ..imageUrl = "assets/images/for_question_setting/cup.jpg"
+      ..omitImageAfterSeconds = 5;
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+
+    // 编辑模式下 AppBar 标题切换
+    expect(find.text("编辑题目"), findsOneWidget);
+
+    // Step 1 → 2
+    await tester.tap(find.widgetWithText(ElevatedButton, "下一步"));
+    await tester.pumpAndSettle();
+
+    // ImageOmitTimeField 因 currQuestion.imageUrl != null 走 Visibility=true
+    // 分支，"图片展示时间（秒）：" + 提示前缀都应出现
+    expect(find.byType(ImageOmitTimeField), findsOneWidget);
+    expect(find.text("图片展示时间（秒）："), findsOneWidget);
+    expect(
+      find.textContaining("场景寻物题设为-1保持显示"),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+      "Step 2: 点 '清除' 图片 → confirm dialog → 确认 → ImageOmitTimeField 隐藏",
+      (tester) async {
+    final q = AudioQuestion()
+      ..imageUrl = "assets/images/for_question_setting/cup.jpg"
+      ..omitImageAfterSeconds = 5;
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ElevatedButton, "下一步"));
+    await tester.pumpAndSettle();
+
+    // 前置：ImageOmitTimeField 此刻可见
+    expect(find.byType(ImageOmitTimeField), findsOneWidget);
+
+    // MediaSection 内 "清除" 是 _MediaButton（Tooltip + TextButton.icon），
+    // 按 byTooltip 比按 text 稳——Tooltip.message 是显式 prop 绑定。
+    // ensureVisible 防止 Stepper 内容超出 viewport 时 tap 落不到。
+    final clearBtn = find.byTooltip("清除");
+    expect(clearBtn, findsOneWidget);
+    await tester.ensureVisible(clearBtn);
+    await tester.pumpAndSettle();
+    await tester.tap(clearBtn);
+    await tester.pumpAndSettle();
+
+    // confirm dialog 弹起："确认要删除已经设置的图片吗？" + 取消 / 确认
+    // 按钮（buildSimpleActionDialog 用 ElevatedButton）
+    expect(find.text("确认要删除已经设置的图片吗？"), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, "确认"), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
+    await tester.pumpAndSettle();
+
+    // _handleClearImage 把 currQuestion.imageUrl = null → ImageOmitTimeField
+    // 的 Visibility.visible=false → 子树隐藏，"图片展示时间（秒）：" 也跟着消失
+    // （ImageOmitTimeField widget 本身仍 mount，但子树不渲——所以只锁
+    // 文案而非 widget 类型 absent）
+    expect(find.text("图片展示时间（秒）："), findsNothing);
+    expect(
+      find.textContaining("场景寻物题设为-1保持显示"),
+      findsNothing,
+    );
+  });
+
+  // 本文件其余 step 覆盖（Step 4 HintRuleStep 表格 + 删除）在后续 commit
+  // 增量补充。
 }
