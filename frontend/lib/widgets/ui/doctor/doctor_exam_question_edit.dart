@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:aphasia_recovery/enum/fake_reflection.dart';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
@@ -13,6 +11,7 @@ import '../../../mixin/eval_rule_mixin.dart';
 import 'doctor_audio_setting_dialog.dart';
 import 'doctor_exam_question_rule_edit.dart';
 import 'question_edit_steps/hint_rule_step.dart';
+import 'question_edit_steps/question_edit_form_widgets.dart';
 import 'question_edit_steps/question_type_step.dart';
 
 class DoctorExamQuestionEditPage extends StatefulWidget {
@@ -432,48 +431,52 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
           children: [
             Text("题目基础设置：", style: commonStyles?.titleStyle),
             const Divider(height: 24, thickness: 0.5),
-            // 统一输入框样式
-            _buildDecoratedTextField(
+            DecoratedTextField(
               label: "题目名称：",
               controller: aliasCtrl,
-              key: _aliasKey,
+              fieldKey: _aliasKey,
               validator: aliasValidator,
-              maxLength: 20
+              maxLength: 20,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            _buildDecoratedTextField(
+            DecoratedTextField(
               label: "题干文本：",
               controller: questionTextCtrl,
-              key: _questionTextKey,
+              fieldKey: _questionTextKey,
               validator: questionTextValidator,
-              maxLength: 50
+              maxLength: 50,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            // 优化多媒体设置区块
-            _buildMediaSection(
+            MediaSection(
               title: "题干音频设置",
               value: currQuestion.audioUrl,
               setAction: _handleSetAudio,
               clearAction: _handleClearAudio,
-              icon: Icons.audiotrack
+              icon: Icons.audiotrack,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            _buildMediaSection(
-              title: "题干图片设置", 
+            MediaSection(
+              title: "题干图片设置",
               value: currQuestion.imageUrl,
               setAction: _handleSetImage,
               clearAction: _handleClearImage,
               icon: Icons.image,
-              extraContent: _buildImageOmitTime()
+              commonStyles: commonStyles!,
+              extraContent: ImageOmitTimeField(
+                visible: currQuestion.imageUrl != null,
+                controller: omitTimeCtrl,
+                fieldKey: _omitTimeKey,
+                validator: omitTimeValidator,
+                commonStyles: commonStyles!,
+              ),
             ),
           ],
         ),
       )
     );
-  }
-
-  double getTextFieldWidth(BuildContext context, double textFieldMinWidth) {
-    return max(MediaQuery.of(context).size.width / 4, textFieldMinWidth);
   }
 
   void _handleSetAudio() {
@@ -537,131 +540,6 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
           currQuestion.omitImageAfterSeconds = -1;
         });
       }
-    );
-  }
-
-  // 新增复用组件方法
-  Widget _buildDecoratedTextField({
-    required String label,
-    required TextEditingController controller,
-    required GlobalKey<FormFieldState> key,
-    required FormFieldValidator<String?> validator,
-    int? maxLength
-  }) {
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      ),
-      child: TextFormField(
-        controller: controller,
-        key: key,
-        validator: validator,
-        maxLength: maxLength,
-        style: commonStyles?.bodyStyle,
-      ),
-    );
-  }
-
-  Widget _buildMediaSection({
-    required String title,
-    required String? value,
-    required VoidCallback setAction,
-    required VoidCallback clearAction,
-    required IconData icon,
-    Widget? extraContent
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: commonStyles?.titleStyle),
-        const SizedBox(height: 8),
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, size: 28),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(value ?? "未设置", 
-                    style: commonStyles?.bodyStyle?.copyWith(
-                      color: value != null 
-                        ? commonStyles?.primaryColor 
-                        : commonStyles?.primaryColor?.withValues(alpha: 0.5)
-                    )
-                  ),
-                ),
-                _buildMediaButton(
-                  label: value != null ? "重新设置" : "设置",
-                  icon: icon,
-                  onPressed: setAction
-                ),
-                if (value != null) ...[
-                  const SizedBox(width: 8),
-                  _buildMediaButton(
-                    label: "清除",
-                    icon: Icons.delete,
-                    color: commonStyles?.errorColor,
-                    onPressed: clearAction
-                  )
-                ]
-              ],
-            ),
-          ),
-        ),
-        if (extraContent != null) extraContent,
-      ],
-    );
-  }
-
-  Widget _buildMediaButton({
-    required String label,
-    required IconData icon,
-    Color? color,
-    required VoidCallback onPressed
-  }) {
-    return Tooltip(
-      message: label,
-      child: TextButton.icon(
-        icon: Icon(icon, size: 20),
-        label: Text(label),
-        style: TextButton.styleFrom(
-          foregroundColor: color ?? commonStyles?.primaryColor,
-          backgroundColor: color?.withValues(alpha: 0.1),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  Widget _buildImageOmitTime() {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Visibility(
-          visible: currQuestion.imageUrl != null,
-          child: Column(
-            children: [
-              _buildDecoratedTextField(
-                label: "图片展示时间（秒）：",
-                controller: omitTimeCtrl,
-                key: _omitTimeKey,
-                validator: omitTimeValidator,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "提示：场景寻物题设为-1保持显示\n其他题型最大${Question.maxOmitTime}秒",
-                style: commonStyles?.hintTextStyle
-              )
-            ],
-          ),
-        )
-      ],
     );
   }
 
