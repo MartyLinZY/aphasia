@@ -13,6 +13,7 @@ import '../../../mixin/eval_rule_mixin.dart';
 import 'doctor_audio_setting_dialog.dart';
 import 'doctor_hint_rule_edit_dialog.dart';
 import 'doctor_exam_question_rule_edit.dart';
+import 'question_edit_steps/question_type_step.dart';
 
 class DoctorExamQuestionEditPage extends StatefulWidget {
   final Question? question;
@@ -25,14 +26,6 @@ class DoctorExamQuestionEditPage extends StatefulWidget {
 class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage> with UseCommonStyles, TextFieldCommonValidators {
   static const double widgetsElevation = 16.0;
   static const double listTileCommonHeight = 32;
-
-  static const Map<Type, String> questionIntroduction = {
-    AudioQuestion: "录音作答题：患者通过录音作答。可选择关键词，关键词列表，流畅度分析等方式对患者作答评分。",
-    ChoiceQuestion: "选择题：患者通过点击选项作答。可设置2-20个选项。",
-    CommandQuestion: "指令题：患者通过点击或拖动物体作答。可设置多个物体并设置指令，系统按照患者完成指令的程度打分。",
-    WritingQuestion: "书写题：患者通过手写作答。可以设置关键词或关键词列表，系统自动识别患者手写内容并与关键词进行匹配打分。",
-    ItemFindingQuestion: "场景寻物题：在题目图片中圈出物体，患者通过点击图片作答，系统自动判断患者是否正确点击指定物体",
-  };
 
   bool requesting = false;
 
@@ -420,63 +413,13 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
 
   Step _buildFirstStep(BuildContext context) {
     return Step(
-        title: Text("题目类型", style: commonStyles?.bodyStyle,),
-        content: wrappedByCardInner(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("选择题目类型：", style: commonStyles?.titleStyle,),
-              const Divider(height: 24, thickness: 0.5,),
-              Row(
-                children: [
-                  // 题型下拉选择器
-                  Text("题目类型：", style: commonStyles?.bodyStyle,),
-                  DropdownMenu(
-                      initialSelection: currQuestion.runtimeType,
-                      requestFocusOnTap: false,
-                      enableSearch: false,
-                      onSelected: (Type? value) {
-                        assert(value != null);
-                        setState(() {
-                          resetQuestionStates(value!);
-                        });
-                      },
-                      textStyle: commonStyles?.bodyStyle,
-                      dropdownMenuEntries: [
-                        DropdownMenuEntry(
-                          value: AudioQuestion,
-                          label: AudioQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: ChoiceQuestion,
-                          label: ChoiceQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: CommandQuestion,
-                          label: CommandQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: WritingQuestion,
-                          label: WritingQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: ItemFindingQuestion,
-                          label: ItemFindingQuestion.questionTypeName(),
-                        ),
-                      ]
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16,),
-              // 题型简介
-              Row(
-                children: [
-                  Expanded(child: Text("题型简介：${questionIntroduction[currQuestion.runtimeType]!}", style: commonStyles?.bodyStyle,)),
-                ],
-              ),
-            ],
-          ),
-        )
+      title: Text("题目类型", style: commonStyles?.bodyStyle),
+      content: QuestionTypeStep(
+        currentType: currQuestion.runtimeType,
+        commonStyles: commonStyles!,
+        cardElevation: widgetsElevation,
+        onTypeSelected: (type) => setState(() => resetQuestionStates(type)),
+      ),
     );
   }
 
