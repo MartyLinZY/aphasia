@@ -134,17 +134,8 @@ void main() {
     );
   });
 
-  // 注：清除图片的 "确认" 路径无法在 widget test 里走通——confirm helper
-  // （utils/common_widget_function.dart:25）在 onConfirm 后跑第二次
-  // Navigator.pop(context, true)，加上 caller _handleClearImage 自己也
-  // Navigator.pop(dialog) 一次，双 pop 会把 DoctorExamQuestionEditPage
-  // 也弹掉、屏空白，断言 findsNothing 全变 false positive（已实测）。
-  // 真实 app 因为外层路由通常压了多个 route 才被掩盖。
-  // 这里只覆盖 "弹 dialog → 取消" 的单 pop 路径，锁住按钮 → dialog 的
-  // 路由契约，不深入 clear 的 setState。confirm 路径的真覆盖需先修
-  // prod 的双 pop bug，单独立项。
   testWidgets(
-      "Step 2: 点 '清除' 图片 → 弹 confirm dialog → 取消 → 图片仍设置",
+      "Step 2: 点 '清除' 图片 → confirm dialog → 确认 → ImageOmitTimeField 隐藏",
       (tester) async {
     final q = AudioQuestion()
       ..imageUrl = "assets/images/for_question_setting/cup.jpg"
@@ -168,19 +159,22 @@ void main() {
     await tester.tap(clearBtn);
     await tester.pumpAndSettle();
 
-    // confirm dialog 弹起："确认要删除已经设置的图片吗？" + 取消 / 确认 按钮
     expect(find.text("确认要删除已经设置的图片吗？"), findsOneWidget);
-    expect(find.widgetWithText(ElevatedButton, "取消"), findsOneWidget);
-    expect(find.widgetWithText(ElevatedButton, "确认"), findsOneWidget);
 
-    // 取消：单 pop 路径，page 仍活着，ImageOmitTimeField 仍可见
-    await tester.tap(find.widgetWithText(ElevatedButton, "取消"));
+    await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
     await tester.pumpAndSettle();
 
+    // confirm helper 修完之后只 caller 自己 pop 一次——page 仍活着
+    // （sanity 断言：原本双 pop bug 时这里会 findsNothing 把整页弹掉）。
     expect(find.byType(DoctorExamQuestionEditPage), findsOneWidget);
+    // _handleClearImage 把 currQuestion.imageUrl = null + setState →
+    // ImageOmitTimeField 子树 Visibility.visible=false → 文案消失
     expect(find.text("确认要删除已经设置的图片吗？"), findsNothing);
-    expect(find.byType(ImageOmitTimeField), findsOneWidget);
-    expect(find.text("图片展示时间（秒）："), findsOneWidget);
+    expect(find.text("图片展示时间（秒）："), findsNothing);
+    expect(
+      find.textContaining("场景寻物题设为-1保持显示"),
+      findsNothing,
+    );
   });
 
   /// 构造一份能一路过 4 步 Stepper 验证的 AudioQuestion——
@@ -255,16 +249,8 @@ void main() {
     );
   });
 
-  // 删除二次确认路径有一条 prod 隐患：utils/common_widget_function.dart:25
-  // 的 confirm helper 在 onConfirm 触发后会跑一次 Navigator.pop(context, true)，
-  // 而 caller（HintRuleStep / _handleClearImage 等）的 onConfirm 内部又会
-  // 主动 Navigator.pop(context) 关 dialog——双 pop 在测试 Navigator 路由栈
-  // 仅 [home] 的场景下会把整个 DoctorExamQuestionEditPage 也弹掉，屏上空白。
-  // 真实 app 因为外层路由通常压了多个 route 才被掩盖。本 commit 不修 prod，
-  // 只覆盖 "取消" 路径——它走 onCancel + 仅 helper 的单 pop（caller 没传
-  // onCancel 时 user-callback 是 noop），不触发双 pop。
   testWidgets(
-      "Step 4: 点删除 → 弹 confirm dialog → 取消 → dialog 关闭、2 条 hintRule 保留",
+      "Step 4: 删除第一条 hintRule → confirm → 表格只剩 1 行",
       (tester) async {
     tester.view.physicalSize = const Size(1600, 1200);
     tester.view.devicePixelRatio = 1.0;
@@ -277,7 +263,7 @@ void main() {
     await tester.pumpAndSettle();
     await goToHintRuleStep(tester);
 
-    // 两行 hintRule → 2 个删除 Tooltip
+    // 前置：2 条 hintRule → 2 个删除 Tooltip
     final deleteBtns = find.byTooltip("删除");
     expect(deleteBtns, findsNWidgets(2));
     await tester.ensureVisible(deleteBtns.first);
@@ -285,14 +271,45 @@ void main() {
     await tester.tap(deleteBtns.first);
     await tester.pumpAndSettle();
 
-    // confirm dialog
     expect(find.text("确认要删除该提示规则吗？"), findsOneWidget);
 
-    // 取消（buildSimpleActionDialog 的 "取消" 是 ElevatedButton）
+    await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
+    await tester.pumpAndSettle();
+
+    // confirm helper 修完 page 仍活着；只 caller 自己的 deleteHintRule
+    // 单 pop 走完——表格只剩 1 条 hintRule。
+    expect(find.byType(DoctorExamQuestionEditPage), findsOneWidget);
+    expect(find.byType(HintRuleStep), findsOneWidget);
+    expect(find.text("确认要删除该提示规则吗？"), findsNothing);
+    expect(find.byTooltip("删除"), findsOneWidget);
+  });
+
+  testWidgets(
+      "Step 4: 点删除 → 取消 → dialog 关、2 条 hintRule 保留",
+      (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final q = buildNavigableAudioQuestion(hintCount: 2);
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+    await goToHintRuleStep(tester);
+
+    final deleteBtns = find.byTooltip("删除");
+    expect(deleteBtns, findsNWidgets(2));
+    await tester.ensureVisible(deleteBtns.first);
+    await tester.pumpAndSettle();
+    await tester.tap(deleteBtns.first);
+    await tester.pumpAndSettle();
+
+    expect(find.text("确认要删除该提示规则吗？"), findsOneWidget);
+
     await tester.tap(find.widgetWithText(ElevatedButton, "取消"));
     await tester.pumpAndSettle();
 
-    // dialog 关闭，page 仍活着，hintRules 仍 2 条
     expect(find.text("确认要删除该提示规则吗？"), findsNothing);
     expect(find.byType(HintRuleStep), findsOneWidget);
     expect(find.byTooltip("删除"), findsNWidgets(2));
