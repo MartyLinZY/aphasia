@@ -75,11 +75,9 @@ class _ItemSlotEditDialogState extends State<ItemSlotEditDialog>
       });
     }
 
-    _confirmBeforeAction(message: "已有图片，重新上传会覆盖已有的图片，确认要重新上传图片吗？", action: doPickFile).then((confirmed) {
-      if (confirmed ?? false) {
-        doPickFile();
-      }
-    });
+    _confirmBeforeAction(
+        message: "已有图片，重新上传会覆盖已有的图片，确认要重新上传图片吗？",
+        action: doPickFile);
   }
 
   void _handleSelectExisting() {
@@ -90,11 +88,9 @@ class _ItemSlotEditDialogState extends State<ItemSlotEditDialog>
           .then((url) => setState(() => imageUrl = url));
     }
 
-    _confirmBeforeAction(message: "已有图片，重新选择图片会覆盖已有的图片，确认要重新选择图片吗？", action: doSelect).then((confirmed) {
-      if (confirmed ?? false) {
-        doSelect();
-      }
-    });
+    _confirmBeforeAction(
+        message: "已有图片，重新选择图片会覆盖已有的图片，确认要重新选择图片吗？",
+        action: doSelect);
   }
 
   void _handleSelectBuiltIn() {
@@ -106,11 +102,9 @@ class _ItemSlotEditDialogState extends State<ItemSlotEditDialog>
           .then((path) => setState(() => imageAssetPath = path));
     }
 
-    _confirmBeforeAction(message: "已有图片，重新选择图片会覆盖已有的图片，确认要重新选择图片吗？", action: doSelect).then((confirmed) {
-      if (confirmed ?? false) {
-        doSelect();
-      }
-    });
+    _confirmBeforeAction(
+        message: "已有图片，重新选择图片会覆盖已有的图片，确认要重新选择图片吗？",
+        action: doSelect);
   }
 
   void _showClearConfirmation() {
@@ -121,23 +115,27 @@ class _ItemSlotEditDialogState extends State<ItemSlotEditDialog>
     });
   }
 
-  // 通用确认方法
-   Future<bool?> _confirmBeforeAction(
+  /// 若已有 imageUrl / imageAssetPath 则弹 confirm 让用户确认覆盖，确认后
+  /// 跑 [action]；没有图片则直接跑 [action]。
+  ///
+  /// 与 doctor_choice_setting_dialog.dart 的同名 helper 对齐：由 helper
+  /// 唯一负责调用 action，caller 不再 .then 重复触发——早期返回
+  /// Future<bool?> + caller .then 内再跑一次 action 的写法会让 file picker
+  /// / uploadFile 双触发（不论是否有现存图片，每次点击 "上传 / 选择" 都会
+  /// 走两遍），调用方需相应改成 fire-and-forget。
+  void _confirmBeforeAction(
       {required String message, required VoidCallback action}) {
     if (imageUrl != null || imageAssetPath != null) {
-      return confirm(context,
+      confirm(context,
           title: "确认",
           body: message,
           commonStyles: commonStyles,
           onConfirm: (context) {
-            Navigator.pop(context, true);  // 明确返回bool类型
+            Navigator.pop(context);
             action();
-          },
-          onCancel: (context) => Navigator.pop(context, false)  // 添加取消处理
-      );
+          });
     } else {
       action();
-      return Future.value(true);  // 立即返回成功结果
     }
   }
 
