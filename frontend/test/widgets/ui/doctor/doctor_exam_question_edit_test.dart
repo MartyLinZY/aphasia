@@ -3,6 +3,7 @@ import 'package:aphasia_recovery/models/rules.dart';
 import 'package:aphasia_recovery/utils/http/http_manager.dart';
 import 'package:aphasia_recovery/utils/io/shared_pref.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/doctor_exam_question_edit.dart';
+import 'package:aphasia_recovery/widgets/ui/doctor/doctor_exam_question_rule_edit.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/question_edit_steps/hint_rule_step.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/question_edit_steps/question_edit_form_widgets.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/question_edit_steps/question_type_step.dart';
@@ -180,15 +181,19 @@ void main() {
   /// 构造一份能一路过 4 步 Stepper 验证的 AudioQuestion——
   /// Step 2 校验要求 questionText!="" 或 audioUrl!=null（满足 questionText）；
   /// Step 3 校验走 evalRule.checkSetting() → super.checkSetting() 要求
-  /// conditions 非空（预置一个 EvalCondition + 一条 range，因为
+  /// conditions 非空（[condCount] 默认 1，因为
   /// doctor_exam_question_rule_edit.dart:695 渲染时会读 ranges[0]，缺会
-  /// RangeError）。hintRules 预置 [count] 条用于 Step 4 表格回归。
-  AudioQuestion buildNavigableAudioQuestion({int hintCount = 0}) {
+  /// RangeError；condCount 调大用于覆盖 Step 3 删除 EvalCondition 路径）。
+  /// hintRules 预置 [hintCount] 条用于 Step 4 表格回归。
+  AudioQuestion buildNavigableAudioQuestion(
+      {int hintCount = 0, int condCount = 1}) {
     final q = AudioQuestion()
       ..alias = "测试题"
       ..questionText = "题干文本";
-    q.evalRule!.addEvalCondition(
-        EvalCondition(score: 10)..addRange(1, 1));
+    for (var i = 0; i < condCount; i++) {
+      q.evalRule!.addEvalCondition(
+          EvalCondition(score: (10 * (i + 1)).toDouble())..addRange(i, i + 1));
+    }
     for (var i = 0; i < hintCount; i++) {
       q.evalRule!.addHintRule(HintRule(
         hintText: "提示${i + 1}",
@@ -199,10 +204,10 @@ void main() {
     return q;
   }
 
-  /// Step 1 → 4 三次"下一步"。Stepper 内容较高时按钮容易越出 viewport，
-  /// 用 ensureVisible 兜底；并 expect 每次点击前 "下一步" 确实存在。
-  Future<void> goToHintRuleStep(WidgetTester tester) async {
-    for (var i = 0; i < 3; i++) {
+  /// 共用：连续点 [count] 次 "下一步"，每步 ensureVisible 兜底。
+  /// Step 1→3 传 2，Step 1→4 传 3。
+  Future<void> goNextSteps(WidgetTester tester, int count) async {
+    for (var i = 0; i < count; i++) {
       final btn = find.widgetWithText(ElevatedButton, "下一步");
       expect(btn, findsOneWidget, reason: "下一步 button missing at iter $i");
       await tester.ensureVisible(btn);
@@ -211,6 +216,138 @@ void main() {
       await tester.pumpAndSettle();
     }
   }
+
+  /// Step 1 → 4 三次"下一步"，兼容旧调用。
+  Future<void> goToHintRuleStep(WidgetTester tester) => goNextSteps(tester, 3);
+
+  // ====== Step 3: EvalRuleStep（评分规则）======
+  // Step 3 = "评分规则"，主体是 DoctorExamQuestionRuleEditSubPage（785 行）。
+  // L1 锁默认渲染契约（题头 + 通用三输入 + DropdownMenu + 得分条件表格 + 新增
+  // 按钮 + 表格头随 evalRule.getScoreConditionName 动态拼前缀），L2 锁删除路径
+  // 走 confirm helper 的回归（caller 单 pop / page 仍活，对标 Step 4 删 hintRule
+  // 的双套路）。L3 增改 EvalCondition 走嵌套 QuestionScoreConditionEditDialog +
+  // 跨题型 dropdown 切换分支爆炸，暂不覆盖。
+  //
+  // 关于 viewport：Step 3 内容 ≥ Step 4（同 400 高 Table，外加 3 个 input field +
+  // dropdown），保持 1600x1200 surface；个别测试需要 ensureVisible 触到目标控件。
+
+  testWidgets(
+      "Step 3: 默认渲染 DoctorExamQuestionRuleEditSubPage（通用三输入 + 得分条件表 + 表头按 evalRule 动态拼）",
+      (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // 默认 condCount=1 即可，本测试只看渲染骨架
+    final q = buildNavigableAudioQuestion();
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+    await goNextSteps(tester, 2);
+
+    // Step 3 子页本体
+    expect(find.byType(DoctorExamQuestionRuleEditSubPage), findsOneWidget);
+
+    // Step 3 自身（_buildThirdStep）的 header 与 DropdownMenu label
+    expect(find.text("评分规则设置"), findsOneWidget);
+    expect(find.text("评分规则："), findsOneWidget);
+
+    // 通用三输入 field label（_buildEvalRuleSetting 顶部固定三条）
+    expect(find.text("题目满分："), findsOneWidget);
+    expect(find.text("题目默认得分："), findsOneWidget);
+    expect(find.text("答题限时（秒）："), findsOneWidget);
+
+    // 得分条件区
+    expect(find.text("得分条件列表："), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, "新增得分条件"), findsOneWidget);
+
+    // 表头 8 列。"序号" 与 Step 4 的 HintRule 表头同名——但本测试只到 Step 3，
+    // Step 4 未渲，所以单数即可命中。"下界"/"上界" 加 evalRule
+    // getScoreConditionName() 前缀；AudioQuestion 默认 evalRule
+    // EvalAudioQuestionByKeywordsMatchesCount.getScoreConditionName 返
+    // "关键词正确个数"，因此表头是 "关键词正确个数下界"/"关键词正确个数上界"。
+    expect(find.text("序号"), findsOneWidget);
+    expect(find.text("对应得分"), findsOneWidget);
+    expect(find.text("关键词正确个数下界"), findsOneWidget);
+    expect(find.text("关键词正确个数上界"), findsOneWidget);
+    expect(find.text("作答时间下界"), findsOneWidget);
+    expect(find.text("作答时间上界"), findsOneWidget);
+    expect(find.text("经过提示"), findsOneWidget);
+    expect(find.text("操作"), findsOneWidget);
+
+    // 预置 1 条 EvalCondition → 表格 1 行行操作 4 个 tooltip：编辑/删除/上移/下移
+    expect(find.byTooltip("编辑"), findsOneWidget);
+    expect(find.byTooltip("删除"), findsOneWidget);
+    expect(find.byTooltip("上移"), findsOneWidget);
+    expect(find.byTooltip("下移"), findsOneWidget);
+  });
+
+  testWidgets(
+      "Step 3: 删除第一条 EvalCondition → confirm → 表格只剩 1 行（confirm helper 单 pop 回归）",
+      (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final q = buildNavigableAudioQuestion(condCount: 2);
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+    await goNextSteps(tester, 2);
+
+    // 前置：2 条 EvalCondition → 2 个删除 Tooltip
+    final deleteBtns = find.byTooltip("删除");
+    expect(deleteBtns, findsNWidgets(2));
+    await tester.ensureVisible(deleteBtns.first);
+    await tester.pumpAndSettle();
+    await tester.tap(deleteBtns.first);
+    await tester.pumpAndSettle();
+
+    expect(find.text("确认要删除该得分规则吗？"), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, "确认"));
+    await tester.pumpAndSettle();
+
+    // confirm helper 修完 page 仍活着（双 pop bug 时这里会 findsNothing
+    // 把整页弹掉）；rule.deleteEvalCondition 走完，删除按钮只剩 1 个。
+    expect(find.byType(DoctorExamQuestionEditPage), findsOneWidget);
+    expect(find.byType(DoctorExamQuestionRuleEditSubPage), findsOneWidget);
+    expect(find.text("确认要删除该得分规则吗？"), findsNothing);
+    expect(find.byTooltip("删除"), findsOneWidget);
+  });
+
+  testWidgets(
+      "Step 3: 删除 EvalCondition → 取消 → dialog 关、2 条 EvalCondition 保留",
+      (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final q = buildNavigableAudioQuestion(condCount: 2);
+
+    await tester.pumpWidget(_wrapPage(question: q));
+    await tester.pumpAndSettle();
+    await goNextSteps(tester, 2);
+
+    final deleteBtns = find.byTooltip("删除");
+    expect(deleteBtns, findsNWidgets(2));
+    await tester.ensureVisible(deleteBtns.first);
+    await tester.pumpAndSettle();
+    await tester.tap(deleteBtns.first);
+    await tester.pumpAndSettle();
+
+    expect(find.text("确认要删除该得分规则吗？"), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, "取消"));
+    await tester.pumpAndSettle();
+
+    expect(find.text("确认要删除该得分规则吗？"), findsNothing);
+    expect(find.byType(DoctorExamQuestionRuleEditSubPage), findsOneWidget);
+    expect(find.byTooltip("删除"), findsNWidgets(2));
+  });
 
   testWidgets(
       "Step 4: 传入 2 条 hintRules → HintRuleStep 表格渲 2 行 + '新增提示条件' 按钮",
