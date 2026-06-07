@@ -54,11 +54,18 @@
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+		<!-- okhttp 5.x 是 Kotlin Multiplatform；Maven 必须显式选 JVM 变种（主 artifact 只是空 metadata） -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
+			<artifactId>okhttp-jvm</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+		<!-- okhttp 4.x 通过 kotlin-stdlib 传递引入 jetbrains-annotations，5.x 改用 kotlin-stdlib 2.x 不再带；
+		     本仓 3 处 @NotNull/@Nullable（IDE 自动添加的辅助 annotation）需此包，显式化以稳定依赖图。 -->
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>26.0.2</version>
 		</dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
