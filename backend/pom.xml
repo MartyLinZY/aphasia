@@ -91,6 +91,35 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						<!-- 排除纯字段 DTO / model（Lombok 生成的 getter/setter 无业务逻辑，纳入会稀释真实覆盖率） -->
+						<exclude>com/blkn/lr/lr_new_server/dto/**</exclude>
+						<exclude>com/blkn/lr/lr_new_server/models/**</exclude>
+						<!-- 启动类 -->
+						<exclude>com/blkn/lr/lr_new_server/LrNewServerApplication.class</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
