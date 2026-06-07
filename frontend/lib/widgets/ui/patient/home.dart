@@ -2,7 +2,6 @@ import 'package:aphasia_recovery/states/user_identity.dart';
 import 'package:aphasia_recovery/widgets/ui/doctor/doctor_exams_management.dart';
 import 'package:aphasia_recovery/widgets/ui/patient/history.dart';
 import 'package:aphasia_recovery/widgets/ui/login.dart';
-import 'package:aphasia_recovery/deprecated/recovery_entry.dart';
 import 'package:aphasia_recovery/widgets/ui/patient/search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

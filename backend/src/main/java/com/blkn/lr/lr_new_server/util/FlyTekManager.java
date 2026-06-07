@@ -91,7 +91,6 @@ public class FlyTekManager {
         String preStr = "host: " + url.getHost() + "\n" +
                 "date: " + date + "\n" +
                 "GET " + url.getPath() + " HTTP/1.1";
-        //System.out.println(preStr);
         // SHA256加密
         Mac mac = Mac.getInstance("hmacsha256");
         SecretKeySpec spec = new SecretKeySpec(apiSecret.getBytes(StandardCharsets.UTF_8), "hmacsha256");

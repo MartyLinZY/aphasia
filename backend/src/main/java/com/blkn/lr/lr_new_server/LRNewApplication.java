@@ -12,7 +12,6 @@ public class LRNewApplication {
     public static void main(String[] args) {
         SpringApplication.run(LRNewApplication.class, args);
         log.info("run successfully");
-//        System.out.println(System.getProperty("user.dir"));
     }
 }
 

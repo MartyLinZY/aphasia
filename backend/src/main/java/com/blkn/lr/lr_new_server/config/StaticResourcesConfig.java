@@ -81,14 +81,5 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
                 log.error("注册音频资源路径失败", e);
             }
         }
-
-//        if (!registry.hasMappingForPattern(RESOURCES_PATH +"/**")) {
-//            try {
-//                registry.addResourceHandler(RESOURCES_PATH +"/**")
-//                        .addResourceLocations("file:" + resourceDir.getCanonicalPath() + File.separator);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 }
