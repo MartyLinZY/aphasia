@@ -33,7 +33,6 @@ public class InterceptorConfigurer implements WebMvcConfigurer {
 			.addPathPatterns("/api/**")
 			.excludePathPatterns("/api/auth")
 			.excludePathPatterns("/api/register")
-			.excludePathPatterns("/api/test/**")
 		;
 	}
 
