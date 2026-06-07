@@ -39,20 +39,20 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
     private void ensureIndexes() {
         // user.identity — 登录时高频查询
         mongoTemplate.indexOps(User.class)
-                .ensureIndex(new Index().on("identity", Sort.Direction.ASC).unique());
+                .createIndex(new Index().on("identity", Sort.Direction.ASC).unique());
 
         // exam.{ownerId, isRecovery, isDisabled} — 医生获取考试列表的核心查询
         mongoTemplate.indexOps(Exam.class)
-                .ensureIndex(new CompoundIndexDefinition(
+                .createIndex(new CompoundIndexDefinition(
                         new Document("ownerId", 1).append("isRecovery", 1).append("isDisabled", 1)));
 
         // question.ownerId — 按属主查题目
         mongoTemplate.indexOps(Question.class)
-                .ensureIndex(new Index().on("ownerId", Sort.Direction.ASC));
+                .createIndex(new Index().on("ownerId", Sort.Direction.ASC));
 
         // examResult.{ownerId, isRecovery, isDisabled} — 患者查历史记录的核心查询
         mongoTemplate.indexOps(ExamResult.class)
-                .ensureIndex(new CompoundIndexDefinition(
+                .createIndex(new CompoundIndexDefinition(
                         new Document("ownerId", 1).append("isRecovery", 1).append("isDisabled", 1)));
     }
 
