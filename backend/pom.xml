@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.github.houbb</groupId>
             <artifactId>heaven</artifactId>
-            <version>0.1.145</version>
+            <version>0.13.0</version>
         </dependency>
     </dependencies>
 
