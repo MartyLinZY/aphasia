@@ -1,6 +1,7 @@
 package com.blkn.lr.lr_new_server.models.rules.subcategory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,5 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExamSubCategoryEvalRule {
+    // factory dispatch key，缺失会让前端 fromJson 失败。
+    @NotBlank
     String typeName;
 }

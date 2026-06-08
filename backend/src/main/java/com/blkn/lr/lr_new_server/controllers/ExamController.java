@@ -191,13 +191,13 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/diagnosisRule")
-    public Map<String, String> addDiagnoseRule(@PathVariable String examId, @RequestBody DiagnosisRule rule) {
+    public Map<String, String> addDiagnoseRule(@PathVariable String examId, @Valid @RequestBody DiagnosisRule rule) {
         examServices.addDiagnoseRule(examId, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/diagnosisRules/{ruleIndex}")
-    public Map<String, String> updateDiagnoseRule(@PathVariable String examId, @PathVariable int ruleIndex, @RequestBody DiagnosisRule rule) {
+    public Map<String, String> updateDiagnoseRule(@PathVariable String examId, @PathVariable int ruleIndex, @Valid @RequestBody DiagnosisRule rule) {
         examServices.updateDiagnoseRule(examId, ruleIndex, rule);
         return Map.of("msg", "ok");
     }
@@ -209,13 +209,13 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRule")
-    public Map<String, String> addTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @RequestBody TerminateRule rule) {
+    public Map<String, String> addTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @Valid @RequestBody TerminateRule rule) {
         examServices.addTerminateRule(examId, categoryIndex, subCategoryIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRules/{ruleIndex}")
-    public Map<String, String> updateTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @RequestBody TerminateRule rule) {
+    public Map<String, String> updateTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody TerminateRule rule) {
         examServices.updateTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule);
         return Map.of("msg", "ok");
     }
@@ -227,13 +227,13 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/categories/{categoryIndex}/evalRule")
-    public Map<String, String> addCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @RequestBody ExamCategoryEvalRule rule) {
+    public Map<String, String> addCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @Valid @RequestBody ExamCategoryEvalRule rule) {
         examServices.addCategoryEvalRule(examId, categoryIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/evalRules/{ruleIndex}")
-    public Map<String, String> updateCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex, @RequestBody ExamCategoryEvalRule rule) {
+    public Map<String, String> updateCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody ExamCategoryEvalRule rule) {
         examServices.updateCategoryEvalRule(examId, categoryIndex, ruleIndex, rule);
         return Map.of("msg", "ok");
     }
@@ -245,13 +245,13 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRule")
-    public Map<String, String> addSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @RequestBody ExamSubCategoryEvalRule rule) {
+    public Map<String, String> addSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @Valid @RequestBody ExamSubCategoryEvalRule rule) {
         examServices.addSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRules/{ruleIndex}")
-    public Map<String, String> updateSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @RequestBody ExamSubCategoryEvalRule rule) {
+    public Map<String, String> updateSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody ExamSubCategoryEvalRule rule) {
         examServices.updateSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule);
         return Map.of("msg", "ok");
     }

@@ -125,4 +125,43 @@ class DtoValidationTest {
                         .content("{\"examName\":\"测评A\",\"categoryResults\":[]}"))
                 .andExpect(status().isOk());
     }
+
+    // ---------- rule typeName 入口校验 ----------
+    // 4 类 rule（DiagnosisRule / TerminateRule / ExamCategoryEvalRule /
+    // ExamSubCategoryEvalRule）都用 typeName 做 factory dispatch；缺 typeName
+    // 直接落库，前端 fromJson 会抛 UnimplementedError 引发"已保存但读不回"。
+    // 这里覆盖 4 个 POST 入口；4 个 PATCH 端点对称同样 @Valid 同样 model 注解，
+    // 不重复覆盖。
+
+    @Test
+    void addDiagnoseRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/diagnosisRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"aphasiaType\":\"motor\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addTerminateRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/subCategories/0/terminateRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"reason\":\"连续答错\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addCategoryEvalRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSubCategoryEvalRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/subCategories/0/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
 }
