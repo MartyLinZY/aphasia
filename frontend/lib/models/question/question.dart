@@ -53,10 +53,6 @@ abstract class Question {
     }
   }
 
-  static Future<Question> updateQuestion(Question updated) async {
-    return await Future.delayed(const Duration(seconds: 1), () => updated);
-  }
-
   Question(
       {String? id,
       this.alias,

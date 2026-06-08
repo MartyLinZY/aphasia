@@ -43,6 +43,10 @@ class QuestionList extends StatefulWidget {
 }
 
 class _QuestionListState extends State<QuestionList> {
+  /// 题目新增 / 编辑保存的 HTTP 期间置 true，遮罩本左栏列表防止重复触发。
+  /// editor 子页 pop 是瞬时的，真正持久化在本页 caller 里跑，spinner 必须在这里。
+  bool _saving = false;
+
   @override
   Widget build(BuildContext context) {
     var examState = context.watch<ExamState>();
@@ -61,24 +65,26 @@ class _QuestionListState extends State<QuestionList> {
           Navigator.push<Question?>(context,
                   MaterialPageRoute(builder: (context) => const DoctorExamQuestionEditPage()))
               .then((newQuestion) {
-            if (newQuestion != null) {
-              editingExam
-                  .addQuestion(newQuestion,
-                      categoryIndex: widget.categoryIndex,
-                      subCategoryIndex: widget.subCategoryIndex)
-                  .then((addedQuestion) {
-                setState(() {
-                  selectionState.editItem = editingExam
-                      .categories[widget.categoryIndex]
-                      .subCategories[widget.subCategoryIndex];
-                  selectionState.editCategoryIndex = widget.categoryIndex;
-                  selectionState.editSubCategoryIndex = widget.subCategoryIndex;
-                });
-              }).catchError((err) {
-                requestResultErrorHandler(context, error: err);
-                return err;
+            if (newQuestion == null) return;
+            setState(() => _saving = true);
+            editingExam
+                .addQuestion(newQuestion,
+                    categoryIndex: widget.categoryIndex,
+                    subCategoryIndex: widget.subCategoryIndex)
+                .then((addedQuestion) {
+              setState(() {
+                _saving = false;
+                selectionState.editItem = editingExam
+                    .categories[widget.categoryIndex]
+                    .subCategories[widget.subCategoryIndex];
+                selectionState.editCategoryIndex = widget.categoryIndex;
+                selectionState.editSubCategoryIndex = widget.subCategoryIndex;
               });
-            }
+            }).catchError((err) {
+              setState(() => _saving = false);
+              requestResultErrorHandler(context, error: err);
+              return err;
+            });
           });
         }
 
@@ -113,26 +119,28 @@ class _QuestionListState extends State<QuestionList> {
                           builder: (context) =>
                               DoctorExamQuestionEditPage(question: question)))
                   .then((updated) {
-                if (updated != null) {
-                  editingExam
-                      .updateQuestion(updated,
-                          categoryIndex: widget.categoryIndex,
-                          subCategoryIndex: widget.subCategoryIndex,
-                          questionIndex: questionIndex)
-                      .then((value) {
-                    setState(() {
-                      selectionState.editItem = editingExam
-                          .categories[widget.categoryIndex]
-                          .subCategories[widget.subCategoryIndex];
-                      selectionState.editCategoryIndex = widget.categoryIndex;
-                      selectionState.editSubCategoryIndex =
-                          widget.subCategoryIndex;
-                    });
-                  }).catchError((err) {
-                    requestResultErrorHandler(context, error: err);
-                    return err;
+                if (updated == null) return;
+                setState(() => _saving = true);
+                editingExam
+                    .updateQuestion(updated,
+                        categoryIndex: widget.categoryIndex,
+                        subCategoryIndex: widget.subCategoryIndex,
+                        questionIndex: questionIndex)
+                    .then((value) {
+                  setState(() {
+                    _saving = false;
+                    selectionState.editItem = editingExam
+                        .categories[widget.categoryIndex]
+                        .subCategories[widget.subCategoryIndex];
+                    selectionState.editCategoryIndex = widget.categoryIndex;
+                    selectionState.editSubCategoryIndex =
+                        widget.subCategoryIndex;
                   });
-                }
+                }).catchError((err) {
+                  setState(() => _saving = false);
+                  requestResultErrorHandler(context, error: err);
+                  return err;
+                });
               });
             }
 
@@ -180,7 +188,21 @@ class _QuestionListState extends State<QuestionList> {
       ));
     }
 
-    return Column(mainAxisSize: MainAxisSize.min, children: children);
+    return Stack(
+      children: [
+        IgnorePointer(
+          ignoring: _saving,
+          child: Column(mainAxisSize: MainAxisSize.min, children: children),
+        ),
+        if (_saving)
+          const Positioned.fill(
+            child: ColoredBox(
+              color: Color(0x33000000),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+      ],
+    );
   }
 
   TextButton _buildNewItemButton(String text,

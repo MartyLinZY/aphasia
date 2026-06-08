@@ -699,19 +699,7 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
           setState(() {
             requesting = true;
           });
-          if (widget.question == null) {
-            doReturn(currQuestion);
-          } else {
-            Question.updateQuestion(currQuestion).then((updated) {
-              doReturn(updated);
-            }).catchError((err) {
-              requestResultErrorHandler(context, error: err);
-              setState(() {
-                requesting = false;
-              });
-              return err;
-            });
-          }
+          doReturn(currQuestion);
         },
         style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.primaryColor, elevation: widgetsElevation),
         child: Text(widget.question == null ? "创建" : "保存", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onPrimaryColor),),
