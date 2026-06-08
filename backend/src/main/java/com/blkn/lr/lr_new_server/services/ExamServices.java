@@ -13,6 +13,8 @@ import com.blkn.lr.lr_new_server.mapper.QuestionMapper;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.question.Question;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.ExamSubCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -202,6 +204,42 @@ public class ExamServices {
     public void deleteTerminateRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex) {
         if (examDao.deleteTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex) <= 0) {
             throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下删除第" + ruleIndex + "个中止规则失败");
+        }
+    }
+
+    public void addCategoryEvalRule(String examId, int categoryIndex, ExamCategoryEvalRule rule) {
+        if (examDao.addCategoryEvalRule(examId, categoryIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下新增评分规则失败");
+        }
+    }
+
+    public void updateCategoryEvalRule(String examId, int categoryIndex, int ruleIndex, ExamCategoryEvalRule rule) {
+        if (examDao.updateCategoryEvalRule(examId, categoryIndex, ruleIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下更新第" + ruleIndex + "个评分规则失败");
+        }
+    }
+
+    public void deleteCategoryEvalRule(String examId, int categoryIndex, int ruleIndex) {
+        if (examDao.deleteCategoryEvalRule(examId, categoryIndex, ruleIndex) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下删除第" + ruleIndex + "个评分规则失败");
+        }
+    }
+
+    public void addSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, ExamSubCategoryEvalRule rule) {
+        if (examDao.addSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下子项" + subCategoryIndex + "下新增评分规则失败");
+        }
+    }
+
+    public void updateSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex, ExamSubCategoryEvalRule rule) {
+        if (examDao.updateSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下子项" + subCategoryIndex + "下更新第" + ruleIndex + "个评分规则失败");
+        }
+    }
+
+    public void deleteSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex) {
+        if (examDao.deleteSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex) <= 0) {
+            throw new BusinessErrorException("在id为" + examId + "的套题中亚项" + categoryIndex + "下子项" + subCategoryIndex + "下删除第" + ruleIndex + "个评分规则失败");
         }
     }
 }

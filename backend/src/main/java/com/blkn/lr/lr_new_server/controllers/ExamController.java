@@ -6,7 +6,9 @@ import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
+import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.ExamSubCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import com.blkn.lr.lr_new_server.services.ExamServices;
 import jakarta.servlet.http.HttpServletRequest;
@@ -221,6 +223,42 @@ public class ExamController {
     @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRules/{ruleIndex}")
     public Map<String, String> deleteTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex) {
         examServices.deleteTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex);
+        return Map.of("msg", "ok");
+    }
+
+    @PostMapping("/exams/{examId}/categories/{categoryIndex}/evalRule")
+    public Map<String, String> addCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @RequestBody ExamCategoryEvalRule rule) {
+        examServices.addCategoryEvalRule(examId, categoryIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @PatchMapping("/exams/{examId}/categories/{categoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> updateCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex, @RequestBody ExamCategoryEvalRule rule) {
+        examServices.updateCategoryEvalRule(examId, categoryIndex, ruleIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> deleteCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex) {
+        examServices.deleteCategoryEvalRule(examId, categoryIndex, ruleIndex);
+        return Map.of("msg", "ok");
+    }
+
+    @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRule")
+    public Map<String, String> addSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @RequestBody ExamSubCategoryEvalRule rule) {
+        examServices.addSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> updateSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @RequestBody ExamSubCategoryEvalRule rule) {
+        examServices.updateSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> deleteSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex) {
+        examServices.deleteSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex);
         return Map.of("msg", "ok");
     }
 }

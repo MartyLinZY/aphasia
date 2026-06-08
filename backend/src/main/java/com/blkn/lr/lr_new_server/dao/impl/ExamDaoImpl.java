@@ -5,7 +5,9 @@ import com.blkn.lr.lr_new_server.dao.ExamDao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
+import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.ExamSubCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -315,6 +317,90 @@ public class ExamDaoImpl implements ExamDao {
 
         List<TerminateRule> termRules = exam.getCategories().get(categoryIndex).getSubCategories().get(subCategoryIndex).getTerminateRules();
         termRules.remove(ruleIndex);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long addCategoryEvalRule(String examId, int categoryIndex, ExamCategoryEvalRule rule) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamCategoryEvalRule> rules = exam.getCategories().get(categoryIndex).getRules();
+        rules.add(rule);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long updateCategoryEvalRule(String examId, int categoryIndex, int ruleIndex, ExamCategoryEvalRule rule) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamCategoryEvalRule> rules = exam.getCategories().get(categoryIndex).getRules();
+        rules.set(ruleIndex, rule);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long deleteCategoryEvalRule(String examId, int categoryIndex, int ruleIndex) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamCategoryEvalRule> rules = exam.getCategories().get(categoryIndex).getRules();
+        rules.remove(ruleIndex);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long addSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, ExamSubCategoryEvalRule rule) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamSubCategoryEvalRule> evalRules = exam.getCategories().get(categoryIndex).getSubCategories().get(subCategoryIndex).getEvalRules();
+        evalRules.add(rule);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long updateSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex, ExamSubCategoryEvalRule rule) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamSubCategoryEvalRule> evalRules = exam.getCategories().get(categoryIndex).getSubCategories().get(subCategoryIndex).getEvalRules();
+        evalRules.set(ruleIndex, rule);
+
+        template.save(exam);
+
+        return 1;
+    }
+
+    public long deleteSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex) {
+        Exam exam = template.findById(examId, Exam.class);
+        if (exam == null) {
+            return 0;
+        }
+
+        List<ExamSubCategoryEvalRule> evalRules = exam.getCategories().get(categoryIndex).getSubCategories().get(subCategoryIndex).getEvalRules();
+        evalRules.remove(ruleIndex);
 
         template.save(exam);
 

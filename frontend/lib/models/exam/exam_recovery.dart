@@ -522,7 +522,10 @@ class ExamQuestionSet {
           categoryIndex: categoryIndex, ruleIndex: ruleIndex);
     }
 
-    // TODO: http请求
+    await HttpClientManager().post(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/evalRule",
+        body: jsonEncode(newRule.toJson()));
 
     categories[categoryIndex].rules.insert(ruleIndex, newRule);
   }
@@ -535,7 +538,10 @@ class ExamQuestionSet {
     _checkCategoryEvalRuleIndex(
         categoryIndex: categoryIndex, ruleIndex: ruleIndex);
 
-    // TODO: http请求
+    await HttpClientManager().patch(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/evalRules/$ruleIndex",
+        body: jsonEncode(updatedEvalRule.toJson()));
 
     categories[categoryIndex].rules[ruleIndex] = updatedEvalRule;
   }
@@ -546,7 +552,9 @@ class ExamQuestionSet {
     _checkCategoryEvalRuleIndex(
         categoryIndex: categoryIndex, ruleIndex: ruleIndex);
 
-    // TODO: http请求
+    await HttpClientManager().delete(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/evalRules/$ruleIndex");
 
     var categoryToUpdate = categories[categoryIndex];
     return categoryToUpdate.rules.removeAt(ruleIndex);
@@ -582,7 +590,10 @@ class ExamQuestionSet {
           ruleIndex: ruleIndex);
     }
 
-    // TODO: http请求
+    await HttpClientManager().post(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/subCategories/$subCategoryIndex/evalRule",
+        body: jsonEncode(newRule.toJson()));
 
     subCategory.evalRules.insert(ruleIndex, newRule);
   }
@@ -600,7 +611,10 @@ class ExamQuestionSet {
     QuestionSubCategory subCategory =
         categories[categoryIndex].subCategories[subCategoryIndex];
 
-    // TODO: http请求
+    await HttpClientManager().patch(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/subCategories/$subCategoryIndex/evalRules/$ruleIndex",
+        body: jsonEncode(updatedEvalRule.toJson()));
 
     subCategory.evalRules[ruleIndex] = updatedEvalRule;
   }
@@ -617,9 +631,11 @@ class ExamQuestionSet {
     QuestionSubCategory subCategory =
         categories[categoryIndex].subCategories[subCategoryIndex];
 
-    // TODO: http请求
+    await HttpClientManager().delete(
+        url:
+            "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/subCategories/$subCategoryIndex/evalRules/$ruleIndex");
 
-    // TODO: 检查所有子项中是否有需要移除的终止规则
+    // TODO: 检查所有子项中是否有需要移除的终止规则（cascade 检查未做，留独立任务）
 
     return subCategory.evalRules.removeAt(ruleIndex);
   }

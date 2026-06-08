@@ -349,4 +349,60 @@ class ExamControllerTest {
         mvc.perform(delete("/api/exams/e1/categories/0/subCategories/0/terminateRules/2")).andExpect(status().isOk());
         verify(examServices).deleteTerminateRule(EXAM_ID, 0, 0, 2);
     }
+
+    // ============================================================
+    // CategoryEvalRule 路由（类别级评分规则）
+    // ============================================================
+
+    @Test
+    void addCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(post("/api/exams/e1/categories/0/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"typeName\":\"ExamEvalByCategoryScoreSum\"}"))
+                .andExpect(status().isOk());
+        verify(examServices).addCategoryEvalRule(eq(EXAM_ID), eq(0), any());
+    }
+
+    @Test
+    void updateCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(patch("/api/exams/e1/categories/0/evalRules/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"typeName\":\"ExamEvalByCategoryScoreSum\"}"))
+                .andExpect(status().isOk());
+        verify(examServices).updateCategoryEvalRule(eq(EXAM_ID), eq(0), eq(2), any());
+    }
+
+    @Test
+    void deleteCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(delete("/api/exams/e1/categories/0/evalRules/2")).andExpect(status().isOk());
+        verify(examServices).deleteCategoryEvalRule(EXAM_ID, 0, 2);
+    }
+
+    // ============================================================
+    // SubCategoryEvalRule 路由（子类别级评分规则）
+    // ============================================================
+
+    @Test
+    void addSubCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(post("/api/exams/e1/categories/0/subCategories/1/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"typeName\":\"EvalSubCategoryByQuestionScoreSum\"}"))
+                .andExpect(status().isOk());
+        verify(examServices).addSubCategoryEvalRule(eq(EXAM_ID), eq(0), eq(1), any());
+    }
+
+    @Test
+    void updateSubCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(patch("/api/exams/e1/categories/0/subCategories/1/evalRules/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"typeName\":\"EvalSubCategoryByQuestionScoreSum\"}"))
+                .andExpect(status().isOk());
+        verify(examServices).updateSubCategoryEvalRule(eq(EXAM_ID), eq(0), eq(1), eq(2), any());
+    }
+
+    @Test
+    void deleteSubCategoryEvalRuleShouldRoute() throws Exception {
+        mvc.perform(delete("/api/exams/e1/categories/0/subCategories/1/evalRules/2")).andExpect(status().isOk());
+        verify(examServices).deleteSubCategoryEvalRule(EXAM_ID, 0, 1, 2);
+    }
 }

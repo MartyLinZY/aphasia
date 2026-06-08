@@ -3,7 +3,9 @@ package com.blkn.lr.lr_new_server.dao;
 import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.exam.QuestionCategory;
 import com.blkn.lr.lr_new_server.models.exam.QuestionSubCategory;
+import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.ExamSubCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 
 import java.util.List;
@@ -63,6 +65,18 @@ public interface ExamDao {
     long updateTerminateRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex, TerminateRule rule);
 
     long deleteTerminateRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex);
+
+    long addCategoryEvalRule(String examId, int categoryIndex, ExamCategoryEvalRule rule);
+
+    long updateCategoryEvalRule(String examId, int categoryIndex, int ruleIndex, ExamCategoryEvalRule rule);
+
+    long deleteCategoryEvalRule(String examId, int categoryIndex, int ruleIndex);
+
+    long addSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, ExamSubCategoryEvalRule rule);
+
+    long updateSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex, ExamSubCategoryEvalRule rule);
+
+    long deleteSubCategoryEvalRule(String examId, int categoryIndex, int subCategoryIndex, int ruleIndex);
 
     long publishExam(String examId);
 }
