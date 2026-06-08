@@ -134,11 +134,6 @@ class AudioQuestion extends Question {
         ClassProperties.displayName:
             EvalAudioQuestionByKeywordMatch.ruleDisplayName(),
       },
-      // EvalAudioQuestionByPronunciation: {
-      //   ClassProperties.constructor: () => EvalAudioQuestionByPronunciation(),
-      //   ClassProperties.displayName:
-      //       EvalAudioQuestionByPronunciation.ruleDisplayName(),
-      // },
       EvalAudioQuestionByFluency: {
         ClassProperties.constructor: () => EvalAudioQuestionByFluency(),
         ClassProperties.displayName:
@@ -149,11 +144,6 @@ class AudioQuestion extends Question {
         ClassProperties.displayName:
             EvalAudioQuestionBySimilarity.ruleDisplayName(),
       },
-      // EvalAudioQuestionByWordType: {
-      //   ClassProperties.constructor: () => EvalAudioQuestionByWordType(),
-      //   ClassProperties.displayName:
-      //       EvalAudioQuestionByWordType.ruleDisplayName()
-      // }
       // 后续添加
     };
   }

@@ -170,27 +170,6 @@ class _DoctorExamQuestionRuleEditSubPageState extends State<DoctorExamQuestionRu
         settingFields.add(const SizedBox(height: 16,));
         settingFields.add(Text("该评分方式由系统自动根据患者所说内容和答案文本的相似度打分，最终分数将根据相似度在0分至题目设置的满分之间，如果开启模糊评分，当患者所说内容与答案文本相似度超过80%即为满分", style: commonStyles?.bodyStyle,));
         break;
-      case EvalAudioQuestionByWordType:
-        var rule = currQuestion.evalRule as EvalAudioQuestionByWordType;
-        settingFields.add(const SizedBox(height: 16,));
-        settingFields.add(Row(
-          children: [
-            Text("词性：", style: commonStyles?.bodyStyle,),
-            DropdownMenu(
-                width: 150,
-                initialSelection: rule.wordType,
-                requestFocusOnTap: false,
-                enableSearch: false,
-                onSelected: (int? value) {
-                  rule.wordType = value ?? 1;
-                },
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 1, label: "动词"),
-                  DropdownMenuEntry(value: 2, label: "名词"),
-                ]),
-          ],
-        ));
-        break;
       case EvalChoiceQuestionByCorrectChoiceCount:
         _buildChoiceQuestionRuleSetting(settingFields);
         break;
