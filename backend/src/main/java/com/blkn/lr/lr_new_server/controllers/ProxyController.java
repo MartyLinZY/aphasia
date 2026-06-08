@@ -1,11 +1,11 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.dto.apiproxy.AudioFromTextRequest;
 import com.blkn.lr.lr_new_server.dto.apiproxy.HandWritingRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.PinyinMatchResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
-import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.exception.ProxyServiceException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
 import com.blkn.lr.lr_new_server.services.PinyinService;
@@ -13,6 +13,7 @@ import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -87,16 +88,8 @@ public class ProxyController {
 
     @PostMapping("/audio_from_text")
     @RequireRole({2})
-    Map<String, String> generateAudioFromText(@RequestBody Map<String, String> param, HttpServletRequest request) throws Exception {
-        if (!param.containsKey("text") || param.get("text").isEmpty()) {
-            throw new BusinessErrorException("收到内容为空的语音合成请求");
-        }
-
-        String text = param.get("text");
-
-        if (text.length() > 100) {
-            throw new BusinessErrorException("语音合成请求长度>100，拒绝响应");
-        }
+    Map<String, String> generateAudioFromText(@Valid @RequestBody AudioFromTextRequest req, HttpServletRequest request) throws Exception {
+        String text = req.getText();
 
         String uid = (String) request.getAttribute("uid");
 
