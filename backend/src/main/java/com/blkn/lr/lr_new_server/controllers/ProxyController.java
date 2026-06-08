@@ -1,12 +1,14 @@
 package com.blkn.lr.lr_new_server.controllers;
 
 import com.blkn.lr.lr_new_server.dto.apiproxy.HandWritingRecognizeResult;
+import com.blkn.lr.lr_new_server.dto.apiproxy.PinyinMatchResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.exception.ProxyServiceException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
+import com.blkn.lr.lr_new_server.services.PinyinService;
 import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
@@ -32,6 +34,17 @@ public class ProxyController {
     private final QwenAudioService qwenAudioService;
     private final FlyTekManager flyTekManager;
     private final Environment environment;
+    private final PinyinService pinyinService;
+
+    @PostMapping("/pinyin_match")
+    PinyinMatchResult pinyinMatch(@RequestParam("keyword") String keyword,
+                                  @RequestParam("spoken") String spoken,
+                                  @RequestParam(value = "threshold", defaultValue = "0.7") double threshold) {
+        if (keyword == null || keyword.isBlank() || spoken == null || spoken.isBlank()) {
+            return new PinyinMatchResult(false, 0d, "", "");
+        }
+        return pinyinService.match(keyword, spoken, threshold);
+    }
 
     @PostMapping("/text_similarity")
     TextSimilarityResult calTextSimilarity(@RequestParam("text1") String text1, @RequestParam("text2") String text2) {

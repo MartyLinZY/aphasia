@@ -765,24 +765,37 @@ class EvalAudioQuestionByKeywordsMatchesCount extends QuestionEvalRule with Fuzz
   Future<QuestionResult> evaluate(QuestionResult result) async {
     result = result as AudioQuestionResult;
 
-    // TODO: 有时间考虑发送请求到后端用拼音做一下判断
-    // if (!enableFuzzyEvaluation) {
     int count = 0;
+    List<String> hitDetails = [];
     for (var keyword in keywords) {
-      if (result.audioContent.contains(keyword)) {
-        count++;
+      bool hit;
+      double sim = 0;
+      if (enableFuzzyEvaluation) {
+        try {
+          final r = await pinyinMatch(keyword, result.audioContent);
+          hit = r.matched;
+          sim = r.similarity;
+        } catch (_) {
+          // 网络/服务异常时降级严格匹配，避免因后端不可用整张卷判 0 分
+          hit = result.audioContent.contains(keyword);
+        }
+      } else {
+        hit = result.audioContent.contains(keyword);
       }
+      if (hit) count++;
+      hitDetails.add(enableFuzzyEvaluation
+          ? "$keyword:${sim.toStringAsFixed(2)}${hit ? '✓' : '✗'}"
+          : "$keyword:${hit ? '✓' : '✗'}");
     }
-    //
-    // } else {
-    // }
 
     setScoreByConditions(result, count);
 
     result.finalScore ??= defaultScore;
 
+    result.extraResults['判分模式'] = enableFuzzyEvaluation ? '拼音模糊匹配' : '严格匹配';
     result.extraResults['患者说话内容'] = result.audioContent;
     result.extraResults['关键词列表'] = keywords.fold("", (prev, e) => prev == ""? e :"$prev, $e");
+    result.extraResults['关键词命中详情'] = hitDetails.join(', ');
     result.extraResults['关键词正确个数'] = count.toString();
     result.extraResults['是否要求关键词按顺序说出'] = enforceOrder ? "是": "否";
 
@@ -828,24 +841,32 @@ class EvalAudioQuestionByKeywordMatch extends QuestionEvalRule with FuzzyEvalSet
   @override
   Future<QuestionResult> evaluate(QuestionResult result) async {
     result = result as AudioQuestionResult;
-    // TODO：有时间做发送请求到后端用拼音判分
+
     int count = 0;
+    double sim = 0;
     if (enableFuzzyEvaluation) {
-      if (result.audioContent.contains(keyword)) {
-        count = 1;
+      try {
+        final r = await pinyinMatch(keyword, result.audioContent);
+        if (r.matched) count = 1;
+        sim = r.similarity;
+      } catch (_) {
+        // 网络/服务异常时降级严格匹配，避免因后端不可用判 0 分
+        if (result.audioContent.contains(keyword)) count = 1;
       }
     } else {
-      if (result.audioContent.contains(keyword)) {
-        count = 1;
-      }
+      if (result.audioContent.contains(keyword)) count = 1;
     }
 
     setScoreByConditions(result, count);
 
     result.finalScore ??= defaultScore;
 
+    result.extraResults['判分模式'] = enableFuzzyEvaluation ? '拼音模糊匹配' : '严格匹配';
     result.extraResults['患者说话内容'] = result.audioContent;
     result.extraResults['关键词'] = keyword;
+    if (enableFuzzyEvaluation) {
+      result.extraResults['拼音相似度'] = sim.toStringAsFixed(2);
+    }
     result.extraResults['关键词正确字数'] = count.toString();
 
     return result;

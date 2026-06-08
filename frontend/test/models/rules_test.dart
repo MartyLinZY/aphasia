@@ -1,14 +1,23 @@
 import 'dart:convert';
 
 import 'package:aphasia_recovery/enum/command_actions.dart';
+import 'package:aphasia_recovery/models/question/question.dart';
 import 'package:aphasia_recovery/models/result/results.dart';
 import 'package:aphasia_recovery/models/rules.dart';
+import 'package:aphasia_recovery/utils/http/http_manager.dart';
+import 'package:aphasia_recovery/utils/http/http_mock.mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../TestBase.dart';
 
 void main () {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
+
   test("EvalByCategoryScoreSum basic test", () {
     TestBase.commonSetUp();
 
@@ -250,6 +259,97 @@ void main () {
     var evalRuleDecoded = QuestionEvalRule.fromJson(jsonDecode(jsonStr)) as EvalWritingQuestionByMatchRate;
     expect(evalRule.defaultScore, evalRuleDecoded.defaultScore);
     expect(evalRule.defaultScore, 9);
+  });
+
+  group("EvalAudioQuestion evaluate (拼音模糊判分)", () {
+    setUp(() {
+      TestBase.commonSetUp();
+    });
+
+    EvalAudioQuestionByKeywordMatch buildSingleRule({required bool fuzzy}) {
+      var rule =
+          EvalAudioQuestionByKeywordMatch(keyword: "医生", fuzzy: fuzzy);
+      rule.conditions.add(EvalCondition(score: 10)..addRange(1, 1));
+      rule.conditions.add(EvalCondition(score: 0)..addRange(0, 0));
+      return rule;
+    }
+
+    AudioQuestionResult buildResult(String content) {
+      return AudioQuestionResult(
+          sourceQuestion: AudioQuestion(), audioContent: content);
+    }
+
+    test("fuzzy on + HTTP 命中 → count=1，extraResults 含拼音相似度", () async {
+      var client = HttpClientManager().testClient! as MockClient;
+      when(client.post(
+        any,
+        body: anyNamed('body'),
+        headers: anyNamed('headers'),
+      )).thenAnswer((inv) async {
+        final uri = inv.positionalArguments[0] as Uri;
+        if (uri.path == '/api/proxy/pinyin_match') {
+          return http.Response(
+              '{"matched":true,"similarity":0.85,"expectedPinyin":"yi1sheng1","actualPinyin":"yi sheng"}',
+              200);
+        }
+        return http.Response('not stubbed: $uri', 500);
+      });
+
+      var rule = buildSingleRule(fuzzy: true);
+      var result = await rule.evaluate(buildResult("yi sheng"))
+          as AudioQuestionResult;
+
+      expect(result.finalScore, 10);
+      expect(result.extraResults['判分模式'], '拼音模糊匹配');
+      expect(result.extraResults['拼音相似度'], '0.85');
+      expect(result.extraResults['关键词正确字数'], '1');
+    });
+
+    test("fuzzy on + HTTP 异常 → fallback 严格 substring 仍可命中", () async {
+      var client = HttpClientManager().testClient! as MockClient;
+      when(client.post(
+        any,
+        body: anyNamed('body'),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async => http.Response('upstream down', 502));
+
+      var rule = buildSingleRule(fuzzy: true);
+      // audioContent 含关键词 "医生" → fallback substring 命中
+      var result = await rule.evaluate(buildResult("我要看医生"))
+          as AudioQuestionResult;
+
+      expect(result.finalScore, 10);
+      expect(result.extraResults['判分模式'], '拼音模糊匹配');
+      // fallback 路径 similarity 保持 0
+      expect(result.extraResults['拼音相似度'], '0.00');
+    });
+
+    test("fuzzy off → 严格 substring，不调 pinyin_match", () async {
+      // 不 stub /pinyin_match —— 若代码错误地发了请求，mockito 会返回 null，
+      // HttpClientManager.post 解包时 NoSuchMethodError 让测试失败。
+      var rule = buildSingleRule(fuzzy: false);
+      var result = await rule.evaluate(buildResult("我要看医生"))
+          as AudioQuestionResult;
+
+      expect(result.finalScore, 10);
+      expect(result.extraResults['判分模式'], '严格匹配');
+      expect(result.extraResults.containsKey('拼音相似度'), false);
+    });
+
+    test("KeywordsMatchesCount fuzzy off 多关键词命中计数正确", () async {
+      var rule = EvalAudioQuestionByKeywordsMatchesCount(
+          keywords: ["医生", "护士", "病人"], fuzzy: false);
+      rule.conditions.add(EvalCondition(score: 10)..addRange(2, 3));
+      rule.conditions.add(EvalCondition(score: 5)..addRange(1, 1));
+      rule.conditions.add(EvalCondition(score: 0)..addRange(0, 0));
+
+      var result = await rule.evaluate(buildResult("我要找医生和护士"))
+          as AudioQuestionResult;
+
+      expect(result.finalScore, 10);
+      expect(result.extraResults['关键词正确个数'], '2');
+      expect(result.extraResults['判分模式'], '严格匹配');
+    });
   });
 
   test("EvalItemFoundQuestion json test", () {

@@ -1,7 +1,9 @@
 package com.blkn.lr.lr_new_server.controllers;
 
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
+import com.blkn.lr.lr_new_server.dto.apiproxy.PinyinMatchResult;
 import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
+import com.blkn.lr.lr_new_server.services.PinyinService;
 import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
@@ -45,6 +47,7 @@ class ProxyControllerTest {
     private QwenAudioService qwenAudio;
     private FlyTekManager flyTek;
     private Environment env;
+    private PinyinService pinyin;
 
     private static final String UID = "user-7";
 
@@ -54,12 +57,56 @@ class ProxyControllerTest {
         qwenAudio = mock(QwenAudioService.class);
         flyTek = mock(FlyTekManager.class);
         env = mock(Environment.class);
+        pinyin = mock(PinyinService.class);
         when(env.getProperty("server.port")).thenReturn("8080");
 
-        ProxyController controller = new ProxyController(baidu, qwenAudio, flyTek, env);
+        ProxyController controller = new ProxyController(baidu, qwenAudio, flyTek, env, pinyin);
         mvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
+    }
+
+    // ============================================================
+    // POST /api/proxy/pinyin_match
+    // ============================================================
+
+    @Test
+    void pinyinMatchShouldShortCircuitToFalseWhenKeywordBlank() throws Exception {
+        mvc.perform(post("/api/proxy/pinyin_match")
+                        .param("keyword", "")
+                        .param("spoken", "yi sheng"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matched").value(false))
+                .andExpect(jsonPath("$.similarity").value(0.0));
+        verify(pinyin, org.mockito.Mockito.never()).match(any(), any(), org.mockito.ArgumentMatchers.anyDouble());
+    }
+
+    @Test
+    void pinyinMatchShouldDelegateToPinyinServiceWithDefaultThreshold() throws Exception {
+        when(pinyin.match("医生", "yi sheng", 0.7))
+                .thenReturn(new PinyinMatchResult(true, 0.85, "yi1sheng1", "yi sheng"));
+
+        mvc.perform(post("/api/proxy/pinyin_match")
+                        .param("keyword", "医生")
+                        .param("spoken", "yi sheng"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matched").value(true))
+                .andExpect(jsonPath("$.similarity").value(0.85))
+                .andExpect(jsonPath("$.expectedPinyin").value("yi1sheng1"))
+                .andExpect(jsonPath("$.actualPinyin").value("yi sheng"));
+    }
+
+    @Test
+    void pinyinMatchShouldHonorCustomThreshold() throws Exception {
+        when(pinyin.match("医生", "wi shang", 0.5))
+                .thenReturn(new PinyinMatchResult(true, 0.55, "yi1sheng1", "wi shang"));
+
+        mvc.perform(post("/api/proxy/pinyin_match")
+                        .param("keyword", "医生")
+                        .param("spoken", "wi shang")
+                        .param("threshold", "0.5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matched").value(true));
     }
 
     // ============================================================
