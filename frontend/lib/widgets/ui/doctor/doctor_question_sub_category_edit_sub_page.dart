@@ -234,15 +234,6 @@ class _QuestionSubCategoryEditSubPageState extends State<QuestionSubCategoryEdit
                                                                   );
                                                                 },
                                                                 // 子项只有一种评分规则，所以暂不增删评分规则
-                                                                // secondBtnAction: () {
-                                                                //   examState.deleteSubCategoryEvalRule(
-                                                                //     categoryIndex: widget.categoryIndex,
-                                                                //     subCategoryIndex: widget.subCategoryIndex,
-                                                                //     ruleIndex: e.key,
-                                                                //   );
-                                                                // },
-                                                                // secondBtnTooltipMsg: "删除",
-                                                                // secondBtnIcon: Icon(Icons.delete_outline, color: commonStyles?.errorColor,),
                                                                 textAreaMaxHeight: listTileCommonHeight,
                                                                 textAreaMaxWidth: max(constraints.maxWidth - 100, 0),
                                                                 commonStyles: commonStyles,

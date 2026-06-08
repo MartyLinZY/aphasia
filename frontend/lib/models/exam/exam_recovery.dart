@@ -635,8 +635,6 @@ class ExamQuestionSet {
         url:
             "${HttpConstants.backendBaseUrl}/api/exams/$_id/categories/$categoryIndex/subCategories/$subCategoryIndex/evalRules/$ruleIndex");
 
-    // TODO: 检查所有子项中是否有需要移除的终止规则（cascade 检查未做，留独立任务）
-
     return subCategory.evalRules.removeAt(ruleIndex);
   }
 
