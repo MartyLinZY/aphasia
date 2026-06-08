@@ -3,6 +3,8 @@ package com.blkn.lr.lr_new_server.services;
 import com.blkn.lr.lr_new_server.dto.apiproxy.PinyinMatchResult;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -112,6 +114,59 @@ class PinyinServiceTest {
     void matchShouldReturnFalseWhenEitherSideBlank() {
         assertFalse(svc.match("", "yi sheng", 0.7).isMatched());
         assertFalse(svc.match("医生", "", 0.7).isMatched());
+    }
+
+    // ============================================================
+    // toAllPinyin + 多音字 keyword 笛卡尔积
+    // ============================================================
+
+    @Test
+    void toAllPinyinShouldAlwaysContainToPinyinResult() {
+        // toPinyin 取首读音；toAllPinyin 必含该组合（其它读音为额外候选）
+        assertTrue(svc.toAllPinyin("你好").contains(svc.toPinyin("你好")));
+        assertTrue(svc.toAllPinyin("行人").contains(svc.toPinyin("行人")));
+        assertTrue(svc.toAllPinyin("abc").contains(svc.toPinyin("abc")));
+    }
+
+    @Test
+    void toAllPinyinShouldCoverAllReadingsOfPolyphone() {
+        // "行" 有 xing2 / hang2 两读音
+        List<String> readings = svc.toAllPinyin("行");
+        assertTrue(readings.contains("xing2"), "actual=" + readings);
+        assertTrue(readings.contains("hang2"), "actual=" + readings);
+    }
+
+    @Test
+    void toAllPinyinShouldCartesianMultiplyAcrossPolyphones() {
+        // "行人" "行" 多音 × "人" 单音 → 应含 xing2ren2 与 hang2ren2
+        List<String> readings = svc.toAllPinyin("行人");
+        assertTrue(readings.contains("xing2ren2"), "actual=" + readings);
+        assertTrue(readings.contains("hang2ren2"), "actual=" + readings);
+    }
+
+    @Test
+    void toAllPinyinShouldReturnSingletonEmptyForNullOrEmpty() {
+        assertEquals(List.of(""), svc.toAllPinyin(""));
+        assertEquals(List.of(""), svc.toAllPinyin(null));
+    }
+
+    @Test
+    void matchShouldHitNonDefaultReadingOfPolyphoneKeyword() {
+        // pinyin4j 对 "行" 默认返 "hang2"，但医生意为 "xing2"——患者说 "xing2ren2"
+        // 旧版只取首读音会判 miss，新版笛卡尔积应命中
+        PinyinMatchResult r = svc.match("行人", "xing2ren2", 0.7);
+        assertTrue(r.isMatched(), "similarity=" + r.getSimilarity()
+                + " expected=" + r.getExpectedPinyin());
+        // expectedPinyin 应反映命中的那个读音组合
+        assertEquals("xing2ren2", r.getExpectedPinyin());
+    }
+
+    @Test
+    void matchShouldStillHitDefaultReadingOfPolyphoneKeyword() {
+        // 反向：患者说默认读音也要命中
+        PinyinMatchResult r = svc.match("行人", "hang2ren2", 0.7);
+        assertTrue(r.isMatched(), "similarity=" + r.getSimilarity());
+        assertEquals("hang2ren2", r.getExpectedPinyin());
     }
 
     @Test

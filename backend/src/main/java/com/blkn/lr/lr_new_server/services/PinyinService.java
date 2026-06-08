@@ -9,12 +9,22 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 /**
  * 失语症录音题"拼音模糊判分"：把关键词与患者语音文本各自转拼音（带声调数字），
  * 在患者拼音串上滑窗算 Levenshtein 归一化相似度，最高分 ≥ 阈值即视为命中。
  *
- * <p>多音字策略：取第一个读音（pinyin4j 默认）。这是 v1 折中——医生设关键词时
- * 通常已认定单一读音，讯飞 ASR 输出文本中多音字概率也低。
+ * <p>多音字策略：
+ * <ul>
+ *   <li><b>keyword 侧</b>取所有读音的笛卡尔积——医生设"行"时可能意为 xing2 或 hang2，
+ *       不能让 pinyin4j 默认首读音判错。关键词通常 1-3 字，组合数可控。</li>
+ *   <li><b>spoken 侧</b>仍取首读音——讯飞 ASR 输出整句长文本，多音字组合会指数爆炸，
+ *       且 ASR 已基于上下文挑读音，多音字误判概率低。</li>
+ * </ul>
  */
 @Service
 public class PinyinService {
@@ -32,18 +42,43 @@ public class PinyinService {
         if (text == null || text.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         for (char c : text.toCharArray()) {
-            try {
-                String[] arr = PinyinHelper.toHanyuPinyinStringArray(c, FORMAT);
-                if (arr == null || arr.length == 0) {
-                    sb.append(c);
-                } else {
-                    sb.append(arr[0]);
-                }
-            } catch (BadHanyuPinyinOutputFormatCombination e) {
-                sb.append(c);
-            }
+            sb.append(charPinyins(c)[0]);
         }
         return sb.toString();
+    }
+
+    /**
+     * 把汉字串转所有可能拼音串（多音字笛卡尔积；非汉字原样保留）。
+     * 如 "行人" → ["xing2ren2", "hang2ren2"]；纯单音字或空串返回 size=1。
+     */
+    public List<String> toAllPinyin(String text) {
+        if (text == null || text.isEmpty()) return Collections.singletonList("");
+        List<String> results = new ArrayList<>();
+        results.add("");
+        for (char c : text.toCharArray()) {
+            String[] pys = charPinyins(c);
+            List<String> next = new ArrayList<>(results.size() * pys.length);
+            for (String prev : results) {
+                for (String py : pys) {
+                    next.add(prev + py);
+                }
+            }
+            results = next;
+        }
+        return results;
+    }
+
+    /** 单字所有去重读音，至少返回长度 1（非汉字时返回字符本身）。 */
+    private String[] charPinyins(char c) {
+        try {
+            String[] arr = PinyinHelper.toHanyuPinyinStringArray(c, FORMAT);
+            if (arr == null || arr.length == 0) {
+                return new String[]{String.valueOf(c)};
+            }
+            return new LinkedHashSet<>(java.util.Arrays.asList(arr)).toArray(new String[0]);
+        } catch (BadHanyuPinyinOutputFormatCombination e) {
+            return new String[]{String.valueOf(c)};
+        }
     }
 
     /** 归一化 Levenshtein 相似度 ∈ [0, 1]；两串都空算 1。 */
@@ -68,32 +103,41 @@ public class PinyinService {
     }
 
     /**
-     * 在 spoken 拼音串上滑窗找与 keyword 拼音的最高相似度。
-     * spoken 较短时整体比较；较长时窗口大小 = keyword 长度 ±2，扫所有位置取 max。
+     * 在 spoken 拼音串上滑窗找与 keyword 任一读音组合的最高相似度。
+     * keyword 用 toAllPinyin 覆盖多音字；spoken 取首读音。expectedPinyin 返回命中
+     * 最高相似度的那个 keyword 读音组合，便于前端 extraResults 排查误判。
      */
     public PinyinMatchResult match(String keyword, String spoken, double threshold) {
-        String keywordPy = toPinyin(keyword);
+        List<String> keywordPys = toAllPinyin(keyword);
         String spokenPy = toPinyin(spoken);
-        if (keywordPy.isEmpty() || spokenPy.isEmpty()) {
-            return new PinyinMatchResult(false, 0d, keywordPy, spokenPy);
+        if (keywordPys.get(0).isEmpty() || spokenPy.isEmpty()) {
+            return new PinyinMatchResult(false, 0d, keywordPys.get(0), spokenPy);
         }
 
-        int kLen = keywordPy.length();
         int sLen = spokenPy.length();
-        double maxSim;
-        if (sLen <= kLen + 2) {
-            maxSim = similarity(keywordPy, spokenPy);
-        } else {
-            maxSim = 0.0;
-            int minWin = Math.max(1, kLen - 2);
-            int maxWin = kLen + 2;
-            for (int winSize = minWin; winSize <= maxWin; winSize++) {
-                for (int i = 0; i + winSize <= sLen; i++) {
-                    double sim = similarity(keywordPy, spokenPy.substring(i, i + winSize));
-                    if (sim > maxSim) maxSim = sim;
+        double maxSim = 0.0;
+        String bestKeywordPy = keywordPys.get(0);
+        for (String kPy : keywordPys) {
+            int kLen = kPy.length();
+            double sim;
+            if (sLen <= kLen + 2) {
+                sim = similarity(kPy, spokenPy);
+            } else {
+                sim = 0.0;
+                int minWin = Math.max(1, kLen - 2);
+                int maxWin = kLen + 2;
+                for (int winSize = minWin; winSize <= maxWin; winSize++) {
+                    for (int i = 0; i + winSize <= sLen; i++) {
+                        double s = similarity(kPy, spokenPy.substring(i, i + winSize));
+                        if (s > sim) sim = s;
+                    }
                 }
             }
+            if (sim > maxSim) {
+                maxSim = sim;
+                bestKeywordPy = kPy;
+            }
         }
-        return new PinyinMatchResult(maxSim >= threshold, maxSim, keywordPy, spokenPy);
+        return new PinyinMatchResult(maxSim >= threshold, maxSim, bestKeywordPy, spokenPy);
     }
 }
