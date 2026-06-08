@@ -348,7 +348,6 @@ class EvalSubCategoryByQuestionScoreSum extends ExamSubCategoryEvalRule {
 
   @override
   String displayName() {
-    // TODO: implement displayName
     return "各题目得分求和";
   }
 }
@@ -390,7 +389,6 @@ abstract class TerminateRule implements ExamSubCategoryEvalRule {
 class ContinuousWrongAnswerTerminate extends TerminateRule {
   @JsonKey(required: true)
   int errorCountThreshold;
-  // int scoreThreshold; // TODO
 
   static String ruleDisplayName() {
     return "连续答错N题（得分小于等于满分的一半为答错）";
