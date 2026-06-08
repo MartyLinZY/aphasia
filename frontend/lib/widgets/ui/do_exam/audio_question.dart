@@ -217,6 +217,18 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
           _showRecordedResult = true;
           _recordedText = content;
         });
+      }).catchError((err) {
+        // 识别失败：仍跳到结果展示界面（audioContent 留空），让患者看到失败提示并
+        // 自主决定提交空答案或退出。否则 finishAnswer 已停录音，界面会卡死无反馈。
+        _trySetAnswerTime(result, timeLimitCountDown!.timePassed);
+        result.audioContent = '';
+        setState(() {
+          _showRecordedResult = true;
+          _recordedText = '';
+        });
+        if (mounted) {
+          toast(context, msg: '语音识别失败，请检查网络后再提交', btnText: '确认');
+        }
       });
     }
   }
@@ -259,6 +271,17 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
         widget.goToNextQuestion(result);
 
         debugPrint("最终得分：${result.finalScore}");
+      }
+    }).catchError((err) {
+      // 评分失败：退回到识别结果展示界面让用户能重试或退出。否则 evaluating=true
+      // 保持，spinner 永转。EvalAudioQuestionByKeywordMatch 内部已经有 HTTP 异常
+      // fallback substring，所以这里能走到 catchError 的多是 BySimilarity / ByFluency
+      // 调 /text_similarity、/fluency 失败（这两类内部尚无 fallback）。
+      setState(() {
+        evaluating = false;
+      });
+      if (mounted) {
+        toast(context, msg: '评分失败，请检查网络后再提交', btnText: '确认');
       }
     });
   }
