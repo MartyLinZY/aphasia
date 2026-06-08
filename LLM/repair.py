@@ -12,7 +12,7 @@ def repair(conversation):
     model = "Pro/deepseek-ai/DeepSeek-V3"
 
     content = create_prompt_repair(conversation)
-    diagnosis = text_conversation(model=model, content=content, output_file=settings.LLM_PATH+"repair.txt", mode="w")
+    diagnosis = text_conversation(model=model, content=content)
 
     result = diagnosis.strip().strip('`').strip()
     return {"repairedConversation": result}

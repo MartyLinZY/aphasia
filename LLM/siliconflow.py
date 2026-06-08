@@ -1,79 +1,60 @@
+"""SiliconFlow chat completions 客户端。
+
+只暴露 ``text_conversation``——给 ``diagnose.py`` / ``repair.py`` 用。原来还有
+``audio_to_text`` 但全工程 0 caller（ASR 走 Java 后端的讯飞 SDK，不走这里），
+已删；如未来恢复参考此处加 ``requests.post(..., files=...)``。
+"""
+
 import os
+
 import requests
-import json
 
-import settings
+API_URL = "https://api.siliconflow.cn/v1/chat/completions"
+DEFAULT_MODEL = "Pro/deepseek-ai/DeepSeek-V3"
+REQUEST_TIMEOUT_SECONDS = 30
 
-# 文本对话大模型
-def text_conversation(model="Pro/deepseek-ai/DeepSeek-V3", content="say hello", output_file=settings.LLM_PATH+"output.txt", mode="a"):
 
-    url = "https://api.siliconflow.cn/v1/chat/completions"
+def text_conversation(model: str = DEFAULT_MODEL, content: str = "say hello") -> str:
+    """调 SiliconFlow chat completions 返回回答字符串。
+
+    SILICONFLOW_API_KEY 必须在环境变量中。任何 HTTP / 解析失败一律抛
+    ``RuntimeError``——上游 diagnose.py / repair.py 的 ``try/except Exception``
+    会把它包成 FastAPI 500，让前端拿到清晰错误而不是无限挂起。
+    """
     api_key = os.environ.get("SILICONFLOW_API_KEY", "")
     if not api_key:
         raise RuntimeError("SILICONFLOW_API_KEY 未配置，无法调用 siliconflow text_conversation")
+
     headers = {
         "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
-
     payload = {
         "model": model,
-        "messages": [
-            {
-                "role": "user",
-                "content": content
-            }
-        ],
+        "messages": [{"role": "user", "content": content}],
         "max_tokens": 4096,
-        "temperature": 0.5
+        "temperature": 0.5,
     }
 
-    response = requests.request("POST", url, json=payload, headers=headers)
-    answer = json.loads(response.text)['choices'][0]['message']['content']
+    try:
+        response = requests.post(
+            API_URL,
+            json=payload,
+            headers=headers,
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+    except requests.RequestException as e:
+        # 含 ConnectionError / Timeout / 等所有 requests 层异常
+        raise RuntimeError(f"siliconflow 网络异常: {e}") from e
 
-    with open(output_file, mode, encoding="utf-8") as test:
-        test.write(answer + '\n')
-    # print(response.text)
-    return answer
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"siliconflow HTTP {response.status_code}: {response.text[:500]}"
+        )
 
-# 语音转文本大模型
-def audio_to_text(model="FunAudioLLM/SenseVoiceSmall", audio_path=settings.LLM_PATH+"audio_test.wav", output_file=settings.LLM_PATH+"output.txt", mode="a"):
-
-    url = "https://api.siliconflow.cn/v1/audio/transcriptions"
-    api_key = os.environ.get("SILICONFLOW_API_KEY", "")
-    if not api_key:
-        raise RuntimeError("SILICONFLOW_API_KEY 未配置，无法调用 siliconflow audio_to_text")
-    boundary = "-----011000010111000001101001"
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": f"multipart/form-data; boundary={boundary}"
-    }
-
-    with open(audio_path, "rb") as audio_file:
-        audio_content = audio_file.read()
-        payload = (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="model"\r\n\r\n'
-            f"{model}\r\n"
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="file"; filename="{audio_path}"\r\n'
-            f"Content-Type: audio/wav\r\n\r\n"
-        ).encode('utf-8')
-        payload += audio_content
-        payload += f"\r\n--{boundary}--\r\n".encode('utf-8')
-
-        response = requests.request("POST", url, data=payload, headers=headers)
-        answer = json.loads(response.text)['text']
-
-        with open(output_file, mode, encoding="utf-8") as f:
-            f.write(answer)
-        # print(response.text)
-        return answer
-
-if __name__ == "__main__":
-
-    # text_conversation()
-
-    # audio_to_text(mode="w")
-
-    pass
+    try:
+        return response.json()["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, ValueError) as e:
+        raise RuntimeError(
+            f"siliconflow 响应结构异常: {response.text[:500]}"
+        ) from e

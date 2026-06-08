@@ -8,13 +8,13 @@ from create_prompt import create_prompt_diagnose
 from get_sentences import get_sentences
 from perplexity import calculate_perplexity
 
-# 将对话提供给大模型，得到 “是否患病” “所患类型” “严重程度”。结果会被写入 diagnosis.txt 中
+# 将对话提供给大模型，得到 “是否患病” “所患类型” “严重程度”
 def diagnose1(conversation):
 
     model = "Pro/deepseek-ai/DeepSeek-V3"
 
     content = create_prompt_diagnose(conversation)
-    diagnosis = text_conversation(model=model, content=content, output_file=settings.LLM_PATH+"diagnosis.txt", mode="w")
+    diagnosis = text_conversation(model=model, content=content)
     # diagnosis应为一行，三个短语，用空格符分割
     result = diagnosis.strip().replace("{", "").replace("}", "").split()
     if len(result) == 3 and (result[0] == "是" or result[0] == "否"):
