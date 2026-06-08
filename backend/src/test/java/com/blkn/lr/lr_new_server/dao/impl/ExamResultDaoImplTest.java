@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.ExecutableUpdateOperation.Executabl
 import org.springframework.data.mongodb.core.ExecutableUpdateOperation.TerminatingUpdate;
 import org.springframework.data.mongodb.core.ExecutableUpdateOperation.UpdateWithUpdate;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
@@ -53,14 +53,14 @@ class ExamResultDaoImplTest {
     }
 
     @Test
-    void findByOwnerIdShouldBuildBasicQueryWithOwnerAndRecoveryAndIsDisabledFalse() {
+    void findByOwnerIdShouldBuildQueryWithOwnerAndRecoveryAndIsDisabledFalse() {
         ExamResult r1 = new ExamResult();
-        when(template.find(any(BasicQuery.class), eq(ExamResult.class))).thenReturn(List.of(r1));
+        when(template.find(any(Query.class), eq(ExamResult.class))).thenReturn(List.of(r1));
 
         List<ExamResult> result = dao.findByOwnerId(OWNER_ID, false);
         assertEquals(List.of(r1), result);
 
-        ArgumentCaptor<BasicQuery> captor = ArgumentCaptor.forClass(BasicQuery.class);
+        ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
         verify(template).find(captor.capture(), eq(ExamResult.class));
         String queryStr = captor.getValue().getQueryObject().toString();
         // 关键：必须同时锁 ownerId + isRecovery + isDisabled=false（已删除的不再返）
@@ -71,11 +71,11 @@ class ExamResultDaoImplTest {
 
     @Test
     void findByOwnerIdShouldPassRecoveryFlagTrueThrough() {
-        when(template.find(any(BasicQuery.class), eq(ExamResult.class))).thenReturn(List.of());
+        when(template.find(any(Query.class), eq(ExamResult.class))).thenReturn(List.of());
 
         dao.findByOwnerId(OWNER_ID, true);
 
-        ArgumentCaptor<BasicQuery> captor = ArgumentCaptor.forClass(BasicQuery.class);
+        ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
         verify(template).find(captor.capture(), eq(ExamResult.class));
         // 序列化结果应包含 isRecovery: true
         String queryStr = captor.getValue().getQueryObject().toString();
