@@ -50,6 +50,11 @@ class _ExamSettingEditSubPageState extends State<ExamSettingEditSubPage> with Us
   bool editingName = false;
   bool editingDesc = false;
 
+  /// 移动 category 上下的 HTTP 期间置 true，把所有 category 的"上/下"按钮 null 化
+  /// （TextButton onPressed:null 自动灰）防双击触发重复 reorder。一次只允许一个
+  /// 移动操作，所以所有 category 共享一个 flag。
+  bool _moving = false;
+
   double listTileCommonHeight = 32;
 
   @override
@@ -452,18 +457,32 @@ class _ExamSettingEditSubPageState extends State<ExamSettingEditSubPage> with Us
                                                           key: Key(index.toString()),
                                                           title: buildListTileContentWithActionButtons(
                                                               body: Text("${index+1}. ${category.description}", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-                                                              firstBtnAction: () {
-                                                                if (index > 0) {
-                                                                  examState.moveCategoryUp(categoryIndex: index,).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                                                                }
-                                                              },
+                                                              firstBtnAction: _moving
+                                                                  ? null
+                                                                  : () {
+                                                                      if (index > 0) {
+                                                                        setState(() => _moving = true);
+                                                                        examState.moveCategoryUp(categoryIndex: index)
+                                                                            .whenComplete(() {
+                                                                              if (mounted) setState(() => _moving = false);
+                                                                            })
+                                                                            .catchError((err) { requestResultErrorHandler(context, error: err); return err;});
+                                                                      }
+                                                                    },
                                                               firstBtnTooltipMsg: "上移",
                                                               firstBtnIcon: const Icon(Icons.arrow_upward),
-                                                              secondBtnAction: () {
-                                                                if (index < examState.exam.categories.length - 1) {
-                                                                  examState.moveCategoryDown(categoryIndex: index,).catchError((err) { requestResultErrorHandler(context, error: err); return err;});
-                                                                }
-                                                              },
+                                                              secondBtnAction: _moving
+                                                                  ? null
+                                                                  : () {
+                                                                      if (index < examState.exam.categories.length - 1) {
+                                                                        setState(() => _moving = true);
+                                                                        examState.moveCategoryDown(categoryIndex: index)
+                                                                            .whenComplete(() {
+                                                                              if (mounted) setState(() => _moving = false);
+                                                                            })
+                                                                            .catchError((err) { requestResultErrorHandler(context, error: err); return err;});
+                                                                      }
+                                                                    },
                                                               secondBtnTooltipMsg: "下移",
                                                               secondBtnIcon: const Icon(Icons.arrow_downward),
                                                               textAreaMaxHeight: listTileCommonHeight,
