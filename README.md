@@ -134,7 +134,13 @@ set -a; source ../.env; set +a    # Spring Boot 不会自动读 .env，必须先
 ./mvnw spring-boot:run
 ```
 
-或者用 IDEA：Run Configuration 里把 `.env` 各项加进 Environment Variables。
+> **非 bash/zsh shell 的 .env 加载方式**
+>
+> 上面 `set -a; source ../.env; set +a` 只在 bash/zsh 工作（macOS/Linux 默认、Windows WSL/Git Bash 也走 bash 链路）。其他环境：
+>
+> - **Fish shell**：`for line in (cat ../.env | grep -v '^#' | grep -v '^$'); set -gx (string split -m 1 = $line); end`
+> - **Windows PowerShell**：`Get-Content ../.env | ForEach-Object { if ($_ -match '^([^=#]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1], $matches[2]) } }`
+> - **IDEA / IntelliJ（跨平台推荐）**：Run Configuration → Environment Variables → 粘贴 `.env` 内容，或勾 "Load environment variables from file" 选 `.env`。这是 Windows 用户最省事的路径，避免 PowerShell 字符串转义坑。
 
 ### 终端 5：前端
 
