@@ -191,8 +191,8 @@ class _ItemFindingQuestionAnswerAreaState
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
-                commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                commonStyles?.primaryColor?.withValues(alpha: 0.03) ?? Colors.white,
+                commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ?? Colors.white,
               ]),
         ),
         child: Padding(
@@ -250,10 +250,10 @@ class _ItemFindingQuestionAnswerAreaState
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(2, 2))
             ]),
@@ -367,8 +367,8 @@ class _ItemFindingQuestionAnswerAreaState
         height: _markerSize,
         decoration: BoxDecoration(
           gradient: RadialGradient(colors: [
-            commonStyles?.primaryColor?.withOpacity(0.3) ??
-                Colors.blue.withOpacity(0.3),
+            commonStyles?.primaryColor?.withValues(alpha: 0.3) ??
+                Colors.blue.withValues(alpha: 0.3),
             commonStyles?.primaryColor ?? Colors.blue,
           ], stops: [
             0.5,

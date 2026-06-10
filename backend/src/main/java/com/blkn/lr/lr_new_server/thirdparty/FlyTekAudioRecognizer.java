@@ -6,44 +6,38 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 
 @Slf4j
 @NoArgsConstructor
 public class FlyTekAudioRecognizer extends WebSocketListener {
-    private static final String hostUrl = "https://iat-api.xfyun.cn/v2/iat"; //中英文，http url 不支持解析 ws/wss schema
-    // private static final String hostUrl = "https://iat-niche-api.xfyun.cn/v2/iat";//小语种
-//    private static final String file = "resource\\iat\\16k_10.pcm"; // 中文
     public static final int StatusFirstFrame = 0;
     public static final int StatusContinueFrame = 1;
     public static final int StatusLastFrame = 2;
     public static final Gson json = new Gson();
     Decoder decoder = new Decoder();
-    // 开始时间
     private Date dateBegin;
-    // 结束时间
     private Date dateEnd;
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");
-
-//    final private StringBuilder finalResult = new StringBuilder();
 
     private byte[] pcm16bitsData;
 
     private Consumer<String> onComplete;
+    // 默认 noop，保证 @NoArgsConstructor 和老 2 参构造不传 onError 时也安全
+    private Consumer<Throwable> onError = t -> {};
     private String appId;
 
     public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete) {
+        this(pcm16bitsData, onComplete, t -> {});
+    }
+
+    public FlyTekAudioRecognizer(byte[] pcm16bitsData, Consumer<String> onComplete, Consumer<Throwable> onError) {
         this.pcm16bitsData = pcm16bitsData;
         this.onComplete = onComplete;
+        this.onError = onError;
         this.appId = "";
     }
 
@@ -121,7 +115,6 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
                             data1.addProperty("audio", Base64.getEncoder().encodeToString(Arrays.copyOf(buffer, len)));
                             frame1.add("data", data1);
                             webSocket.send(frame1.toString());
-                            // System.out.println("send continue");
                             break;
                         case StatusLastFrame:    // 最后一帧音频status = 2 ，标志音频发送结束
                             JsonObject frame2 = new JsonObject();
@@ -151,17 +144,18 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     @Override
     public void onMessage(WebSocket webSocket, String text) {
         super.onMessage(webSocket, text);
-        //System.out.println(text);
         ResponseData resp = json.fromJson(text, ResponseData.class);
         if (resp != null) {
             if (resp.getCode() != 0) {
                 log.error("讯飞识别错误 code={}, error={}, sid={}", resp.getCode(), resp.getMessage(), resp.getSid());
+                onError.accept(new IOException(
+                        "讯飞识别错误 code=" + resp.getCode() + " sid=" + resp.getSid()));
+                webSocket.close(1000, "");
                 return;
             }
             if (resp.getData() != null) {
                 if (resp.getData().getResult() != null) {
                     Text te = resp.getData().getResult().getText();
-                    //System.out.println(te.toString());
                     try {
                         decoder.decode(te);
                         log.debug("中间识别结果: {}", decoder);
@@ -193,60 +187,18 @@ public class FlyTekAudioRecognizer extends WebSocketListener {
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         super.onFailure(webSocket, t, response);
-        try {
-            if (null != response) {
-                int code = response.code();
-                log.error("讯飞识别连接失败，code={}, body={}", code, response.body().string());
-                if (101 != code) {
-                    log.error("connection failed");
-                    System.exit(0);
-                }
+        int code = -1;
+        String body = "";
+        if (null != response) {
+            code = response.code();
+            try {
+                body = response.body() != null ? response.body().string() : "";
+            } catch (IOException e) {
+                log.warn("读取讯飞识别失败响应 body 出错", e);
             }
-        } catch (IOException e) {
-            log.error("处理讯飞识别失败响应时出错", e);
         }
-    }
-    public static void main(String[] args) throws Exception {
-        // 构建鉴权url
-        String authUrl = getAuthUrl(
-                hostUrl,
-                System.getenv().getOrDefault("FLYTEK_API_KEY", ""),
-                System.getenv().getOrDefault("FLYTEK_CLIENT_SECRET", "")
-        );
-        OkHttpClient client = new OkHttpClient.Builder().build();
-        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
-        String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
-        //System.out.println(url);
-        Request request = new Request.Builder().url(url).build();
-        // System.out.println(client.newCall(request).execute());
-        //System.out.println("url===>" + url);
-        client.newWebSocket(request, new FlyTekAudioRecognizer());
-    }
-    public static String getAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {
-        URL url = new URL(hostUrl);
-        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String date = format.format(new Date());
-        StringBuilder builder = new StringBuilder("host: ").append(url.getHost()).append("\n").//
-                append("date: ").append(date).append("\n").//
-                append("GET ").append(url.getPath()).append(" HTTP/1.1");
-        //System.out.println(builder);
-        Charset charset = Charset.forName("UTF-8");
-        Mac mac = Mac.getInstance("hmacsha256");
-        SecretKeySpec spec = new SecretKeySpec(apiSecret.getBytes(charset), "hmacsha256");
-        mac.init(spec);
-        byte[] hexDigits = mac.doFinal(builder.toString().getBytes(charset));
-        String sha = Base64.getEncoder().encodeToString(hexDigits);
-
-        //System.out.println(sha);
-        String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"", apiKey, "hmac-sha256", "host date request-line", sha);
-        //System.out.println(authorization);
-        HttpUrl httpUrl = HttpUrl.parse("https://" + url.getHost() + url.getPath()).newBuilder().//
-                addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(charset))).//
-                addQueryParameter("date", date).//
-                addQueryParameter("host", url.getHost()).//
-                build();
-        return httpUrl.toString();
+        log.error("讯飞识别连接失败，code={}, body={}", code, body, t);
+        onError.accept(t != null ? t : new IOException("讯飞识别连接失败 code=" + code));
     }
     public static class ResponseData {
         private int code;

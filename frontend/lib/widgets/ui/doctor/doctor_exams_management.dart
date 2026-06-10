@@ -225,9 +225,9 @@ class DoctorExamsManagementPageState extends State<DoctorExamsManagementPage>
     return Container(
       width: constraints.maxWidth >= 800 ? _extendedNavWidth : _navRailWidth,
       decoration:
-      BoxDecoration(color: Colors.grey.withOpacity(0.1), boxShadow: [
+      BoxDecoration(color: Colors.grey.withValues(alpha: 0.1), boxShadow: [
         BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 2,
             blurRadius: 8,
             offset: const Offset(2, 0))
@@ -238,11 +238,11 @@ class DoctorExamsManagementPageState extends State<DoctorExamsManagementPage>
             child: NavigationRail(
               extended: constraints.maxWidth >= 800,
               minExtendedWidth: _extendedNavWidth,
-              backgroundColor: Colors.white.withOpacity(0.4),
+              backgroundColor: Colors.white.withValues(alpha: 0.4),
               selectedIconTheme:
-              IconThemeData(color: Colors.black.withOpacity(0.8)),
+              IconThemeData(color: Colors.black.withValues(alpha: 0.8)),
               unselectedIconTheme:
-              IconThemeData(color: Colors.grey.withOpacity(0.8)),
+              IconThemeData(color: Colors.grey.withValues(alpha: 0.8)),
               labelType: constraints.maxWidth >= 800
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.selected,

@@ -121,7 +121,7 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
                                         gradient: LinearGradient(colors: [
                                           theme.colorScheme.primary,
                                           theme.colorScheme.primary
-                                              .withOpacity(0.8)
+                                              .withValues(alpha: 0.8)
                                         ]),
                                         borderRadius:
                                             BorderRadius.circular(_cardRadius),
@@ -225,7 +225,7 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
                                                         vertical: 4),
                                                     decoration: BoxDecoration(
                                                       color: Colors.green
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha: 0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               4),
@@ -693,7 +693,7 @@ class ExamDetailCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(_cardRadius),
       child: Container(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(_cardRadius),
         ),
         child: InkWell(

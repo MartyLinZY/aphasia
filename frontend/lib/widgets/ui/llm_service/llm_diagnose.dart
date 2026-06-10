@@ -15,14 +15,15 @@ class LLMDiagnosePage extends StatefulWidget {
 
 class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles {
   final TextEditingController _conversationCtrl = TextEditingController();
-  String? type;
+  // 客观特征诊断结果（/api/diagnose2）：是否失语 + 严重度 + 加权分 + 证据特征。
+  // 旧的"类型(type)"与"困惑度(perplexity)"已下线——类型实测无效、困惑度方向被语料证伪。
+  bool? hasAphasia;
   String? severity;
-  double? perplexity;
-  bool loading1 = false;
-  bool loading2 = false;
+  double? score;
+  List<String> evidence = [];
+  bool loading = false;
   String? errorMsg;
-  bool diagnose1Done = false;
-  bool diagnose2Done = false;
+  bool done = false;
   String lastInput = '';
 
   @override
@@ -35,27 +36,27 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
     final current = _conversationCtrl.text.trim();
     if (current != lastInput) {
       setState(() {
-        type = null;
+        hasAphasia = null;
         severity = null;
-        perplexity = null;
+        score = null;
+        evidence = [];
         errorMsg = null;
-        diagnose1Done = false;
-        diagnose2Done = false;
+        done = false;
       });
       lastInput = current;
     }
   }
 
-  Future<void> _runDiagnose1() async {
-    if (diagnose1Done) return;
+  Future<void> _runDiagnose() async {
+    if (done) return;
     setState(() {
-      loading1 = true;
+      loading = true;
       errorMsg = null;
     });
     final conversation = _conversationCtrl.text.trim();
     if (conversation.isEmpty) {
       setState(() {
-        loading1 = false;
+        loading = false;
         errorMsg = '请输入医患对话内容';
       });
       return;
@@ -64,55 +65,20 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
       // 走 HttpClientManager 是为了自动带上登录后保存的 Token 头；
       // 之前裸 http.post 没有 Token，会被拦截器以 401 拒绝。
       final data = await HttpClientManager().post(
-            url: '${HttpConstants.backendBaseUrl}/api/diagnose1',
-            body: jsonEncode({'conversation': conversation}),
-          ) as Map<String, dynamic>;
-      setState(() {
-        type = data['type']?.toString();
-        severity = data['severity']?.toString();
-        diagnose1Done = true;
-      });
-    } on HttpRequestException catch (e) {
-      setState(() {
-        errorMsg = '诊断类型接口错误: ${_extractMessage(e)}';
-      });
-    } catch (e) {
-      setState(() {
-        errorMsg = e.toString();
-      });
-    } finally {
-      setState(() {
-        loading1 = false;
-      });
-    }
-  }
-
-  Future<void> _runDiagnose2() async {
-    if (diagnose2Done) return;
-    setState(() {
-      loading2 = true;
-      errorMsg = null;
-    });
-    final conversation = _conversationCtrl.text.trim();
-    if (conversation.isEmpty) {
-      setState(() {
-        loading2 = false;
-        errorMsg = '请输入医患对话内容';
-      });
-      return;
-    }
-    try {
-      final data = await HttpClientManager().post(
             url: '${HttpConstants.backendBaseUrl}/api/diagnose2',
             body: jsonEncode({'conversation': conversation}),
           ) as Map<String, dynamic>;
       setState(() {
-        perplexity = (data['perplexity'] as num?)?.toDouble();
-        diagnose2Done = true;
+        hasAphasia = data['hasAphasia'] as bool?;
+        severity = data['severity']?.toString();
+        score = (data['score'] as num?)?.toDouble();
+        final ev = data['evidence'];
+        evidence = ev is List ? ev.map((e) => e.toString()).toList() : [];
+        done = true;
       });
     } on HttpRequestException catch (e) {
       setState(() {
-        errorMsg = '诊断严重程度接口错误: ${_extractMessage(e)}';
+        errorMsg = '诊断接口错误: ${_extractMessage(e)}';
       });
     } catch (e) {
       setState(() {
@@ -120,7 +86,7 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
       });
     } finally {
       setState(() {
-        loading2 = false;
+        loading = false;
       });
     }
   }
@@ -150,7 +116,6 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
     super.dispose();
   }
 
-  // ▼▼▼ 仅修改build方法：移除NavigationRail相关代码，其余完全保留 ▼▼▼
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +141,6 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ▼▼▼ 完全保留原有UI组件 ▼▼▼
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Card(
@@ -209,7 +173,7 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
                                     const SizedBox(width: 0),
                                     Expanded(
                                       child: Text(
-                                        '使用人工智能技术分析医生与患者的对话内容，提供失语症的智能诊断服务。',
+                                        '使用人工智能分析医患对话，逐条识别失语症语言学特征，给出是否失语、严重程度与判定依据。',
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             fontSize: 15,
                                             color: Colors.blueGrey[900]),
@@ -290,61 +254,26 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
                 const SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: loading1
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.medical_services_outlined,
-                                  size: 22, color: Colors.white),
-                          label: Text('大模型诊断患病类型与严重程度',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white, fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF448AFF),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 3,
-                          ),
-                          onPressed: (!loading1 && !diagnose1Done)
-                              ? _runDiagnose1
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: loading2
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.analytics_outlined,
-                                  size: 22, color: Colors.white),
-                          label: Text('大模型计算患者话的困惑度',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white, fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF43A047),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 3,
-                          ),
-                          onPressed: (!loading2 && !diagnose2Done)
-                              ? _runDiagnose2
-                              : null,
-                        ),
-                      ),
-                    ],
+                  child: ElevatedButton.icon(
+                    icon: loading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.medical_services_outlined,
+                            size: 22, color: Colors.white),
+                    label: Text('智能诊断',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.white, fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF448AFF),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      elevation: 3,
+                    ),
+                    onPressed: (!loading && !done) ? _runDiagnose : null,
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -354,7 +283,7 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
                     child: Text(errorMsg!,
                         style: const TextStyle(color: Colors.red, fontSize: 15)),
                   ),
-                if (type != null || severity != null || perplexity != null)
+                if (hasAphasia != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18),
                     child: Card(
@@ -368,15 +297,18 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (type != null)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: Text('失语症类型：$type',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600)),
-                              ),
-                            if (severity != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                  '诊断结果：${hasAphasia! ? '疑似失语' : '未见明显失语'}',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: hasAphasia!
+                                          ? Colors.red[700]
+                                          : Colors.green[800])),
+                            ),
+                            if (hasAphasia! && severity != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 6),
                                 child: Text('严重程度：$severity',
@@ -384,11 +316,38 @@ class _LLMDiagnosePageState extends State<LLMDiagnosePage> with UseCommonStyles 
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600)),
                               ),
-                            if (perplexity != null)
-                              Text('困惑度：${perplexity!.toStringAsFixed(2)}',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600)),
+                            if (score != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text('严重度分：${score!.toStringAsFixed(2)}',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                            if (evidence.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 8),
+                                child: Text('判定依据（识别到的语言学特征）：',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        fontSize: 14,
+                                        color: Colors.blueGrey[700])),
+                              ),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 6,
+                                children: [
+                                  for (final f in evidence)
+                                    Chip(
+                                      label: Text(f,
+                                          style: const TextStyle(fontSize: 13)),
+                                      backgroundColor: Colors.white,
+                                      visualDensity: VisualDensity.compact,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

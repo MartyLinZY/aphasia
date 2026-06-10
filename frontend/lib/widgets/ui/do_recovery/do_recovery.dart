@@ -295,7 +295,7 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
               borderRadius: BorderRadius.circular(_cardRadius),
               child: LinearProgressIndicator(
                 value: (categoryIndex + 1) / exam.categories.length,
-                backgroundColor: Colors.grey.withOpacity(0.5),
+                backgroundColor: Colors.grey.withValues(alpha: 0.5),
                 valueColor: AlwaysStoppedAnimation<Color>(
                   commonStyles?.primaryColor ?? Colors.blueAccent
                 ),
@@ -320,8 +320,8 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
-                    commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                    commonStyles?.primaryColor?.withValues(alpha: 0.03) ?? Colors.white,
+                    commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ?? Colors.white,
                   ]
                 ),
                 borderRadius: BorderRadius.circular(_cardRadius),
@@ -335,7 +335,7 @@ class _DoRecoveryPageState extends State<DoRecoveryPage> with UseCommonStyles {
                       top: -60,
                       child: Icon(Icons.psychology_alt_outlined,
                         size: 200,
-                        color: commonStyles?.primaryColor?.withOpacity(0.1),
+                        color: commonStyles?.primaryColor?.withValues(alpha: 0.1),
                       ),
                     ),
                     Padding(

@@ -63,15 +63,21 @@ public class BaiduApiManager {
 
     @Nullable
     private JSONObject requestService(String url, JSONObject param) {
-        ResponseEntity<JSONObject> responseEntity=restTemplate.postForEntity(url +accessToken,param,JSONObject.class);
-        if (responseEntity.getStatusCode().value() == 200){
-            JSONObject result= responseEntity.getBody();
-            if (result.getInteger("error_code") != null) {
-                log.error("百度 API 错误: {}", result.getString("error_msg"));
-            }
-            return result;
+        ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(url + accessToken, param, JSONObject.class);
+        if (responseEntity.getStatusCode().value() != 200) {
+            return null;
         }
-        return null;
+        JSONObject result = responseEntity.getBody();
+        if (result == null) {
+            log.warn("百度 API 200 但响应 body 为空");
+            return null;
+        }
+        if (result.getInteger("error_code") != null) {
+            log.error("百度 API 错误 code={}, msg={}",
+                    result.getInteger("error_code"), result.getString("error_msg"));
+            return null;
+        }
+        return result;
     }
 
     public Double shortTextSimilarity(String text1, String text2) {
@@ -87,11 +93,7 @@ public class BaiduApiManager {
         param.put("text_2",text2);
 
         JSONObject result = requestService(url, param);
-        if (result != null) {
-            return result.getDouble("score");
-        } else {
-            return null;
-        }
+        return result == null ? null : result.getDouble("score");
     }
 
     public String handWriteRecognize(byte[] imageBytes) throws BaiduApiFailException {
@@ -115,19 +117,22 @@ public class BaiduApiManager {
         }
         log.debug("使用 accessToken 调用手写识别");
         JSONObject resultObj = JSON.parseObject(result);
-
-        JSONArray results;
-        if (resultObj != null) {
-           results = resultObj.getJSONArray("words_result");
-        } else {
+        if (resultObj == null) {
+            return null;
+        }
+        if (resultObj.getInteger("error_code") != null) {
+            throw new BaiduApiFailException(
+                    "百度手写识别错误 code=" + resultObj.getInteger("error_code")
+                            + " msg=" + resultObj.getString("error_msg"));
+        }
+        JSONArray results = resultObj.getJSONArray("words_result");
+        if (results == null) {
             return null;
         }
         StringBuilder builder = new StringBuilder();
-
-        for (int i = 0;i < results.size();i++) {
+        for (int i = 0; i < results.size(); i++) {
             builder.append(results.getJSONObject(i).get("words"));
         }
-
         return builder.toString();
     }
 

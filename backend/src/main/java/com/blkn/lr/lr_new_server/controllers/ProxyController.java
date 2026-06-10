@@ -1,16 +1,19 @@
 package com.blkn.lr.lr_new_server.controllers;
 
+import com.blkn.lr.lr_new_server.dto.apiproxy.AudioFromTextRequest;
 import com.blkn.lr.lr_new_server.dto.apiproxy.HandWritingRecognizeResult;
+import com.blkn.lr.lr_new_server.dto.apiproxy.PinyinMatchResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.TextSimilarityResult;
 import com.blkn.lr.lr_new_server.dto.flytek.audio.AudioRecognizeResult;
 import com.blkn.lr.lr_new_server.dto.apiproxy.FluencyResult;
-import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.exception.ProxyServiceException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
+import com.blkn.lr.lr_new_server.services.PinyinService;
 import com.blkn.lr.lr_new_server.services.QwenAudioService;
 import com.blkn.lr.lr_new_server.util.BaiduApiManager;
 import com.blkn.lr.lr_new_server.util.FlyTekManager;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -19,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @RestController
@@ -30,6 +35,17 @@ public class ProxyController {
     private final QwenAudioService qwenAudioService;
     private final FlyTekManager flyTekManager;
     private final Environment environment;
+    private final PinyinService pinyinService;
+
+    @PostMapping("/pinyin_match")
+    PinyinMatchResult pinyinMatch(@RequestParam("keyword") String keyword,
+                                  @RequestParam("spoken") String spoken,
+                                  @RequestParam(value = "threshold", defaultValue = "0.7") double threshold) {
+        if (keyword == null || keyword.isBlank() || spoken == null || spoken.isBlank()) {
+            return new PinyinMatchResult(false, 0d, "", "");
+        }
+        return pinyinService.match(keyword, spoken, threshold);
+    }
 
     @PostMapping("/text_similarity")
     TextSimilarityResult calTextSimilarity(@RequestParam("text1") String text1, @RequestParam("text2") String text2) {
@@ -46,8 +62,12 @@ public class ProxyController {
     @PostMapping("/audio_recognize")
     AudioRecognizeResult recognizeAudioContent(@RequestParam("file") MultipartFile file) throws Exception {
         Future<String> future = flyTekManager.recognizeAudio(file.getBytes());
-        String result = future.get();
-        return new AudioRecognizeResult(result);
+        try {
+            return new AudioRecognizeResult(future.get(60, TimeUnit.SECONDS));
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new ProxyServiceException("讯飞 ASR 超时", e);
+        }
     }
 
     @PostMapping("/fluency")
@@ -68,22 +88,20 @@ public class ProxyController {
 
     @PostMapping("/audio_from_text")
     @RequireRole({2})
-    Map<String, String> generateAudioFromText(@RequestBody Map<String, String> param, HttpServletRequest request) throws Exception {
-        if (!param.containsKey("text") || param.get("text").isEmpty()) {
-            throw new BusinessErrorException("收到内容为空的语音合成请求");
-        }
-
-        String text = param.get("text");
-
-        if (text.length() > 100) {
-            throw new BusinessErrorException("语音合成请求长度>100，拒绝响应");
-        }
+    Map<String, String> generateAudioFromText(@Valid @RequestBody AudioFromTextRequest req, HttpServletRequest request) throws Exception {
+        String text = req.getText();
 
         String uid = (String) request.getAttribute("uid");
 
         String port = environment.getProperty("server.port");
         Future<String> future = flyTekManager.synthesisAudioFromText(text, uid, port);
-        String url = future.get();
+        String url;
+        try {
+            url = future.get(30, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new ProxyServiceException("讯飞 TTS 超时", e);
+        }
 
         String[] tokens = url.split("/");
         String fileName = tokens[tokens.length - 1];

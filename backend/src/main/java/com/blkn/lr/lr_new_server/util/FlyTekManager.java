@@ -1,5 +1,6 @@
 package com.blkn.lr.lr_new_server.util;
 
+import com.blkn.lr.lr_new_server.config.AppSetting;
 import com.blkn.lr.lr_new_server.config.FlyTekApiConfig;
 import com.blkn.lr.lr_new_server.config.StaticResourcesConfig;
 import com.blkn.lr.lr_new_server.thirdparty.FlyTekAudioRecognizer;
@@ -7,7 +8,6 @@ import com.blkn.lr.lr_new_server.thirdparty.FlyTekAudioSynthesiser;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.WebSocket;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FlyTekManager {
     private final FlyTekApiConfig flyTekApiConfig;
+    private final AppSetting appSetting;
 
     public Future<String> recognizeAudio(byte[] pcm16bitsData) throws Exception {
         String authedUrl = getAuthUrl(
@@ -40,12 +41,10 @@ public class FlyTekManager {
         OkHttpClient client = OkHttpManager.getClient();
         Request request = new Request.Builder().url(authedUrl).build();
         CompletableFuture<String> future = new CompletableFuture<>();
-        FlyTekAudioRecognizer recognizer = new FlyTekAudioRecognizer(pcm16bitsData, future::complete);
+        FlyTekAudioRecognizer recognizer = new FlyTekAudioRecognizer(
+                pcm16bitsData, future::complete, future::completeExceptionally);
         recognizer.setAppId(flyTekApiConfig.getAppId());
-        WebSocket webSocket = client.newWebSocket(
-                request,
-                recognizer
-        );
+        client.newWebSocket(request, recognizer);
         return future;
     }
 
@@ -63,7 +62,8 @@ public class FlyTekManager {
                 .replaceAll("[\\\\/:*?\"<>|\\s]", "_");
         String fileName = safeStem + ".mp3";
         String destFilePath = StaticResourcesConfig.getAudioDirPath(uid) + fileName;
-        String fileUrlPath = StaticResourcesConfig.getUrlPrefix(serverPort) + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
+        String fileUrlPath = StaticResourcesConfig.getUrlPrefix(appSetting.getHost(), serverPort)
+                + StaticResourcesConfig.getAudioUrlPath(uid, fileName);
 
         Path destPath = Paths.get(destFilePath);
         if (destPath.getParent() != null) {
@@ -72,7 +72,11 @@ public class FlyTekManager {
 
         client.newWebSocket(
                 request,
-                new FlyTekAudioSynthesiser(flyTekApiConfig.getAppId(), text, destFilePath, () -> future.complete(fileUrlPath))
+                new FlyTekAudioSynthesiser(
+                        flyTekApiConfig.getAppId(), text, destFilePath,
+                        () -> future.complete(fileUrlPath),
+                        future::completeExceptionally
+                )
         );
         return future;
     }
@@ -87,7 +91,6 @@ public class FlyTekManager {
         String preStr = "host: " + url.getHost() + "\n" +
                 "date: " + date + "\n" +
                 "GET " + url.getPath() + " HTTP/1.1";
-        //System.out.println(preStr);
         // SHA256加密
         Mac mac = Mac.getInstance("hmacsha256");
         SecretKeySpec spec = new SecretKeySpec(apiSecret.getBytes(StandardCharsets.UTF_8), "hmacsha256");

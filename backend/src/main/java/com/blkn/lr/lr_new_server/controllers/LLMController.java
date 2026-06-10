@@ -18,23 +18,12 @@ public class LLMController {
     private final LLMService llmService;
 
     /**
-     * 大模型诊断患病类型与严重程度
-     * 
-     * @param jsonConversation 医患对话内容 { "conversation": "..." }
-     * @return 诊断结果 { "type": "...", "severity": "..." }
-     * @throws Exception 调用异常
-     */
-    @PostMapping("/diagnose1")
-    public Map<String, Object> diagnose1(@Valid @RequestBody ConversationRequest req) throws Exception {
-        log.debug("diagnose1 called");
-        return llmService.diagnose1(req.getConversation());
-    }
-
-    /**
-     * 大模型计算患者话的困惑度
-     * 
-     * @param jsonConversation 医患对话内容 { "conversation": "..." }
-     * @return 困惑度 { "perplexity": ... }
+     * 客观特征诊断：返回是否失语、严重度、加权分、特征向量与证据特征。
+     * （旧 /diagnose1 大模型一锤子判类型已删除——实测类型无效、误诊率高；
+     *   旧困惑度实现也已废弃，方向被语料证伪。端点名暂留 diagnose2。）
+     *
+     * @param req 医患对话内容 { "conversation": "..." }
+     * @return { "hasAphasia": bool, "severity": "...", "score": ..., "features": {...}, "evidence": [...] }
      * @throws Exception 调用异常
      */
     @PostMapping("/diagnose2")

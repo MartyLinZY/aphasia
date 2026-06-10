@@ -177,8 +177,8 @@ class _CommandQuestionAnswerAreaState extends State<CommandQuestionAnswerArea>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                widget.commonStyles?.primaryColor?.withOpacity(0.03) ?? Colors.white,
-                widget.commonStyles?.onPrimaryColor?.withOpacity(0.05) ?? Colors.white,
+                widget.commonStyles?.primaryColor?.withValues(alpha: 0.03) ?? Colors.white,
+                widget.commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ?? Colors.white,
               ]
             ),
           ),
@@ -346,12 +346,12 @@ class _CommandQuestionAnswerAreaState extends State<CommandQuestionAnswerArea>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
               width: 1
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 6,
                 offset: const Offset(2, 2)
               )
@@ -370,7 +370,7 @@ class _CommandQuestionAnswerAreaState extends State<CommandQuestionAnswerArea>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: candidateData.isNotEmpty 
-              ? commonStyles?.primaryColor?.withOpacity(0.1)
+              ? commonStyles?.primaryColor?.withValues(alpha: 0.1)
               : Colors.transparent,
             borderRadius: BorderRadius.circular(12)
           ),
@@ -439,7 +439,7 @@ class _CommandQuestionAnswerAreaState extends State<CommandQuestionAnswerArea>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.white.withOpacity(0.9)
+                color: Colors.white.withValues(alpha: 0.9)
               ),
               child: _buildSlotImages(slot),
             ),

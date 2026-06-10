@@ -16,7 +16,12 @@ import java.util.Arrays;
 public class TokenInterceptor implements HandlerInterceptor {
 	public final static String LOGIN_SYMBOL = "uid";
 
-	// TODO: potential security problem, after login, the user has access to all url
+	private final TokenUtil tokenUtil;
+
+	public TokenInterceptor(TokenUtil tokenUtil) {
+		this.tokenUtil = tokenUtil;
+	}
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		if (request.getMethod().equals("OPTIONS")) {
@@ -29,7 +34,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         //			HttpSession session = request.getSession();
         //			return session.getAttribute("uid") != null;
         if (token != null) {
-			DecodedJWT decodedJWT = TokenUtil.verifyToken(token);
+			DecodedJWT decodedJWT = tokenUtil.verifyToken(token);
 			if (decodedJWT != null) {
 				// valid token => add the identity information into the request
 				String uid = decodedJWT.getClaim("uid").asString();
@@ -43,7 +48,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 				}
 
 				// refresh token and put in header
-				response.addHeader("Token", TokenUtil.getToken(uid, uType));
+				response.addHeader("Token", tokenUtil.getToken(uid, uType));
 				return true;
 			} else {
 				// invalid token => return json with state = 0

@@ -1,8 +1,7 @@
-import 'dart:html' as html;
 import 'dart:typed_data';
 
-import 'package:http/http.dart';
 import 'package:record/record.dart';
+import 'package:web/web.dart' as web;
 
 mixin AudioRecorderMixin {
   Future<void> recordFile(AudioRecorder recorder, RecordConfig config) {
@@ -22,19 +21,17 @@ mixin AudioRecorderMixin {
           bytes.addAll(uint8List);
         }
         onStop(bytes);
-        // downloadWebData(html.Url.createObjectUrl(html.Blob(b)));
       },
     );
   }
 
   void downloadWebData(String path) {
-    // Simple download code for web testing
-    final anchor = html.document.createElement('a') as html.AnchorElement
+    final anchor = web.HTMLAnchorElement()
       ..href = path
       ..style.display = 'none'
       ..download = 'audio.wav';
-    html.document.body!.children.add(anchor);
+    web.document.body!.appendChild(anchor);
     anchor.click();
-    html.document.body!.children.remove(anchor);
+    web.document.body!.removeChild(anchor);
   }
 }

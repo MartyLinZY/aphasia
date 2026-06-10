@@ -22,29 +22,36 @@ void toast(BuildContext context, {required String msg, required String btnText, 
   );
 }
 
-Future<bool?> confirm (BuildContext context, {  // 修改返回类型为Future<bool?>
+/// 弹一个确认对话框，返回 [Future<bool?>]——确认 / 取消 / 外部关闭分别
+/// 解析为 true / false / null。
+///
+/// **caller 自己负责在 [onConfirm] / [onCancel] 里 `Navigator.pop`**——
+/// 仓库内现有 29 处 caller 全部按此写法。早期实现里 helper 内部还会再
+/// 跑一次 `Navigator.pop(context, true/false)`，与 caller 的 pop 叠加成
+/// 双 pop——会顺手把 dialog 下面的父路由也弹掉。真实 app 因为外层通常
+/// 还压着别的 route 才被掩盖，widget test 里 home 是单 route 时直接
+/// 屏空白；某些 caller（如 doctor_item_slot_edit_dialog.dart:120 双
+/// pop 主动返 ItemSlot）甚至会把更上一层路由也带走。
+///
+/// 现行规约：
+/// - caller 没传 [onConfirm]：默认 `Navigator.pop(ctx, true)` 关 dialog；
+/// - caller 没传 [onCancel]：默认 `Navigator.pop(ctx, false)` 关 dialog；
+/// - caller 传了回调：helper 不再额外 pop，回调里**必须**自己 pop（不然
+///   dialog 关不掉）。
+Future<bool?> confirm (BuildContext context, {
   required String title,
   required String body,
   void Function(BuildContext dialogContext)? onConfirm,
   void Function(BuildContext dialogContext)? onCancel,
   required CommonStyles? commonStyles}) {
 
-  return showDialog<bool?>(context: context, builder: (context) {  // 添加泛型类型
-    var result = false;
+  return showDialog<bool?>(context: context, builder: (context) {
     return buildSimpleActionDialog(context,
       title: title,
       body: Text(body, style: commonStyles?.bodyStyle,),
       commonStyles: commonStyles,
-      onConfirm: (ctx) {
-        onConfirm?.call(ctx);
-        result = true;
-        Navigator.pop(context, true);  // 确认时返回true
-      },
-      onCancel: (ctx) {
-        onCancel?.call(ctx);
-        result = false;
-        Navigator.pop(context, false); // 取消时返回false
-      }
+      onConfirm: onConfirm ?? (ctx) => Navigator.pop(ctx, true),
+      onCancel: onCancel ?? (ctx) => Navigator.pop(ctx, false),
     );
   });
 }

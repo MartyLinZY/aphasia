@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 翻译服务：通过 LLM 对输入文本进行补全/猜测含义并输出翻译结果。
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TranslationService {
@@ -71,6 +73,8 @@ public class TranslationService {
             String responseBody = callLlm(text);
             return parseTranslationFromResponse(responseBody, text);
         } catch (IOException e) {
+            // 保留"返原文"兜底契约（caller 已经依赖），但运维要能看到上游故障。
+            log.warn("翻译 LLM 调用失败 → 降级返原文: {}", e.getMessage());
             return text;
         }
     }
@@ -142,6 +146,7 @@ public class TranslationService {
             String content = message.has("content") ? message.get("content").getAsString() : null;
             return (content != null && !content.isBlank()) ? content.trim() : fallback;
         } catch (Exception e) {
+            log.warn("翻译响应 JSON 解析失败 → 降级返原文: {}", e.getMessage());
             return fallback;
         }
     }

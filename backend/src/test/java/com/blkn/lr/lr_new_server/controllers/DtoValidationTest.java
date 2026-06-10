@@ -1,13 +1,11 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.ExamDao;
-import com.blkn.lr.lr_new_server.dao.ExamResultDao;
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
+import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
 import com.blkn.lr.lr_new_server.exception.GlobalExceptionHandler;
-import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import com.blkn.lr.lr_new_server.services.ExamServices;
+import com.blkn.lr.lr_new_server.services.ResultServices;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,21 +30,18 @@ class DtoValidationTest {
     private MockMvc examMvc;
     private MockMvc resultMvc;
     private ExamServices examServices;
-    private ExamResultDao resultDao;
+    private ResultServices resultServices;
 
     @BeforeEach
     void setUp() {
         examServices = Mockito.mock(ExamServices.class);
-        ExamController examController = new ExamController(
-                examServices,
-                Mockito.mock(ExamDao.class),
-                Mockito.mock(QuestionDao.class));
+        ExamController examController = new ExamController(examServices);
         examMvc = MockMvcBuilders.standaloneSetup(examController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
-        resultDao = Mockito.mock(ExamResultDao.class);
-        ResultController resultController = new ResultController(resultDao, Mockito.mock(QuestionDao.class));
+        resultServices = Mockito.mock(ResultServices.class);
+        ResultController resultController = new ResultController(resultServices);
         resultMvc = MockMvcBuilders.standaloneSetup(resultController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -121,13 +116,52 @@ class DtoValidationTest {
 
     @Test
     void saveResultShouldPassWithEmptyCategoryResults() throws Exception {
-        ExamResult saved = new ExamResult();
+        ExamResultDto saved = new ExamResultDto();
         saved.setCategoryResults(List.of());
-        when(resultDao.save(any())).thenReturn(saved);
+        when(resultServices.saveResult(any(), any())).thenReturn(saved);
 
         resultMvc.perform(post("/api/examRecord")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"examName\":\"测评A\",\"categoryResults\":[]}"))
                 .andExpect(status().isOk());
+    }
+
+    // ---------- rule typeName 入口校验 ----------
+    // 4 类 rule（DiagnosisRule / TerminateRule / ExamCategoryEvalRule /
+    // ExamSubCategoryEvalRule）都用 typeName 做 factory dispatch；缺 typeName
+    // 直接落库，前端 fromJson 会抛 UnimplementedError 引发"已保存但读不回"。
+    // 这里覆盖 4 个 POST 入口；4 个 PATCH 端点对称同样 @Valid 同样 model 注解，
+    // 不重复覆盖。
+
+    @Test
+    void addDiagnoseRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/diagnosisRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"aphasiaType\":\"motor\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addTerminateRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/subCategories/0/terminateRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"reason\":\"连续答错\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addCategoryEvalRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSubCategoryEvalRuleShouldRejectBlankTypeName() throws Exception {
+        examMvc.perform(post("/api/exams/e1/categories/0/subCategories/0/evalRule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
     }
 }

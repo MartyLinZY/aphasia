@@ -22,6 +22,7 @@ import java.util.Objects;
 public class FileController {
     private final FileDao fileDao;
     private final Environment environment;
+    private final AppSetting appSetting;
 
     @PostMapping("/image")
     Map<String, String> uploadImages(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
@@ -37,7 +38,7 @@ public class FileController {
         String uid = (String) request.getAttribute("uid");
 
         String contentType = Objects.requireNonNull(file.getContentType());
-        String accessUrl = StaticResourcesConfig.getUrlPrefix(environment.getProperty("server.port"));
+        String accessUrl = StaticResourcesConfig.getUrlPrefix(appSetting.getHost(), environment.getProperty("server.port"));
         String fileName;
         if (contentType.contains("audio/")) {
             fileName = fileDao.createAudioFile(file, uid).getName();
@@ -55,7 +56,7 @@ public class FileController {
     @GetMapping("/images")
     List<Map<String, String>> getAllImageInfo(HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
-        String urlPrefix = "http://" + AppSetting.HOSTNAME + ":" + environment.getProperty("server.port");
+        String urlPrefix = StaticResourcesConfig.getUrlPrefix(appSetting.getHost(), environment.getProperty("server.port"));
 
         return fileDao.getAllImageUrlPaths(uid).stream().map(e -> {
             String[] tokens = e.split("/");
@@ -68,7 +69,7 @@ public class FileController {
     @GetMapping("/audios")
     List<Map<String, String>> getAllAudioInfo(HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
-        String urlPrefix = "http://" + AppSetting.HOSTNAME + ":" + environment.getProperty("server.port");
+        String urlPrefix = StaticResourcesConfig.getUrlPrefix(appSetting.getHost(), environment.getProperty("server.port"));
 
         return fileDao.getAllAudioUrlPaths(uid).stream().map(e -> {
             String[] tokens = e.split("/");

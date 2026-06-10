@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version>
+		<version>3.5.14</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.blkn.lr</groupId>
@@ -47,33 +47,41 @@
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
-			<version>4.4.0</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+		<!-- okhttp 5.x 是 Kotlin Multiplatform；Maven 必须显式选 JVM 变种（主 artifact 只是空 metadata） -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
+			<artifactId>okhttp-jvm</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+		<!-- okhttp 4.x 通过 kotlin-stdlib 传递引入 jetbrains-annotations，5.x 改用 kotlin-stdlib 2.x 不再带；
+		     本仓 3 处 @NotNull/@Nullable（IDE 自动添加的辅助 annotation）需此包，显式化以稳定依赖图。 -->
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>26.0.2</version>
 		</dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.11.0</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>2.0.53</version>
+            <version>2.0.62</version>
         </dependency>
+        <!-- 录音题"拼音模糊判分"用：失语症患者发音变形导致原 substring 精确匹配判 0 分。Spring Boot BOM 不含，显式 pin。 -->
         <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>heaven</artifactId>
-            <version>0.1.145</version>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
         </dependency>
     </dependencies>
 
@@ -88,6 +96,35 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						<!-- 排除纯字段 DTO / model（Lombok 生成的 getter/setter 无业务逻辑，纳入会稀释真实覆盖率） -->
+						<exclude>com/blkn/lr/lr_new_server/dto/**</exclude>
+						<exclude>com/blkn/lr/lr_new_server/models/**</exclude>
+						<!-- 启动类 -->
+						<exclude>com/blkn/lr/lr_new_server/LrNewServerApplication.class</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

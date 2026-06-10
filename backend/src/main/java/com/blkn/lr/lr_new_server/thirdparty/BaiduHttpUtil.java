@@ -6,8 +6,6 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class BaiduHttpUtil {
@@ -36,41 +34,34 @@ public class BaiduHttpUtil {
     public static String postGeneralUrl(String generalUrl, String contentType, String params, String encoding)
             throws Exception {
         URL url = new URL(generalUrl);
-        // 打开和URL之间的连接
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        // 设置通用的请求属性
-        connection.setRequestProperty("Content-Type", contentType);
-        connection.setRequestProperty("Connection", "Keep-Alive");
-        connection.setUseCaches(false);
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
+        try {
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", contentType);
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
 
-        // 得到请求的输出流对象
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.write(params.getBytes(encoding));
-        out.flush();
-        out.close();
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                out.write(params.getBytes(encoding));
+                out.flush();
+            }
 
-        // 建立实际的连接
-        connection.connect();
-        // 获取所有响应头字段
-        Map<String, List<String>> headers = connection.getHeaderFields();
-        // 遍历所有的响应头字段
-//        for (String key : headers.keySet()) {
-//            System.err.println(key + "--->" + headers.get(key));
-//        }
-        // 定义 BufferedReader输入流来读取URL的响应
-        BufferedReader in = null;
-        in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), encoding));
-        String result = "";
-        String getLine;
-        while ((getLine = in.readLine()) != null) {
-            result += getLine;
+            connection.connect();
+
+            StringBuilder result = new StringBuilder();
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), encoding))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    result.append(line);
+                }
+            }
+            log.debug("百度 HTTP 响应: {}", result);
+            return result.toString();
+        } finally {
+            connection.disconnect();
         }
-        in.close();
-        log.debug("百度 HTTP 响应: {}", result);
-        return result;
     }
 }

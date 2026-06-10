@@ -2,7 +2,6 @@
 import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/states/user_identity.dart';
 import 'package:aphasia_recovery/utils/http/http_manager.dart';
-import 'package:aphasia_recovery/deprecated/global_states_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,12 +25,12 @@ class TestBase {
   }
 
   // final String placeholder = "";
-  static Future<void> runTest(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody) async {
+  static Future<void> runTest(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody, {bool? skip}) async {
     setUp(() {
       _enableTestMode();
     });
 
-    testWidgets(description, (widgetTester) async {
+    testWidgets(description, skip: skip, (widgetTester) async {
       await widgetTester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -44,18 +43,16 @@ class TestBase {
     });
   }
 
-  static Future<void> runTestWithFullGlobalStates(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody) async {
+  static Future<void> runTestWithFullGlobalStates(String description, Widget widget, AsyncValueSetter<WidgetTester> testBody, {bool? skip}) async {
     setUp(() {
       _enableTestMode();
     });
 
-    testWidgets(description, (widgetTester) async {
+    testWidgets(description, skip: skip, (widgetTester) async {
       await widgetTester.pumpWidget(
-          GlobalStatesProviders(
-            child: MaterialApp(
-              home: Scaffold(
-                body: widget,
-              ),
+          MaterialApp(
+            home: Scaffold(
+              body: widget,
             ),
           )
       );
@@ -67,11 +64,9 @@ class TestBase {
   // 新的通用测试函数，上面的测试函数会导致Android Studio无法单独运行单个测试用例
   static Future<void> testWithFullGlobalStates(WidgetTester tester, Widget widget, AsyncCallback testBody) async {
     await tester.pumpWidget(
-        GlobalStatesProviders(
-          child: MaterialApp(
-            home: Scaffold(
-              body: widget,
-            ),
+        MaterialApp(
+          home: Scaffold(
+            body: widget,
           ),
         )
     );

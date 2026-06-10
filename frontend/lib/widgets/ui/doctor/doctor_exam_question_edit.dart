@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:aphasia_recovery/enum/fake_reflection.dart';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
@@ -10,8 +8,11 @@ import 'package:aphasia_recovery/widgets/ui/common/common.dart';
 import 'package:flutter/material.dart';
 
 import '../../../mixin/eval_rule_mixin.dart';
-import 'doctor_exam_question_edit_dialogs.dart';
+import 'doctor_audio_setting_dialog.dart';
 import 'doctor_exam_question_rule_edit.dart';
+import 'question_edit_steps/hint_rule_step.dart';
+import 'question_edit_steps/question_edit_form_widgets.dart';
+import 'question_edit_steps/question_type_step.dart';
 
 class DoctorExamQuestionEditPage extends StatefulWidget {
   final Question? question;
@@ -24,14 +25,6 @@ class DoctorExamQuestionEditPage extends StatefulWidget {
 class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage> with UseCommonStyles, TextFieldCommonValidators {
   static const double widgetsElevation = 16.0;
   static const double listTileCommonHeight = 32;
-
-  static const Map<Type, String> questionIntroduction = {
-    AudioQuestion: "录音作答题：患者通过录音作答。可选择关键词，关键词列表，流畅度分析等方式对患者作答评分。",
-    ChoiceQuestion: "选择题：患者通过点击选项作答。可设置2-20个选项。",
-    CommandQuestion: "指令题：患者通过点击或拖动物体作答。可设置多个物体并设置指令，系统按照患者完成指令的程度打分。",
-    WritingQuestion: "书写题：患者通过手写作答。可以设置关键词或关键词列表，系统自动识别患者手写内容并与关键词进行匹配打分。",
-    ItemFindingQuestion: "场景寻物题：在题目图片中圈出物体，患者通过点击图片作答，系统自动判断患者是否正确点击指定物体",
-  };
 
   bool requesting = false;
 
@@ -370,35 +363,14 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
       resetQuestionStates(AudioQuestion);
     }
 
-    // currStep = 3;
     currStep = 0;
 
-    // TODO: remove test code
-    // 场景寻物测试
-    // currQuestion.evalRule!.conditions.add(EvalCondition(score: 10.0)..addRange(5, 5)..addRange(0, 10));
-    // currQuestion.evalRule!.conditions.add(EvalCondition(score: 20.0)..addRange(5, 5)..addRange(11, 20));
-    // currQuestion.evalRule!.conditions.add(EvalCondition(score: 0.0)..addRange(0, 0));
-    // 指令题测试
-    // rule.slotCount = 20;
-    // rule.slots[2] = (ItemSlot(itemName: "梳子", itemImageAssetPath: "assets/images/for_question_setting/comb.png"));
-    // rule.slots[6] = (ItemSlot(itemName: "刀", itemImageAssetPath: "assets/images/for_question_setting/knife.jpg"));
-    // rule.slots[8] = (ItemSlot(itemName: "锁", itemImageAssetPath: "assets/images/for_question_setting/lock.jpg"));
-    // rule.slots[12] = (ItemSlot(itemName: "枪", itemImageAssetPath: "assets/images/for_question_setting/gun.jpg"));
-    // 提示规则测试
-    // currQuestion.evalRule!.addHintRule(HintRule(scoreHighBound: 10.0, adjustValue: 2));
-    // currQuestion.evalRule!.addHintRule(HintRule(scoreHighBound: 10.0, adjustValue: 4));
-    // currQuestion.evalRule!.addHintRule(HintRule(scoreHighBound: 10.0, adjustValue: 6));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     initStyles(context);
-
-    // if (widget.question != null && widget.question != currQuestion) {
-    //   // TODO: 考虑一下
-    //   resetQuestionStates(widget.question.runtimeType, useQuestion: widget.question);
-    // }
 
     steps = createSteps(context);
 
@@ -435,92 +407,22 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
       _buildSecondStep(context),
       _buildThirdStep(context),
       _buildFourthStep(context),
-      // _buildFifthStep(context)
     ];
   }
 
   Step _buildFirstStep(BuildContext context) {
     return Step(
-        title: Text("题目类型", style: commonStyles?.bodyStyle,),
-        content: wrappedByCardInner(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("选择题目类型：", style: commonStyles?.titleStyle,),
-              const Divider(height: 24, thickness: 0.5,),
-              Row(
-                children: [
-                  // 题型下拉选择器
-                  Text("题目类型：", style: commonStyles?.bodyStyle,),
-                  DropdownMenu(
-                      initialSelection: currQuestion.runtimeType,
-                      requestFocusOnTap: false,
-                      enableSearch: false,
-                      onSelected: (Type? value) {
-                        assert(value != null);
-                        setState(() {
-                          resetQuestionStates(value!);
-                        });
-                      },
-                      textStyle: commonStyles?.bodyStyle,
-                      dropdownMenuEntries: [
-                        DropdownMenuEntry(
-                          value: AudioQuestion,
-                          label: AudioQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: ChoiceQuestion,
-                          label: ChoiceQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: CommandQuestion,
-                          label: CommandQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: WritingQuestion,
-                          label: WritingQuestion.questionTypeName(),
-                        ),
-                        DropdownMenuEntry(
-                          value: ItemFindingQuestion,
-                          label: ItemFindingQuestion.questionTypeName(),
-                        ),
-                      ]
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16,),
-              // 题型简介
-              Row(
-                children: [
-                  Expanded(child: Text("题型简介：${questionIntroduction[currQuestion.runtimeType]!}", style: commonStyles?.bodyStyle,)),
-                ],
-              ),
-            ],
-          ),
-        )
+      title: Text("题目类型", style: commonStyles?.bodyStyle),
+      content: QuestionTypeStep(
+        currentType: currQuestion.runtimeType,
+        commonStyles: commonStyles!,
+        cardElevation: widgetsElevation,
+        onTypeSelected: (type) => setState(() => resetQuestionStates(type)),
+      ),
     );
   }
 
   Step _buildSecondStep(BuildContext context) {
-    // return Step(
-    //   title: Text("基础设置", style: commonStyles?.bodyStyle,),
-    //   content: wrappedByCardInner(
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           Text("题目基础设置：", style: commonStyles?.titleStyle,),
-    //           const Divider(height: 24, thickness: 0.5,),
-    //           _buildAliasField(),
-    //           const SizedBox(height: 16,),
-    //           _buildQuestionTextField(),
-    //           const SizedBox(height: 16,),
-    //           _buildAudioSetting(),
-    //           const SizedBox(height: 16,),
-    //           _buildImageSetting(),
-    //         ],
-    //       )
-    //   )
-    // );
     return Step(
       title: Text("基础设置", style: commonStyles?.bodyStyle),
       content: wrappedByCardInner(
@@ -529,48 +431,52 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
           children: [
             Text("题目基础设置：", style: commonStyles?.titleStyle),
             const Divider(height: 24, thickness: 0.5),
-            // 统一输入框样式
-            _buildDecoratedTextField(
+            DecoratedTextField(
               label: "题目名称：",
               controller: aliasCtrl,
-              key: _aliasKey,
+              fieldKey: _aliasKey,
               validator: aliasValidator,
-              maxLength: 20
+              maxLength: 20,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            _buildDecoratedTextField(
+            DecoratedTextField(
               label: "题干文本：",
               controller: questionTextCtrl,
-              key: _questionTextKey,
+              fieldKey: _questionTextKey,
               validator: questionTextValidator,
-              maxLength: 50
+              maxLength: 50,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            // 优化多媒体设置区块
-            _buildMediaSection(
+            MediaSection(
               title: "题干音频设置",
               value: currQuestion.audioUrl,
               setAction: _handleSetAudio,
               clearAction: _handleClearAudio,
-              icon: Icons.audiotrack
+              icon: Icons.audiotrack,
+              commonStyles: commonStyles!,
             ),
             const SizedBox(height: 16),
-            _buildMediaSection(
-              title: "题干图片设置", 
+            MediaSection(
+              title: "题干图片设置",
               value: currQuestion.imageUrl,
               setAction: _handleSetImage,
               clearAction: _handleClearImage,
               icon: Icons.image,
-              extraContent: _buildImageOmitTime()
+              commonStyles: commonStyles!,
+              extraContent: ImageOmitTimeField(
+                visible: currQuestion.imageUrl != null,
+                controller: omitTimeCtrl,
+                fieldKey: _omitTimeKey,
+                validator: omitTimeValidator,
+                commonStyles: commonStyles!,
+              ),
             ),
           ],
         ),
       )
     );
-  }
-
-  double getTextFieldWidth(BuildContext context, double textFieldMinWidth) {
-    return max(MediaQuery.of(context).size.width / 4, textFieldMinWidth);
   }
 
   void _handleSetAudio() {
@@ -613,12 +519,6 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
         commonStyles: commonStyles,
       ),
     ).then((map) {
-    //   if (map != null) {
-    //     setState(() {
-    //       currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
-    //     });
-    //   }
-    // });
       if (map != null && (map['imageUrl'] != null || map['imageAssetPath'] != null)) {
         setState(() {
           currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
@@ -642,263 +542,6 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
       }
     );
   }
-
-  // 新增复用组件方法
-  Widget _buildDecoratedTextField({
-    required String label,
-    required TextEditingController controller,
-    required GlobalKey<FormFieldState> key,
-    required FormFieldValidator<String?> validator,
-    int? maxLength
-  }) {
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      ),
-      child: TextFormField(
-        controller: controller,
-        key: key,
-        validator: validator,
-        maxLength: maxLength,
-        style: commonStyles?.bodyStyle,
-      ),
-    );
-  }
-
-  Widget _buildMediaSection({
-    required String title,
-    required String? value,
-    required VoidCallback setAction,
-    required VoidCallback clearAction,
-    required IconData icon,
-    Widget? extraContent
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: commonStyles?.titleStyle),
-        const SizedBox(height: 8),
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, size: 28),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(value ?? "未设置", 
-                    style: commonStyles?.bodyStyle?.copyWith(
-                      color: value != null 
-                        ? commonStyles?.primaryColor 
-                        : commonStyles?.primaryColor?.withOpacity(0.5)
-                    )
-                  ),
-                ),
-                _buildMediaButton(
-                  label: value != null ? "重新设置" : "设置",
-                  icon: icon,
-                  onPressed: setAction
-                ),
-                if (value != null) ...[
-                  const SizedBox(width: 8),
-                  _buildMediaButton(
-                    label: "清除",
-                    icon: Icons.delete,
-                    color: commonStyles?.errorColor,
-                    onPressed: clearAction
-                  )
-                ]
-              ],
-            ),
-          ),
-        ),
-        if (extraContent != null) extraContent,
-      ],
-    );
-  }
-
-  Widget _buildMediaButton({
-    required String label,
-    required IconData icon,
-    Color? color,
-    required VoidCallback onPressed
-  }) {
-    return Tooltip(
-      message: label,
-      child: TextButton.icon(
-        icon: Icon(icon, size: 20),
-        label: Text(label),
-        style: TextButton.styleFrom(
-          foregroundColor: color ?? commonStyles?.primaryColor,
-          backgroundColor: color?.withOpacity(0.1),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  Widget _buildImageOmitTime() {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Visibility(
-          visible: currQuestion.imageUrl != null,
-          child: Column(
-            children: [
-              _buildDecoratedTextField(
-                label: "图片展示时间（秒）：",
-                controller: omitTimeCtrl,
-                key: _omitTimeKey,
-                validator: omitTimeValidator,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "提示：场景寻物题设为-1保持显示\n其他题型最大${Question.maxOmitTime}秒",
-                style: commonStyles?.hintTextStyle
-              )
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  // Widget _buildAliasField() {
-  //   double textFieldMinWidth = 100.0;
-  //   return Row(
-  //     children: [
-  //       Text("题目名称：", style: commonStyles?.bodyStyle,),
-  //       Container(
-  //         constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
-  //         child: TextFormField(
-  //           key: _aliasKey,
-  //           decoration: const InputDecoration(border: OutlineInputBorder()),
-  //           maxLength: 20,
-  //           controller: aliasCtrl,
-  //           style: commonStyles?.bodyStyle,
-  //           validator: aliasValidator,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildQuestionTextField() {
-  //   double textFieldMinWidth = 100;
-  //   return Row(
-  //     children: [
-  //       Text("题干文本：", style: commonStyles?.bodyStyle,),
-  //       Container(
-  //         constraints: BoxConstraints(maxWidth: getTextFieldWidth(context, textFieldMinWidth), minWidth: textFieldMinWidth),
-  //         child: TextFormField(
-  //           key: _questionTextKey,
-  //           maxLength: 50,
-  //           decoration: const InputDecoration(border: OutlineInputBorder()),
-  //           controller: questionTextCtrl,
-  //           style: commonStyles?.bodyStyle,
-  //           validator: questionTextValidator,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildAudioSetting() {
-
-  //   return Row(
-  //     children: [
-  //       Text("设置题干音频：", style: commonStyles?.bodyStyle,),
-  //       ElevatedButton (
-  //         onPressed: () {
-  //           showDialog<String?>(context: context, builder: (context) => AudioSettingDialog(uploadedAudioUrl: currQuestion.audioUrl,))
-  //             .then((fileUrl) {
-  //             if (fileUrl != null) {
-  //               setState(() {
-  //                 currQuestion.audioUrl = fileUrl;
-  //               });
-  //             }
-  //           });
-  //         },
-  //         child: Text("设置", style: commonStyles?.bodyStyle,),
-  //       ),
-  //       const SizedBox(width: 16,),
-  //       currQuestion.audioUrl == null ? const SizedBox.shrink(): ElevatedButton(
-  //         onPressed: () {
-  //           confirm(context, title: "确认", body: "确认要删除已经设置的音频吗？", commonStyles: commonStyles,
-  //             onConfirm: (context) {
-  //               Navigator.pop(context);
-  //               setState(() {
-  //                 currQuestion.audioUrl = null;
-  //               });
-  //             }
-  //           );
-  //         },
-  //         style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
-  //         child: Text("清除已设置音频", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor), ),
-  //       )
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildImageSetting() {
-  //   String? imageAssetPath;
-  //   String? imageUrl;
-  //   if (isImageUrlAssets(currQuestion.imageUrl)) {
-  //     imageAssetPath = currQuestion.imageUrl;
-  //   } else {
-  //     imageUrl = currQuestion.imageUrl;
-  //   }
-
-  //   return Column(
-  //     children: [
-  //       Row(
-  //         children: [
-  //           Text("设置题干图片：", style: commonStyles?.bodyStyle,),
-  //           ElevatedButton (
-  //             onPressed: () {
-  //               showDialog<Map<String, dynamic>?>(context: context, builder: (context) => SelectImagesDialog (
-  //                 imageAssetPath: imageAssetPath,
-  //                 imageUrl: imageUrl,
-  //                 commonStyles: commonStyles,
-  //               )).then((map) {
-  //                 if(map != null) {
-  //                   setState(() {
-  //                     currQuestion.imageUrl = map['imageUrl'] ?? map['imageAssetPath'];
-  //                   });
-  //                 }
-  //               });
-  //             },
-  //             child: Text("设置", style: commonStyles?.bodyStyle,),
-  //           ),
-  //           const SizedBox(width: 16,),
-  //           currQuestion.imageUrl == null ? const SizedBox.shrink(): ElevatedButton(
-  //               onPressed: () {
-  //                 confirm(context, title: "确认", body: "确认要删除已经设置的图片吗？", commonStyles: commonStyles,
-  //                   onConfirm: (context) {
-  //                     Navigator.pop(context);
-  //                     setState(() {
-  //                       currQuestion.imageUrl = null;
-  //                       currQuestion.omitImageAfterSeconds = -1;
-  //                     });
-  //                   }
-  //                 );
-  //               },
-  //               style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.errorColor),
-  //               child: Text("清除已设置图片", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onErrorColor),)
-  //           )
-  //         ],
-  //       ),
-  //       const SizedBox(height: 16,),
-  //       currQuestion.imageUrl == null? const SizedBox.shrink() : buildInputFormField("图片展示时间（1-${Question.maxOmitTime}）：", _omitTimeKey, omitTimeCtrl, omitTimeValidator, commonStyles: commonStyles),
-  //       currQuestion.imageUrl == null? const SizedBox.shrink() : Text("场景寻物题不需要修改该值；对于录音题，可以将该值设为-1来设置始终显示图片；对于选择题、指令题和书写题，该值最大为${Question.maxOmitTime}", style: commonStyles?.bodyStyle,),
-  //     ],
-  //   );
-  // }
 
   Step _buildThirdStep(BuildContext context) {
     return Step(
@@ -956,185 +599,17 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
   }
 
   Step _buildFourthStep(BuildContext context) {
-    if (requesting) {
-      return Step(
-        title: Text("提示规则", style: commonStyles?.bodyStyle,),
-        content: wrappedByCardInner(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text(
-                    '处理中，请稍候',
-                    style: commonStyles!.hintTextStyle,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     return Step(
-      title: Text("提示规则", style: commonStyles?.bodyStyle,),
-      content: wrappedByCardInner(
-        child: Column(
-          children: [
-            Text("提示规则", style: commonStyles?.titleStyle,),
-            const Divider(),
-            Text("提示条件列表（每道题只会触发一条提示）：", style: commonStyles?.bodyStyle,),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey)
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showDialog<HintRule?>(
-                            context: context,
-                            builder: (context) => HintRuleEditDialog(question: currQuestion))
-                            .then((hintRule) {
-                          if (hintRule != null) {
-                            setState(() {
-                              currQuestion.evalRule!.addHintRule(hintRule);
-                            });
-                          }
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.primaryColor),
-                      child: Text("新增提示条件", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onPrimaryColor),),
-                    ),
-                  ),
-                  const Divider(),
-                  SizedBox(
-                    height: 400,
-                    child: LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) {
-                          return Table(
-                            border: TableBorder.all(),
-                            columnWidths: const<int, TableColumnWidth> {
-                              0: FlexColumnWidth(0.5),
-                              4: FlexColumnWidth(1.5),
-                              5: FlexColumnWidth(1.5),
-                              6: FlexColumnWidth(1.0),
-                            },
-                            children: [
-                              TableRow(
-                                  children: [
-                                    Center(child: Text("序号", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)),
-                                    Center(child: Text("触发提示得分下界", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)),
-                                    Center(child: Text("触发提示得分上界", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)),
-                                    Center(child: Text("操作", style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,))
-                                  ]
-                              ),
-                              ...currQuestion.evalRule!.hintRules.asMap().entries.map((e) {
-                                final hintIndex = e.key;
-                                HintRule hintRule = e.value;
-
-                                final buttonSize = commonStyles!.isMedium || commonStyles!.isLarge ? 30.0 : 20.0;
-
-                                return TableRow(
-                                  children: [
-                                    Center(child: Text((e.key + 1).toString(), style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,)),
-                                    Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                        child: Text(hintRule.scoreLowBound.toString(), style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                        child: Text(hintRule.scoreHighBound.toString(), style: commonStyles?.bodyStyle, overflow: TextOverflow.ellipsis,),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: buildListTileContentWithActionButtons(
-                                          body: const SizedBox.shrink(),
-                                          textAreaMaxHeight: listTileCommonHeight,
-                                          textAreaMaxWidth: 0,
-                                          mainAxisSize: MainAxisSize.min,
-                                          buttonSize: buttonSize,
-                                          commonStyles: commonStyles,
-                                          moreButtons: [
-                                            createActionButtonSetting(btnTooltipMsg: "编辑", btnIcon: Icon(Icons.edit, size: buttonSize,),
-                                              btnAction: () {
-                                                showDialog<HintRule?>(context: context,
-                                                    builder: (context) => HintRuleEditDialog(question: currQuestion, hintRule: hintRule,))
-                                                    .then((updated) {
-                                                  if (updated != null) {
-                                                    setState(() {
-                                                      currQuestion.evalRule!.updateHintRule(updated: updated, index: hintIndex);
-                                                    });
-                                                  }
-                                                });
-                                              },
-                                            ),
-                                            createActionButtonSetting(btnTooltipMsg: "删除", btnIcon: Icon(Icons.delete_outline, color: commonStyles?.errorColor,size: buttonSize,),
-                                              btnAction: () {
-                                                confirm(context, title: "确认", body: "确认要删除该提示规则吗？", commonStyles: commonStyles,
-                                                    onConfirm: (context) {
-                                                      Navigator.pop(context);
-                                                      setState(() {
-                                                        currQuestion.evalRule!.deleteHintRule(hintIndex);
-                                                      });
-                                                    }
-                                                );
-                                              },
-                                            ),
-                                            createActionButtonSetting(btnTooltipMsg: "上移", btnIcon: Icon(Icons.arrow_upward, size: buttonSize,),
-                                              btnAction: () {
-                                                setState(() {
-                                                  currQuestion.evalRule!.moveUpHintRule(hintIndex);
-                                                });
-                                              },
-                                            ),
-                                            createActionButtonSetting(btnTooltipMsg: "下移", btnIcon: Icon(Icons.arrow_downward, size: buttonSize,),
-                                              btnAction: () {
-                                                setState(() {
-                                                  currQuestion.evalRule!.moveDownHintRule(hintIndex);
-                                                });
-                                              },
-                                            ),
-                                          ]
-                                      ),
-                                    )
-                                  ],
-                                );
-                              }).toList(),
-                            ],
-                          );
-                        }
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      )
+      title: Text("提示规则", style: commonStyles?.bodyStyle),
+      content: HintRuleStep(
+        currQuestion: currQuestion,
+        requesting: requesting,
+        commonStyles: commonStyles!,
+        listTileCommonHeight: listTileCommonHeight,
+        cardElevation: widgetsElevation,
+      ),
     );
   }
-
-  Step _buildFifthStep(BuildContext context) {
-    return Step(
-        title: Text("基本信息", style: commonStyles?.bodyStyle,),
-        content: const Placeholder()
-    );
-  }
-
 
   Widget wrappedByCardInner({required Widget child}) {
     return wrappedByCard(child: child, elevation: widgetsElevation);
@@ -1224,19 +699,7 @@ class _DoctorExamQuestionEditPageState extends State<DoctorExamQuestionEditPage>
           setState(() {
             requesting = true;
           });
-          if (widget.question == null) {
-            doReturn(currQuestion);
-          } else {
-            Question.updateQuestion(currQuestion).then((updated) {
-              doReturn(updated);
-            }).catchError((err) {
-              requestResultErrorHandler(context, error: err);
-              setState(() {
-                requesting = false;
-              });
-              return err;
-            });
-          }
+          doReturn(currQuestion);
         },
         style: ElevatedButton.styleFrom(backgroundColor: commonStyles?.primaryColor, elevation: widgetsElevation),
         child: Text(widget.question == null ? "创建" : "保存", style: commonStyles?.bodyStyle?.copyWith(color: commonStyles?.onPrimaryColor),),

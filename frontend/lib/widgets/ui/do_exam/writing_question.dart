@@ -149,9 +149,9 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  widget.commonStyles?.primaryColor?.withOpacity(0.03) ??
+                  widget.commonStyles?.primaryColor?.withValues(alpha: 0.03) ??
                       Colors.white,
-                  widget.commonStyles?.onPrimaryColor?.withOpacity(0.05) ??
+                  widget.commonStyles?.onPrimaryColor?.withValues(alpha: 0.05) ??
                       Colors.white,
                 ]),
           ),

@@ -18,6 +18,19 @@ fi
 
 source .env
 
+LLM_PID=""
+SPRING_PID=""
+
+cleanup() {
+  echo
+  echo "⏹ 关闭服务..."
+  if [ -n "$SPRING_PID" ]; then kill "$SPRING_PID" 2>/dev/null || true; fi
+  if [ -n "$LLM_PID" ]; then kill "$LLM_PID" 2>/dev/null || true; fi
+}
+# 覆盖 EXIT 以保证正常退出 / mvnw 失败 / set -e 触发时也能清理；
+# 不再用 `pkill -f spring-boot:run`，避免误杀同机其他 Spring 进程。
+trap cleanup EXIT INT TERM
+
 # === Python LLM 服务 ===
 echo "▶ 启动 Python LLM 服务 (port 8001)..."
 cd LLM
@@ -35,13 +48,12 @@ for i in {1..10}; do
 done
 if ! curl -fs http://localhost:8001/health > /dev/null 2>&1; then
   echo "  ❌ LLM 服务启动失败，日志见 /tmp/aphasia-llm.log"
-  kill $LLM_PID 2>/dev/null
   exit 1
 fi
 
 # === Spring 后端 ===
 echo "▶ 启动 Spring 后端 (port 8080)..."
 cd backend
-trap "echo '\n⏹ 收到退出信号，关闭服务...'; kill $LLM_PID 2>/dev/null; pkill -f spring-boot:run 2>/dev/null; exit 0" INT TERM
-
-./mvnw spring-boot:run
+./mvnw spring-boot:run &
+SPRING_PID=$!
+wait $SPRING_PID

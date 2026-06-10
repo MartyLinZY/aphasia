@@ -33,8 +33,8 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
         return workingDir + File.separator + StaticResourcesConfig.AUDIO_DIR + File.separator + uid + File.separator;
     }
 
-    static public String getUrlPrefix(String port) {
-        return "http://" + AppSetting.HOSTNAME + ":" + port;
+    static public String getUrlPrefix(String host, String port) {
+        return "http://" + host + ":" + port;
     }
 
 //    public static final String RESOURCES_DIR = "resources";
@@ -81,14 +81,5 @@ public class StaticResourcesConfig implements WebMvcConfigurer {
                 log.error("注册音频资源路径失败", e);
             }
         }
-
-//        if (!registry.hasMappingForPattern(RESOURCES_PATH +"/**")) {
-//            try {
-//                registry.addResourceHandler(RESOURCES_PATH +"/**")
-//                        .addResourceLocations("file:" + resourceDir.getCanonicalPath() + File.separator);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 }

@@ -348,7 +348,6 @@ class EvalSubCategoryByQuestionScoreSum extends ExamSubCategoryEvalRule {
 
   @override
   String displayName() {
-    // TODO: implement displayName
     return "各题目得分求和";
   }
 }
@@ -390,7 +389,6 @@ abstract class TerminateRule implements ExamSubCategoryEvalRule {
 class ContinuousWrongAnswerTerminate extends TerminateRule {
   @JsonKey(required: true)
   int errorCountThreshold;
-  // int scoreThreshold; // TODO
 
   static String ruleDisplayName() {
     return "连续答错N题（得分小于等于满分的一半为答错）";
@@ -409,8 +407,9 @@ class ContinuousWrongAnswerTerminate extends TerminateRule {
 
   @override
   SubCategoryResult evaluate(SubCategoryResult result) {
-    // TODO: implement evaluate
-    throw UnimplementedError();
+    // 终止规则只通过 checkIfNeedTerminate 参与终止判断，不进入 evalRule 评分链；
+    // 此方法是 ExamSubCategoryEvalRule interface 契约必填，业务路径不会调用。
+    return result;
   }
 
   @override
@@ -603,19 +602,14 @@ abstract class QuestionEvalRule {
   factory QuestionEvalRule.fromJson(Map<String, dynamic> jsonMap) {
     var typeName = jsonMap['typeName'];
     switch (typeName) {
-    // TODO: add types
       case "EvalAudioQuestionByKeywordsMatchesCount":
         return EvalAudioQuestionByKeywordsMatchesCount.fromJson(jsonMap);
       case "EvalAudioQuestionByKeywordMatch":
         return EvalAudioQuestionByKeywordMatch.fromJson(jsonMap);
-      case "EvalAudioQuestionByPronunciation":
-        return EvalAudioQuestionByPronunciation.fromJson(jsonMap);
       case "EvalAudioQuestionByFluency":
         return EvalAudioQuestionByFluency.fromJson(jsonMap);
       case "EvalAudioQuestionBySimilarity":
         return EvalAudioQuestionBySimilarity.fromJson(jsonMap);
-      case "EvalAudioQuestionByWordType":
-        return EvalAudioQuestionByWordType.fromJson(jsonMap);
       case "EvalCommandQuestionByCorrectActionCount":
         final tmp = EvalCommandQuestionByCorrectActionCount.fromJson(jsonMap);
         // debugPrint(jsonEncode(tmp.toJson()));
@@ -771,24 +765,37 @@ class EvalAudioQuestionByKeywordsMatchesCount extends QuestionEvalRule with Fuzz
   Future<QuestionResult> evaluate(QuestionResult result) async {
     result = result as AudioQuestionResult;
 
-    // TODO: 有时间考虑发送请求到后端用拼音做一下判断
-    // if (!enableFuzzyEvaluation) {
     int count = 0;
+    List<String> hitDetails = [];
     for (var keyword in keywords) {
-      if (result.audioContent.contains(keyword)) {
-        count++;
+      bool hit;
+      double sim = 0;
+      if (enableFuzzyEvaluation) {
+        try {
+          final r = await pinyinMatch(keyword, result.audioContent);
+          hit = r.matched;
+          sim = r.similarity;
+        } catch (_) {
+          // 网络/服务异常时降级严格匹配，避免因后端不可用整张卷判 0 分
+          hit = result.audioContent.contains(keyword);
+        }
+      } else {
+        hit = result.audioContent.contains(keyword);
       }
+      if (hit) count++;
+      hitDetails.add(enableFuzzyEvaluation
+          ? "$keyword:${sim.toStringAsFixed(2)}${hit ? '✓' : '✗'}"
+          : "$keyword:${hit ? '✓' : '✗'}");
     }
-    //
-    // } else {
-    // }
 
     setScoreByConditions(result, count);
 
     result.finalScore ??= defaultScore;
 
+    result.extraResults['判分模式'] = enableFuzzyEvaluation ? '拼音模糊匹配' : '严格匹配';
     result.extraResults['患者说话内容'] = result.audioContent;
     result.extraResults['关键词列表'] = keywords.fold("", (prev, e) => prev == ""? e :"$prev, $e");
+    result.extraResults['关键词命中详情'] = hitDetails.join(', ');
     result.extraResults['关键词正确个数'] = count.toString();
     result.extraResults['是否要求关键词按顺序说出'] = enforceOrder ? "是": "否";
 
@@ -834,24 +841,32 @@ class EvalAudioQuestionByKeywordMatch extends QuestionEvalRule with FuzzyEvalSet
   @override
   Future<QuestionResult> evaluate(QuestionResult result) async {
     result = result as AudioQuestionResult;
-    // TODO：有时间做发送请求到后端用拼音判分
+
     int count = 0;
+    double sim = 0;
     if (enableFuzzyEvaluation) {
-      if (result.audioContent.contains(keyword)) {
-        count = 1;
+      try {
+        final r = await pinyinMatch(keyword, result.audioContent);
+        if (r.matched) count = 1;
+        sim = r.similarity;
+      } catch (_) {
+        // 网络/服务异常时降级严格匹配，避免因后端不可用判 0 分
+        if (result.audioContent.contains(keyword)) count = 1;
       }
     } else {
-      if (result.audioContent.contains(keyword)) {
-        count = 1;
-      }
+      if (result.audioContent.contains(keyword)) count = 1;
     }
 
     setScoreByConditions(result, count);
 
     result.finalScore ??= defaultScore;
 
+    result.extraResults['判分模式'] = enableFuzzyEvaluation ? '拼音模糊匹配' : '严格匹配';
     result.extraResults['患者说话内容'] = result.audioContent;
     result.extraResults['关键词'] = keyword;
+    if (enableFuzzyEvaluation) {
+      result.extraResults['拼音相似度'] = sim.toStringAsFixed(2);
+    }
     result.extraResults['关键词正确字数'] = count.toString();
 
     return result;
@@ -869,45 +884,6 @@ class EvalAudioQuestionByKeywordMatch extends QuestionEvalRule with FuzzyEvalSet
   @override
   String getScoreConditionName() {
     return "关键词正确个数";
-  }
-}
-
-/// 录音题 - 按关键词发音（音素）正确个数
-@JsonSerializable(explicitToJson: true)
-class EvalAudioQuestionByPronunciation extends QuestionEvalRule with FuzzyEvalSetting, RuleKeyword {
-
-  EvalAudioQuestionByPronunciation({super.defaultScore, String keyword = "关键词", bool fuzzy = true}) {
-    enableFuzzyEvaluation = fuzzy;
-    this.keyword = keyword;
-  }
-
-  static String ruleDisplayName() {
-    return "按关键词发音中拼音音节正确个数";
-  }
-
-  factory EvalAudioQuestionByPronunciation.fromJson(Map<String, dynamic> jsonMap) => _$EvalAudioQuestionByPronunciationFromJson(jsonMap);
-
-  @override
-  Map<String, dynamic> toJson() => _$EvalAudioQuestionByPronunciationToJson(this);
-
-  @override
-  Future<QuestionResult> evaluate(QuestionResult result) async {
-    // TODO: implement evaluate
-    throw UnimplementedError();
-  }
-
-  @override
-  String? checkSetting() {
-    String? errMsg = super.checkSetting();
-    if (errMsg != null) {
-      return errMsg;
-    }
-    return null;
-  }
-
-  @override
-  String getScoreConditionName() {
-    return "关键词音节正确个数";
   }
 }
 
@@ -1009,49 +985,6 @@ class EvalAudioQuestionBySimilarity extends QuestionEvalRule with FuzzyEvalSetti
   @override
   String getScoreConditionName() {
     return "";
-  }
-}
-
-/// 录音题 - 音频内容中特定词性的词语个数
-@JsonSerializable(explicitToJson: true)
-class EvalAudioQuestionByWordType extends QuestionEvalRule {
-  /// 1表示动词，2表示名词
-  int wordType;
-
-  EvalAudioQuestionByWordType({this.wordType = 1, });
-
-  factory EvalAudioQuestionByWordType.fromJson(Map<String, dynamic> jsonMap) {
-    return _$EvalAudioQuestionByWordTypeFromJson(jsonMap);
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$EvalAudioQuestionByWordTypeToJson(this);
-  }
-
-
-  static String ruleDisplayName() {
-    return "按语音内容中特定词性的词语个数评分";
-  }
-
-  @override
-  Future<QuestionResult> evaluate(QuestionResult result) async {
-    // TODO: implement evaluate
-    throw UnimplementedError();
-  }
-
-  @override
-  String? checkSetting() {
-    String? errMsg = super.checkSetting();
-    if (errMsg != null) {
-      return errMsg;
-    }
-    return null;
-  }
-
-  @override
-  String getScoreConditionName() {
-    return "词性正确的词语个数";
   }
 }
 

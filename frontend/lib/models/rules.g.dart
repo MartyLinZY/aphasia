@@ -26,8 +26,9 @@ DiagnoseByScoreRange _$DiagnoseByScoreRangeFromJson(Map<String, dynamic> json) {
     aphasiaType: json['aphasiaType'] as String,
   )
     ..typeName = json['typeName'] as String
-    ..categoryIndices =
-        (json['categoryIndices'] as List<dynamic>).map((e) => e as int).toList()
+    ..categoryIndices = (json['categoryIndices'] as List<dynamic>)
+        .map((e) => (e as num).toInt())
+        .toList()
     ..ranges = (json['ranges'] as List<dynamic>)
         .map((e) => ScoreRange.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -48,7 +49,7 @@ ExamEvalByCategoryScoreSum _$ExamEvalByCategoryScoreSumFromJson(
       resultDimensionName: json['resultDimensionName'] as String? ?? "总分",
     )
       ..categoryIndices = (json['categoryIndices'] as List<dynamic>)
-          .map((e) => e as int)
+          .map((e) => (e as num).toInt())
           .toList()
       ..typeName = json['typeName'] as String;
 
@@ -89,7 +90,7 @@ ContinuousWrongAnswerTerminate _$ContinuousWrongAnswerTerminateFromJson(
   return ContinuousWrongAnswerTerminate(
     reason: json['reason'] as String,
     equivalentScore: (json['equivalentScore'] as num).toDouble(),
-    errorCountThreshold: json['errorCountThreshold'] as int,
+    errorCountThreshold: (json['errorCountThreshold'] as num).toInt(),
   )..typeName = json['typeName'] as String;
 }
 
@@ -109,7 +110,7 @@ HintRule _$HintRuleFromJson(Map<String, dynamic> json) => HintRule(
       hintImageAssetPath: json['hintImageAssetPath'] as String?,
       scoreLowBound: (json['scoreLowBound'] as num?)?.toDouble() ?? 0.0,
       scoreHighBound: (json['scoreHighBound'] as num?)?.toDouble() ?? 1.0,
-      scoreAdjustType: json['scoreAdjustType'] as int? ?? 1,
+      scoreAdjustType: (json['scoreAdjustType'] as num?)?.toInt() ?? 1,
       adjustValue: (json['adjustValue'] as num?)?.toDouble() ?? 0,
     );
 
@@ -204,36 +205,6 @@ Map<String, dynamic> _$EvalAudioQuestionByKeywordMatchToJson(
       'typeName': instance.typeName,
     };
 
-EvalAudioQuestionByPronunciation _$EvalAudioQuestionByPronunciationFromJson(
-        Map<String, dynamic> json) =>
-    EvalAudioQuestionByPronunciation(
-      defaultScore: (json['defaultScore'] as num?)?.toDouble() ?? 0,
-      keyword: json['keyword'] as String? ?? "关键词",
-    )
-      ..enableFuzzyEvaluation = json['enableFuzzyEvaluation'] as bool
-      ..fullScore = (json['fullScore'] as num).toDouble()
-      ..timeLimit = json['timeLimit'] as num
-      ..conditions = (json['conditions'] as List<dynamic>)
-          .map((e) => EvalCondition.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..hintRules = (json['hintRules'] as List<dynamic>)
-          .map((e) => HintRule.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..typeName = json['typeName'] as String;
-
-Map<String, dynamic> _$EvalAudioQuestionByPronunciationToJson(
-        EvalAudioQuestionByPronunciation instance) =>
-    <String, dynamic>{
-      'enableFuzzyEvaluation': instance.enableFuzzyEvaluation,
-      'keyword': instance.keyword,
-      'fullScore': instance.fullScore,
-      'timeLimit': instance.timeLimit,
-      'defaultScore': instance.defaultScore,
-      'conditions': instance.conditions.map((e) => e.toJson()).toList(),
-      'hintRules': instance.hintRules.map((e) => e.toJson()).toList(),
-      'typeName': instance.typeName,
-    };
-
 EvalAudioQuestionByFluency _$EvalAudioQuestionByFluencyFromJson(
         Map<String, dynamic> json) =>
     EvalAudioQuestionByFluency(
@@ -293,34 +264,6 @@ Map<String, dynamic> _$EvalAudioQuestionBySimilarityToJson(
       'fullScoreThreshold': instance.fullScoreThreshold,
     };
 
-EvalAudioQuestionByWordType _$EvalAudioQuestionByWordTypeFromJson(
-        Map<String, dynamic> json) =>
-    EvalAudioQuestionByWordType(
-      wordType: json['wordType'] as int? ?? 1,
-    )
-      ..fullScore = (json['fullScore'] as num).toDouble()
-      ..timeLimit = json['timeLimit'] as num
-      ..defaultScore = (json['defaultScore'] as num).toDouble()
-      ..conditions = (json['conditions'] as List<dynamic>)
-          .map((e) => EvalCondition.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..hintRules = (json['hintRules'] as List<dynamic>)
-          .map((e) => HintRule.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..typeName = json['typeName'] as String;
-
-Map<String, dynamic> _$EvalAudioQuestionByWordTypeToJson(
-        EvalAudioQuestionByWordType instance) =>
-    <String, dynamic>{
-      'fullScore': instance.fullScore,
-      'timeLimit': instance.timeLimit,
-      'defaultScore': instance.defaultScore,
-      'conditions': instance.conditions.map((e) => e.toJson()).toList(),
-      'hintRules': instance.hintRules.map((e) => e.toJson()).toList(),
-      'typeName': instance.typeName,
-      'wordType': instance.wordType,
-    };
-
 Choice _$ChoiceFromJson(Map<String, dynamic> json) => Choice(
       imageUrl: json['imageUrl'] as String?,
       imageAssetPath: json['imageAssetPath'] as String?,
@@ -353,7 +296,7 @@ EvalChoiceQuestionByCorrectChoiceCount
               .map((e) => Choice.fromJson(e as Map<String, dynamic>))
               .toList()
           ..correctChoices = (json['correctChoices'] as List<dynamic>)
-              .map((e) => e as int)
+              .map((e) => (e as num).toInt())
               .toList();
 
 Map<String, dynamic> _$EvalChoiceQuestionByCorrectChoiceCountToJson(
@@ -384,9 +327,9 @@ Map<String, dynamic> _$ItemSlotToJson(ItemSlot instance) => <String, dynamic>{
 
 CommandActions _$CommandActionsFromJson(Map<String, dynamic> json) =>
     CommandActions(
-      sourceSlotIndex: json['sourceSlotIndex'] as int,
+      sourceSlotIndex: (json['sourceSlotIndex'] as num).toInt(),
       firstAction: $enumDecode(_$ClickActionEnumMap, json['firstAction']),
-      targetSlotIndex: json['targetSlotIndex'] as int?,
+      targetSlotIndex: (json['targetSlotIndex'] as num?)?.toInt(),
       secondAction:
           $enumDecodeNullable(_$PutDownActionEnumMap, json['secondAction']),
     );

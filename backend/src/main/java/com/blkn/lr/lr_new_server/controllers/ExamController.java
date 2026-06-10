@@ -1,16 +1,14 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.ExamDao;
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
 import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.exam.QuestionSubCategoryDto;
 import com.blkn.lr.lr_new_server.dto.models.question.QuestionDto;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
-import com.blkn.lr.lr_new_server.exception.NotFoundException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
-import com.blkn.lr.lr_new_server.models.exam.Exam;
+import com.blkn.lr.lr_new_server.models.rules.category.ExamCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.exam.DiagnosisRule;
+import com.blkn.lr.lr_new_server.models.rules.subcategory.ExamSubCategoryEvalRule;
 import com.blkn.lr.lr_new_server.models.rules.subcategory.TerminateRule;
 import com.blkn.lr.lr_new_server.services.ExamServices;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,19 +26,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ExamController {
     private final ExamServices examServices;
-    private final ExamDao examDao;
-    private final QuestionDao questionDao;
 
     @GetMapping("/exams/{examId}")
     @RequireRole({1, 2})
     ExamDto getExamById(@PathVariable String examId) {
-        Exam exam = examDao.findPublishedExamById(examId);
-
-        if (exam == null) {
-            throw new NotFoundException();
-        }
-
-        return new ExamDto(exam, questionDao);
+        return examServices.getExamById(examId);
     }
 
     @GetMapping("/doctors/{uid}/exams")
@@ -76,28 +66,19 @@ public class ExamController {
 
     @PatchMapping("/exams/{examId}/name/{newName}")
     Map<String, String> updateExamName(@PathVariable String examId, @PathVariable String newName) {
-        if (examDao.updateExamName(examId, newName) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中更新套题名称失败");
-        }
-
+        examServices.updateExamName(examId, newName);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/desc/{desc}")
     Map<String, String> updateExamDesc(@PathVariable String examId, @PathVariable String desc) {
-        if (examDao.updateExamDesc(examId, desc) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中更新套题简介失败");
-        }
-
+        examServices.updateExamDesc(examId, desc);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}")
     Map<String, String> publishExam(@PathVariable String examId) {
-        if (examDao.publishExam(examId) <= 0) {
-            throw new BusinessErrorException("发布id为" + examId + "的套题失败");
-        }
-
+        examServices.publishExam(examId);
         return Map.of("msg", "ok");
     }
 
@@ -116,9 +97,7 @@ public class ExamController {
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}")
     Map<String, String> updateCategory(@Valid @RequestBody QuestionCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId) {
-        if (examDao.updateCategory(examId, categoryIndex, newCategory.toModel()) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中更新亚项"+ categoryIndex + "失败");
-        }
+        examServices.updateCategory(examId, categoryIndex, newCategory);
         return Map.of("msg", "ok");
     }
 
@@ -150,9 +129,7 @@ public class ExamController {
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}")
     Map<String, String> updateSubCategory(@Valid @RequestBody QuestionSubCategoryDto newCategory, @PathVariable int categoryIndex, @PathVariable("examId") String examId, @PathVariable int subCategoryIndex) {
-        if (examDao.updateSubCategory(examId, categoryIndex, subCategoryIndex, newCategory.toModel()) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下更新子项"+ subCategoryIndex +"失败");
-        }
+        examServices.updateSubCategory(examId, categoryIndex, subCategoryIndex, newCategory);
         return Map.of("msg", "ok");
     }
 
@@ -192,7 +169,7 @@ public class ExamController {
                             HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
 
-        return new QuestionDto(questionDao.save(newQuestion.toModel(uid)));
+        return examServices.updateQuestion(newQuestion, uid);
     }
 
     @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/questions/{questionIndex}")
@@ -214,58 +191,74 @@ public class ExamController {
     }
 
     @PostMapping("/exams/{examId}/diagnosisRule")
-    public Map<String, String> addDiagnoseRule(@PathVariable String examId, @RequestBody DiagnosisRule rule) {
-        if (examDao.addDiagnosisRule(examId, rule) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中新增诊断规则失败");
-        }
-
+    public Map<String, String> addDiagnoseRule(@PathVariable String examId, @Valid @RequestBody DiagnosisRule rule) {
+        examServices.addDiagnoseRule(examId, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/diagnosisRules/{ruleIndex}")
-    public Map<String, String> updateDiagnoseRule(@PathVariable String examId, @PathVariable int ruleIndex, @RequestBody DiagnosisRule rule) {
-        if (examDao.updateDiagnosisRule(examId, ruleIndex, rule) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中更新第"+ ruleIndex+ "个诊断规则失败");
-        }
-
+    public Map<String, String> updateDiagnoseRule(@PathVariable String examId, @PathVariable int ruleIndex, @Valid @RequestBody DiagnosisRule rule) {
+        examServices.updateDiagnoseRule(examId, ruleIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @DeleteMapping("/exams/{examId}/diagnosisRules/{ruleIndex}")
     public Map<String, String> deleteDiagnoseRule(@PathVariable String examId, @PathVariable int ruleIndex) {
-        if (examDao.deleteDiagnosisRule(examId, ruleIndex) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中删除第"+ ruleIndex+ "个诊断规则失败");
-        }
-
+        examServices.deleteDiagnoseRule(examId, ruleIndex);
         return Map.of("msg", "ok");
     }
 
     @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRule")
-    public Map<String, String> addTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @RequestBody TerminateRule rule) {
-        if (examDao.addTerminateRule(examId, categoryIndex, subCategoryIndex, rule) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下新增中止规则失败");
-        }
-
+    public Map<String, String> addTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @Valid @RequestBody TerminateRule rule) {
+        examServices.addTerminateRule(examId, categoryIndex, subCategoryIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRules/{ruleIndex}")
-    public Map<String, String> updateTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @RequestBody TerminateRule rule) {
-        if (examDao.updateTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下更新第" + ruleIndex + "个中止规则失败");
-        }
-
+    public Map<String, String> updateTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody TerminateRule rule) {
+        examServices.updateTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule);
         return Map.of("msg", "ok");
     }
 
     @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/terminateRules/{ruleIndex}")
     public Map<String, String> deleteTerminateRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex) {
-        if (examDao.deleteTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex) <= 0) {
-            throw new BusinessErrorException("在id为" + examId + "的套题中亚项"+ categoryIndex + "下子项" + subCategoryIndex + "下删除第" + ruleIndex + "个中止规则失败");
-        }
-
+        examServices.deleteTerminateRule(examId, categoryIndex, subCategoryIndex, ruleIndex);
         return Map.of("msg", "ok");
     }
 
+    @PostMapping("/exams/{examId}/categories/{categoryIndex}/evalRule")
+    public Map<String, String> addCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @Valid @RequestBody ExamCategoryEvalRule rule) {
+        examServices.addCategoryEvalRule(examId, categoryIndex, rule);
+        return Map.of("msg", "ok");
+    }
 
+    @PatchMapping("/exams/{examId}/categories/{categoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> updateCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody ExamCategoryEvalRule rule) {
+        examServices.updateCategoryEvalRule(examId, categoryIndex, ruleIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> deleteCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int ruleIndex) {
+        examServices.deleteCategoryEvalRule(examId, categoryIndex, ruleIndex);
+        return Map.of("msg", "ok");
+    }
+
+    @PostMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRule")
+    public Map<String, String> addSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @Valid @RequestBody ExamSubCategoryEvalRule rule) {
+        examServices.addSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @PatchMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> updateSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex, @Valid @RequestBody ExamSubCategoryEvalRule rule) {
+        examServices.updateSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex, rule);
+        return Map.of("msg", "ok");
+    }
+
+    @DeleteMapping("/exams/{examId}/categories/{categoryIndex}/subCategories/{subCategoryIndex}/evalRules/{ruleIndex}")
+    public Map<String, String> deleteSubCategoryEvalRule(@PathVariable String examId, @PathVariable int categoryIndex, @PathVariable int subCategoryIndex, @PathVariable int ruleIndex) {
+        examServices.deleteSubCategoryEvalRule(examId, categoryIndex, subCategoryIndex, ruleIndex);
+        return Map.of("msg", "ok");
+    }
 }

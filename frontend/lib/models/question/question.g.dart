@@ -13,7 +13,7 @@ AudioQuestion _$AudioQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String?,
       audioUrl: json['audioUrl'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      omitImageAfterSeconds: json['omitImageAfterSeconds'] as int?,
+      omitImageAfterSeconds: (json['omitImageAfterSeconds'] as num?)?.toInt(),
       evalRule: json['evalRule'] == null
           ? null
           : QuestionEvalRule.fromJson(json['evalRule'] as Map<String, dynamic>),
@@ -38,7 +38,7 @@ ChoiceQuestion _$ChoiceQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String?,
       audioUrl: json['audioUrl'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      omitImageAfterSeconds: json['omitImageAfterSeconds'] as int?,
+      omitImageAfterSeconds: (json['omitImageAfterSeconds'] as num?)?.toInt(),
       evalRule: json['evalRule'] == null
           ? null
           : QuestionEvalRule.fromJson(json['evalRule'] as Map<String, dynamic>),
@@ -63,7 +63,7 @@ CommandQuestion _$CommandQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String? ?? "请按照给出的指令进行操作",
       audioUrl: json['audioUrl'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      omitImageAfterSeconds: json['omitImageAfterSeconds'] as int?,
+      omitImageAfterSeconds: (json['omitImageAfterSeconds'] as num?)?.toInt(),
       evalRule: json['evalRule'] == null
           ? null
           : QuestionEvalRule.fromJson(json['evalRule'] as Map<String, dynamic>),
@@ -88,7 +88,7 @@ WritingQuestion _$WritingQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String?,
       audioUrl: json['audioUrl'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      omitImageAfterSeconds: json['omitImageAfterSeconds'] as int?,
+      omitImageAfterSeconds: (json['omitImageAfterSeconds'] as num?)?.toInt(),
       evalRule: json['evalRule'] == null
           ? null
           : QuestionEvalRule.fromJson(json['evalRule'] as Map<String, dynamic>),
@@ -113,7 +113,7 @@ ItemFindingQuestion _$ItemFindingQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String?,
       audioUrl: json['audioUrl'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      omitImageAfterSeconds: json['omitImageAfterSeconds'] as int?,
+      omitImageAfterSeconds: (json['omitImageAfterSeconds'] as num?)?.toInt(),
       evalRule: json['evalRule'] == null
           ? null
           : QuestionEvalRule.fromJson(json['evalRule'] as Map<String, dynamic>),

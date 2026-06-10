@@ -82,7 +82,7 @@ public class QwenAudioService {
         }
 
         byte[] wav = WavUtil.pcm16kMonoToWav(rawPcm16kMono);
-        String audioDataUri = "data:;base64," + Base64.getEncoder().encodeToString(wav);
+        String audioDataUri = "data:audio/wav;base64," + Base64.getEncoder().encodeToString(wav);
 
         String body = buildRequestBody(audioDataUri);
         Request request = new Request.Builder()
@@ -158,6 +158,8 @@ public class QwenAudioService {
      */
     private String readSseStream(ResponseBody respBody) throws IOException {
         StringBuilder full = new StringBuilder();
+        int droppedChunks = 0;
+        String lastDropMessage = null;
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(respBody.byteStream(), StandardCharsets.UTF_8))) {
             String line;
@@ -180,9 +182,16 @@ public class QwenAudioService {
                         full.append(delta.get("content").getAsString());
                     }
                 } catch (Exception e) {
+                    droppedChunks++;
+                    lastDropMessage = e.getMessage();
                     log.debug("跳过无法解析的 SSE 块: {}", payload);
                 }
             }
+        }
+        if (droppedChunks > 0) {
+            // 每个 chunk 单独 log.warn 太噪；循环结束后汇总一条让运维知道流畅度评分链路有数据丢失。
+            log.warn("qwen-audio SSE 共丢弃 {} 个无法解析的 chunk，最后一次异常: {}",
+                    droppedChunks, lastDropMessage);
         }
         log.debug("qwen-audio SSE 完整文本: {}", full);
         return full.toString();

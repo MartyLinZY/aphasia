@@ -70,7 +70,7 @@ class _SearchPageState extends State<SearchPage> implements ResettableState {
                               borderRadius: BorderRadius.circular(_inputRadius),
                               boxShadow: [
                                 BoxShadow(
-                                    color: Colors.blueAccent.withOpacity(0.1),
+                                    color: Colors.blueAccent.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4))
                               ],

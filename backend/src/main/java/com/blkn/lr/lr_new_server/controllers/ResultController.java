@@ -1,12 +1,9 @@
 package com.blkn.lr.lr_new_server.controllers;
 
-import com.blkn.lr.lr_new_server.dao.ExamResultDao;
-import com.blkn.lr.lr_new_server.dao.QuestionDao;
-import com.blkn.lr.lr_new_server.dto.models.exam.ExamDto;
 import com.blkn.lr.lr_new_server.dto.models.result.ExamResultDto;
 import com.blkn.lr.lr_new_server.exception.BusinessErrorException;
 import com.blkn.lr.lr_new_server.interceptor.RequireRole;
-import com.blkn.lr.lr_new_server.models.results.ExamResult;
+import com.blkn.lr.lr_new_server.services.ResultServices;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,29 +18,24 @@ import java.util.Objects;
 @RequireRole({1})
 @RequiredArgsConstructor
 public class ResultController {
-    private final ExamResultDao resultDao;
-    private final QuestionDao questionDao;
+    private final ResultServices resultServices;
 
     @GetMapping("/patient/{uid}/examRecords")
     List<ExamResultDto> getExamResultsByUserId(@PathVariable("uid") String uid, HttpServletRequest request) {
         checkUid(request, uid);
-        return resultDao.findByOwnerId(uid, false).stream().map(e -> new ExamResultDto(e, questionDao)).toList();
+        return resultServices.getResultsByUserId(uid, false);
     }
 
     @GetMapping("/patient/{uid}/recoveryRecords")
     List<ExamResultDto> getRecoveryResultsByUserId(@PathVariable("uid") String uid, HttpServletRequest request) {
         checkUid(request, uid);
-        return resultDao.findByOwnerId(uid, true).stream().map(e -> new ExamResultDto(e, questionDao)).toList();
+        return resultServices.getResultsByUserId(uid, true);
     }
 
     @PostMapping("/examRecord")
     ExamResultDto saveResult(@Valid @RequestBody ExamResultDto resultDto, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
-        ExamResult updated = resultDao.save(resultDto.toModel(uid));
-        if (updated == null) {
-            throw new BusinessErrorException("保存id为" + resultDto.getId() + "的作答结果失败");
-        }
-        return new ExamResultDto(updated, questionDao);
+        return resultServices.saveResult(resultDto, uid);
     }
 
     void checkUid(HttpServletRequest request, String uid1) {
@@ -57,7 +49,7 @@ public class ResultController {
     @DeleteMapping("/examRecord/{recordId}")
     Map<String, String> deleteResult(@PathVariable String recordId, HttpServletRequest request) {
         String uid = (String) request.getAttribute("uid");
-       resultDao.deleteByIdWithOwnerId(uid, recordId);
+        resultServices.deleteResult(uid, recordId);
 
         return Map.of("msg", "ok");
     }

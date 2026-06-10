@@ -1,12 +1,10 @@
 package com.blkn.lr.lr_new_server.dao.impl;
 
 import com.blkn.lr.lr_new_server.dao.ExamResultDao;
-import com.blkn.lr.lr_new_server.models.exam.Exam;
 import com.blkn.lr.lr_new_server.models.results.ExamResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,11 @@ public class ExamResultDaoImpl implements ExamResultDao {
     }
 
     public List<ExamResult> findByOwnerId(String ownerId, boolean isRecovery) {
-        return template.find(new BasicQuery("{ownerId: \"" + ownerId + "\", isRecovery: " + isRecovery + ", isDisabled: " + false + "}"), ExamResult.class);
+        return template.find(
+                Query.query(where("ownerId").is(ownerId)
+                        .and("isRecovery").is(isRecovery)
+                        .and("isDisabled").is(false)),
+                ExamResult.class);
     }
 
     public void deleteByIdWithOwnerId(String ownerId, String resultId) {

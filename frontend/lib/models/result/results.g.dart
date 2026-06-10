@@ -80,7 +80,7 @@ AudioQuestionResult _$AudioQuestionResultFromJson(Map<String, dynamic> json) =>
       sourceQuestion:
           Question.fromJson(json['sourceQuestion'] as Map<String, dynamic>),
       audioContent: json['audioContent'] as String? ?? "",
-      answerTime: json['answerTime'] as int?,
+      answerTime: (json['answerTime'] as num?)?.toInt(),
     )
       ..finalScore = (json['finalScore'] as num?)?.toDouble()
       ..isHinted = json['isHinted'] as bool
@@ -107,7 +107,7 @@ CommandQuestionResult _$CommandQuestionResultFromJson(
       actions: (json['actions'] as List<dynamic>?)
           ?.map((e) => CommandActions.fromJson(e as Map<String, dynamic>))
           .toList(),
-      answerTime: json['answerTime'] as int?,
+      answerTime: (json['answerTime'] as num?)?.toInt(),
     )
       ..finalScore = (json['finalScore'] as num?)?.toDouble()
       ..isHinted = json['isHinted'] as bool
@@ -132,9 +132,9 @@ ChoiceQuestionResult _$ChoiceQuestionResultFromJson(
       sourceQuestion:
           Question.fromJson(json['sourceQuestion'] as Map<String, dynamic>),
       choiceSelected: (json['choiceSelected'] as List<dynamic>?)
-          ?.map((e) => e as int)
+          ?.map((e) => (e as num).toInt())
           .toList(),
-      answerTime: json['answerTime'] as int?,
+      answerTime: (json['answerTime'] as num?)?.toInt(),
     )
       ..finalScore = (json['finalScore'] as num?)?.toDouble()
       ..isHinted = json['isHinted'] as bool
@@ -158,7 +158,7 @@ WritingQuestionResult _$WritingQuestionResultFromJson(
     WritingQuestionResult(
       sourceQuestion:
           Question.fromJson(json['sourceQuestion'] as Map<String, dynamic>),
-      answerTime: json['answerTime'] as int?,
+      answerTime: (json['answerTime'] as num?)?.toInt(),
     )
       ..finalScore = (json['finalScore'] as num?)?.toDouble()
       ..isHinted = json['isHinted'] as bool
@@ -181,7 +181,7 @@ ItemFindingQuestionResult _$ItemFindingQuestionResultFromJson(
     ItemFindingQuestionResult(
       sourceQuestion:
           Question.fromJson(json['sourceQuestion'] as Map<String, dynamic>),
-      answerTime: json['answerTime'] as int?,
+      answerTime: (json['answerTime'] as num?)?.toInt(),
     )
       ..finalScore = (json['finalScore'] as num?)?.toDouble()
       ..isHinted = json['isHinted'] as bool

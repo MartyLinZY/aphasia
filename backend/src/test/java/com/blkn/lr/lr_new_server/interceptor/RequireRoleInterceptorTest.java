@@ -20,17 +20,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RequireRoleInterceptorTest {
 
     private MockMvc mockMvc;
+    private TokenUtil tokenUtil;
 
     @BeforeEach
     void setUp() {
+        tokenUtil = TokenUtil.forSecret("test-secret");
         mockMvc = MockMvcBuilders.standaloneSetup(new DummyRoleController())
-                .addInterceptors(new TokenInterceptor())
+                .addInterceptors(new TokenInterceptor(tokenUtil))
                 .build();
     }
 
     @Test
     void shouldRejectPatientTokenForDoctorOnlyApi() throws Exception {
-        String patientToken = TokenUtil.getToken("patient-uid", 1);
+        String patientToken = tokenUtil.getToken("patient-uid", 1);
 
         mockMvc.perform(post("/api/test/role/doctor-only")
                         .header("Token", patientToken)
@@ -43,7 +45,7 @@ class RequireRoleInterceptorTest {
 
     @Test
     void shouldAllowDoctorTokenForDoctorOnlyApi() throws Exception {
-        String doctorToken = TokenUtil.getToken("doctor-uid", 2);
+        String doctorToken = tokenUtil.getToken("doctor-uid", 2);
 
         mockMvc.perform(post("/api/test/role/doctor-only")
                         .header("Token", doctorToken)

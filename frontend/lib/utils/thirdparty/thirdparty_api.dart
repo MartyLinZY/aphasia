@@ -49,6 +49,24 @@ Future<double> textSimilarity(String text1, String text2) async {
   return result['sim'];
 }
 
+/// 失语症录音题"拼音模糊判分"：把 keyword 和 spoken 都转拼音，滑窗算相似度，>= threshold 视为命中。
+/// 返回 (matched, similarity) — similarity 留给 caller 写入 extraResults 以便后续调阈值。
+Future<({bool matched, double similarity})> pinyinMatch(
+    String keyword, String spoken,
+    {double threshold = 0.7}) async {
+  JsonObject result = await HttpClientManager().post(
+      url: "${HttpConstants.backendBaseUrl}/api/proxy/pinyin_match"
+          "?keyword=${Uri.encodeComponent(keyword)}"
+          "&spoken=${Uri.encodeComponent(spoken)}"
+          "&threshold=$threshold",
+      body: "");
+
+  return (
+    matched: (result['matched'] ?? false) as bool,
+    similarity: ((result['similarity'] ?? 0) as num).toDouble(),
+  );
+}
+
 Future<String> handWritingRecognize(Uint8List imageData) async {
   final imageFile =
       MultipartFile.fromBytes("file", imageData, filename: "handWrite.png");

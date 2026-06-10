@@ -53,7 +53,7 @@ class CircleIconSwitchTextButton extends StatelessWidget {
         shape: const CircleBorder(),
         backgroundColor: setting['btnIcon'].color ?? Colors.blueAccent,
         elevation: _elevation,
-        shadowColor: Colors.black.withOpacity(0.2),
+        shadowColor: Colors.black.withValues(alpha: 0.2),
       ),
        onPressed: setting['btnAction'],
       child: Tooltip(
@@ -212,7 +212,7 @@ class InnerShadowBox extends StatelessWidget {
         //   borderRadius: BorderRadius.circular(10), // 圆角
         //   boxShadow: [
         //     BoxShadow(
-        //       color: Colors.grey.withOpacity(0.5),
+        //       color: Colors.grey.withValues(alpha: 0.5),
         //       spreadRadius: 2,
         //       blurRadius: 5,
         //       offset: const Offset(0, 3),
@@ -228,7 +228,7 @@ class InnerShadowBox extends StatelessWidget {
           borderRadius: BorderRadius.circular(_defaultRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(_shadowOpacity),
+              color: Colors.grey.withValues(alpha: _shadowOpacity),
               spreadRadius: 3,
               blurRadius: 8,
               offset: const Offset(2, 4),

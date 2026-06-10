@@ -1,9 +1,10 @@
 fastapi>=0.100.0
 uvicorn>=0.23.0
-torch>=2.0.0
-transformers>=4.30.0
-numpy>=1.24.0
 requests>=2.31.0
+numpy>=1.24.0          # 仅离线验证脚本(rescore/p3_severity)用，服务本身不依赖
 
-# 测试依赖（运行 test_app.py 路由测试用，无需 torch）：
+# 注：torch/transformers(BERT 困惑度)已移除——困惑度判失语的方向被 JiangLin 语料证伪，
+# 客观严重度改用特征加权分(features.py)，无重型依赖。
+
+# 测试依赖（pytest 路由/回归测试）：
 # pip install httpx pytest
