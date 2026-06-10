@@ -14,7 +14,8 @@ DEFAULT_MODEL = "Pro/deepseek-ai/DeepSeek-V3"
 REQUEST_TIMEOUT_SECONDS = 30
 
 
-def text_conversation(model: str = DEFAULT_MODEL, content: str = "say hello") -> str:
+def text_conversation(model: str = DEFAULT_MODEL, content: str = "say hello",
+                      temperature: float = 0.5) -> str:
     """调 SiliconFlow chat completions 返回回答字符串。
 
     SILICONFLOW_API_KEY 必须在环境变量中。任何 HTTP / 解析失败一律抛
@@ -33,7 +34,7 @@ def text_conversation(model: str = DEFAULT_MODEL, content: str = "say hello") ->
         "model": model,
         "messages": [{"role": "user", "content": content}],
         "max_tokens": 4096,
-        "temperature": 0.5,
+        "temperature": temperature,
     }
 
     try:

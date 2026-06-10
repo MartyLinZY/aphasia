@@ -32,10 +32,6 @@ public class LLMService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> diagnose1(String conversation) throws Exception {
-        return call("/diagnose1", conversation);
-    }
-
     public Map<String, Object> diagnose2(String conversation) throws Exception {
         return call("/diagnose2", conversation);
     }

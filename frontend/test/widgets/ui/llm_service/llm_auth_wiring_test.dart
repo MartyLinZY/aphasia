@@ -12,8 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 验证 P0 回归修复：LLM 诊断/修复接口必须经过 HttpClientManager，
 /// 这样登录后保存的 Token 才会被自动塞进请求头。
 /// 之前 llm_diagnose.dart / llm_repair.dart 用裸 http.post 直接调
-/// /api/diagnose1, /api/diagnose2, /api/repair，没带 Token 头，
-/// 在 P0 移除拦截器白名单之后会一律 401。
+/// /api/diagnose2, /api/repair，没带 Token 头，
+/// 在 P0 移除拦截器白名单之后会一律 401。（/api/diagnose1 已下线）
 ///
 /// 这里通过 HttpClientManager + 已保存的 Token 校验：
 ///   1) 请求被发到正确的 URL
@@ -41,27 +41,7 @@ void main() {
   });
 
   group('LLM diagnose / repair 鉴权布线', () {
-    test('/api/diagnose1 携带 Token 头并解析出 type/severity', () async {
-      when(client.post(
-        Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose1'),
-        body: jsonEncode({'conversation': 'INV: 你叫什么名字？\nPAR: 小明。'}),
-        headers: argThat(
-          containsPair('Token', _fakeToken),
-          named: 'headers',
-        ),
-      )).thenAnswer((_) async =>
-          _utf8Resp(jsonEncode({'type': 'Broca', 'severity': '轻度'}), 200));
-
-      final data = await HttpClientManager().post(
-        url: '${HttpConstants.backendBaseUrl}/api/diagnose1',
-        body: jsonEncode({'conversation': 'INV: 你叫什么名字？\nPAR: 小明。'}),
-      ) as Map<String, dynamic>;
-
-      expect(data['type'], 'Broca');
-      expect(data['severity'], '轻度');
-    });
-
-    test('/api/diagnose2 携带 Token 头并解析出 perplexity', () async {
+    test('/api/diagnose2 携带 Token 头并解析出特征诊断结果', () async {
       when(client.post(
         Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose2'),
         body: jsonEncode({'conversation': 'PAR: 我...我叫小明'}),
@@ -69,15 +49,24 @@ void main() {
           containsPair('Token', _fakeToken),
           named: 'headers',
         ),
-      )).thenAnswer((_) async =>
-          _utf8Resp(jsonEncode({'perplexity': 12.34}), 200));
+      )).thenAnswer((_) async => _utf8Resp(
+          jsonEncode({
+            'hasAphasia': true,
+            'severity': '中度',
+            'score': 4.5,
+            'evidence': ['短而简化', '找词困难'],
+          }),
+          200));
 
       final data = await HttpClientManager().post(
         url: '${HttpConstants.backendBaseUrl}/api/diagnose2',
         body: jsonEncode({'conversation': 'PAR: 我...我叫小明'}),
       ) as Map<String, dynamic>;
 
-      expect((data['perplexity'] as num).toDouble(), closeTo(12.34, 1e-9));
+      expect(data['hasAphasia'], true);
+      expect(data['severity'], '中度');
+      expect((data['score'] as num).toDouble(), closeTo(4.5, 1e-9));
+      expect(data['evidence'], ['短而简化', '找词困难']);
     });
 
     test('/api/repair 携带 Token 头并解析出 repairedConversation', () async {
@@ -101,10 +90,10 @@ void main() {
       expect(data['repairedConversation'], '修复后的对话');
     });
 
-    test('/api/diagnose1 后端 401 → HttpRequestException(statusCode=401)',
+    test('/api/diagnose2 后端 401 → HttpRequestException(statusCode=401)',
         () async {
       when(client.post(
-        Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose1'),
+        Uri.parse('${HttpConstants.backendBaseUrl}/api/diagnose2'),
         body: anyNamed('body'),
         headers: anyNamed('headers'),
       )).thenAnswer((_) async => _utf8Resp(
@@ -114,7 +103,7 @@ void main() {
 
       expect(
         () => HttpClientManager().post(
-          url: '${HttpConstants.backendBaseUrl}/api/diagnose1',
+          url: '${HttpConstants.backendBaseUrl}/api/diagnose2',
           body: jsonEncode({'conversation': 'x'}),
         ),
         throwsA(

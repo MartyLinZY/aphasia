@@ -57,7 +57,7 @@ class ControllerSecurityTest {
     // ---------- 参数校验 ----------
 
     @Test
-    void diagnose1ShouldReturn400WhenConversationBlank() throws Exception {
+    void diagnose2ShouldReturn400WhenConversationBlank() throws Exception {
         LLMService svc = Mockito.mock(LLMService.class);
         LLMController controller = new LLMController(svc);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
@@ -65,22 +65,22 @@ class ControllerSecurityTest {
                 .build();
 
         // 空白对话 -> 校验失败 -> 400（此前抛 IllegalArgumentException 会落到 500）
-        mockMvc.perform(post("/api/diagnose1")
+        mockMvc.perform(post("/api/diagnose2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"conversation\":\"   \"}"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void diagnose1ShouldPassWhenConversationPresent() throws Exception {
+    void diagnose2ShouldPassWhenConversationPresent() throws Exception {
         LLMService svc = Mockito.mock(LLMService.class);
-        when(svc.diagnose1(anyString())).thenReturn(Map.of("type", "运动性失语"));
+        when(svc.diagnose2(anyString())).thenReturn(Map.of("hasAphasia", true));
         LLMController controller = new LLMController(svc);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
-        mockMvc.perform(post("/api/diagnose1")
+        mockMvc.perform(post("/api/diagnose2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"conversation\":\"医生：你好\"}"))
                 .andExpect(status().isOk());

@@ -34,19 +34,12 @@ class LLMServiceTest {
     void setUp() throws Exception {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
 
-        // diagnose1：返回大模型诊断结果
-        server.createContext("/diagnose1", exchange -> {
-            lastPath.set("/diagnose1");
-            lastBody.set(readBody(exchange.getRequestBody()));
-            respond(exchange, 200,
-                    "{\"type\":\"运动性失语\",\"severity\":\"中度\",\"error\":\"无\",\"LLManswer\":\"是 运动性失语 中度\"}");
-        });
-
-        // diagnose2：返回困惑度
+        // diagnose2：返回特征诊断结果（旧 diagnose1/困惑度已删除）
         server.createContext("/diagnose2", exchange -> {
             lastPath.set("/diagnose2");
             lastBody.set(readBody(exchange.getRequestBody()));
-            respond(exchange, 200, "{\"perplexity\":123.45}");
+            respond(exchange, 200,
+                    "{\"hasAphasia\":true,\"severity\":\"中度\",\"score\":4.5,\"evidence\":[\"短而简化\"]}");
         });
 
         // repair：返回修复后的句子
@@ -57,8 +50,8 @@ class LLMServiceTest {
         });
 
         // 模拟服务端 500：注册到精确路径，避免依赖 HttpContext 前缀匹配
-        server.createContext("/boom/diagnose1",
-                exchange -> respond(exchange, 500, "{\"detail\":\"模型加载失败\"}"));
+        server.createContext("/boom/diagnose2",
+                exchange -> respond(exchange, 500, "{\"detail\":\"特征抽取失败\"}"));
 
         server.start();
 
@@ -75,25 +68,17 @@ class LLMServiceTest {
     }
 
     @Test
-    void diagnose1ShouldPostConversationAndParseResult() throws Exception {
-        Map<String, Object> result = llmService.diagnose1("医生：你好\n患者：水...喝");
+    void diagnose2ShouldPostConversationAndParseResult() throws Exception {
+        Map<String, Object> result = llmService.diagnose2("医生：你好\n患者：水...喝");
 
-        assertEquals("/diagnose1", lastPath.get());
+        assertEquals("/diagnose2", lastPath.get());
         // 请求体应为 {"conversation": "..."}
         Map<String, Object> sentBody = objectMapper.readValue(lastBody.get(), Map.class);
         assertEquals("医生：你好\n患者：水...喝", sentBody.get("conversation"));
-        // 响应解析
-        assertEquals("运动性失语", result.get("type"));
+        // 响应解析：特征诊断结构
+        assertEquals(true, result.get("hasAphasia"));
         assertEquals("中度", result.get("severity"));
-        assertEquals("无", result.get("error"));
-    }
-
-    @Test
-    void diagnose2ShouldParsePerplexity() throws Exception {
-        Map<String, Object> result = llmService.diagnose2("患者：水...喝");
-
-        assertEquals("/diagnose2", lastPath.get());
-        assertEquals(123.45, ((Number) result.get("perplexity")).doubleValue(), 1e-6);
+        assertEquals(4.5, ((Number) result.get("score")).doubleValue(), 1e-6);
     }
 
     @Test
@@ -106,12 +91,12 @@ class LLMServiceTest {
 
     @Test
     void shouldThrowBusinessErrorWhenServiceReturns500() {
-        // 将 baseUrl 指向 /boom，使 diagnose1() 拼出 /boom/diagnose1 命中桩 500 路径
+        // 将 baseUrl 指向 /boom，使 diagnose2() 拼出 /boom/diagnose2 命中桩 500 路径
         String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
         ReflectionTestUtils.setField(llmService, "llmServiceUrl", baseUrl + "/boom");
 
         BusinessErrorException ex = assertThrows(BusinessErrorException.class,
-                () -> llmService.diagnose1("任意"));
+                () -> llmService.diagnose2("任意"));
         assertTrue(ex.getMessage().contains("HTTP 500"),
                 "异常 message 应明确包含 HTTP 500 状态：" + ex.getMessage());
     }

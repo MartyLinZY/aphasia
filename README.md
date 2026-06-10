@@ -63,23 +63,9 @@ db.createUser({ user: "zsb", pwd: "<.env 里 MONGO_PASSWORD 的值>", roles: [{ 
 
 或者关掉 Mongo 认证只跑 noauth（不推荐，但能省事）：把 `application.properties` 里 `spring.data.mongodb.username/password` 两行直接注释掉。
 
-### 4. 下载 BERT 模型（LLM 困惑度计算用）
+> **关于 `/diagnose2`（客观严重度）**：早期用 BERT 困惑度，但经 JiangLin 语料实测，困惑度判失语方向相反（患者重复反而压低困惑度），已废弃。现改为**特征加权分**（`LLM/features.py`，LLM 抽 13 个语言学特征 → 加权严重度分），**无需下载 BERT、无 torch/transformers 依赖**。
 
-`LLM/diagnose.py` 的 `diagnose2` 模式调 `LLM/perplexity.py`，需要本地 `bert-base-chinese`：
-
-```bash
-# 方式一：git clone（需要 git-lfs，模型权重是 LFS 文件）
-cd LLM
-git lfs install
-git clone https://huggingface.co/google-bert/bert-base-chinese models/bert-base-chinese
-
-# 方式二：huggingface-cli
-huggingface-cli download google-bert/bert-base-chinese --local-dir LLM/models/bert-base-chinese
-```
-
-最终目录应该是 `LLM/models/bert-base-chinese/{config.json, pytorch_model.bin, ...}`（`LLM/models/` 已 gitignored，不会污染仓库）。
-
-### 5. Python 虚拟环境
+### 4. Python 虚拟环境
 
 ```bash
 cd LLM
@@ -89,7 +75,7 @@ pip install -r requirements.txt
 pip install httpx pytest   # 测试依赖（见 requirements.txt 注释）
 ```
 
-### 6. Flutter 依赖
+### 5. Flutter 依赖
 
 ```bash
 cd frontend
@@ -189,5 +175,5 @@ cd LLM && source .venv/bin/activate && pytest
 | Spring Boot 报 `Authentication failed` | `application.properties` 期望 `zsb/123456`（或 .env 里的密码），但本地 Mongo 没建这个用户 → 走第 3 步初始化 |
 | 前端按钮点击无响应、控制台 CORS 错误 | `application.properties` 的 `app.cors.allowed-origin-patterns` 默认通配 `localhost:*`；如果 Flutter 跑在别的域名或端口外，加到 `APP_CORS_ALLOWED_ORIGIN_PATTERNS` 环境变量 |
 | LLM 调用 500 报 `SILICONFLOW_API_KEY 未配置` | `.env` 里这个 key 没填 / 启动 uvicorn 之前没 `set -a; source ../.env; set +a` |
-| `diagnose2` 启动慢 / 报模型加载失败 | `LLM/models/bert-base-chinese/` 缺文件，重新走第 4 步 |
+| `/diagnose2` 报错 / 返回异常 | 现走特征加权分(features.py)，依赖 `SILICONFLOW_API_KEY` + `prompt_features.txt`；不再需要 BERT 模型 |
 | 讯飞 ASR 返 401 / 403 | `FLYTEK_*` 三个 key 配错，或讯飞控制台没开 IAT/TTS 接口 |

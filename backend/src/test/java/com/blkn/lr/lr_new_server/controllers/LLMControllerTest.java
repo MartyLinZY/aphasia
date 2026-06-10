@@ -18,8 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * LLMController 路由测试。3 个 endpoint 都是 conversation → LLMService 透传，
- * @Valid 体外校验由 GlobalExceptionHandler 拦 400。
+ * LLMController 路由测试。2 个 endpoint（diagnose2 / repair）都是 conversation → LLMService 透传，
+ * @Valid 体外校验由 GlobalExceptionHandler 拦 400。（diagnose1 已删除）
  */
 class LLMControllerTest {
 
@@ -36,28 +36,18 @@ class LLMControllerTest {
     }
 
     @Test
-    void diagnose1ShouldDelegateConversationToService() throws Exception {
-        when(llmService.diagnose1("医患对话"))
-                .thenReturn(Map.of("type", "运动性失语", "severity", "中度"));
-
-        mvc.perform(post("/api/diagnose1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"conversation\":\"医患对话\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("运动性失语"))
-                .andExpect(jsonPath("$.severity").value("中度"));
-        verify(llmService).diagnose1("医患对话");
-    }
-
-    @Test
     void diagnose2ShouldDelegateConversationToService() throws Exception {
-        when(llmService.diagnose2("医患对话")).thenReturn(Map.of("perplexity", 123.45));
+        when(llmService.diagnose2("医患对话"))
+                .thenReturn(Map.of("hasAphasia", true, "severity", "中度", "score", 4.5));
 
         mvc.perform(post("/api/diagnose2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"conversation\":\"医患对话\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.perplexity").value(123.45));
+                .andExpect(jsonPath("$.hasAphasia").value(true))
+                .andExpect(jsonPath("$.severity").value("中度"))
+                .andExpect(jsonPath("$.score").value(4.5));
+        verify(llmService).diagnose2("医患对话");
     }
 
     @Test
@@ -72,9 +62,9 @@ class LLMControllerTest {
     }
 
     @Test
-    void diagnose1ShouldRejectMissingConversation() throws Exception {
+    void diagnose2ShouldRejectMissingConversation() throws Exception {
         // ConversationRequest.conversation 有 @NotBlank
-        mvc.perform(post("/api/diagnose1")
+        mvc.perform(post("/api/diagnose2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().is4xxClientError());

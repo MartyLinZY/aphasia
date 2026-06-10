@@ -29,8 +29,8 @@ class LlmApiAuthInterceptorTest {
     }
 
     @Test
-    void shouldReturn401WhenNoTokenForDiagnose1() throws Exception {
-        mockMvc.perform(post("/api/diagnose1")
+    void shouldReturn401WhenNoTokenForDiagnose2() throws Exception {
+        mockMvc.perform(post("/api/diagnose2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"conversation\":\"测试会话\"}"))
                 .andExpect(status().isUnauthorized());
@@ -39,8 +39,8 @@ class LlmApiAuthInterceptorTest {
     }
 
     @Test
-    void shouldReturn403WhenInvalidTokenForDiagnose1() throws Exception {
-        mockMvc.perform(post("/api/diagnose1")
+    void shouldReturn403WhenInvalidTokenForDiagnose2() throws Exception {
+        mockMvc.perform(post("/api/diagnose2")
                         .header("Token", "invalid-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"conversation\":\"测试会话\"}"))
