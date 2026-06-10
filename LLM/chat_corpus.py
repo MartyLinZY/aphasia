@@ -61,6 +61,39 @@ def extract_dialogue(cha_path):
     return "\n".join(lines)
 
 
+def extract_dialogue_en(cha_path):
+    """英文版 extract_dialogue：清掉标注/时间戳/CLAN 码，但【保留单词间空格】。
+
+    与中文版唯一的区别：中文把 token 间空格全删（'你 好'→'你好'），
+    英文必须保留单词边界（'I am'→'I am'，否则糊成 'Iam'）。
+    """
+    lines = []
+    with open(cha_path, encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            if line.startswith("*INV:") or line.startswith("*PAR:"):
+                speaker = line[1:4]
+                text = line[5:]
+                text = _BULLET.sub("", text)
+                text = _TIMESTAMP.sub("", text)
+                text = _CLAN_BRACKET.sub("", text)
+                text = _CLAN_AMP.sub("", text)
+                text = _CLAN_MISC.sub("", text)
+                text = re.sub(r"\s+", " ", text).strip()  # 折叠空白但保留单词边界
+                if text:
+                    lines.append(f"{speaker}: {text}")
+    return "\n".join(lines)
+
+
+def cha_aphasia_type(cha_path):
+    """读 .cha 的 PAR @ID 第6字段（WAB 类型 / 组别）。读不到返回空串。"""
+    with open(cha_path, encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            if line.startswith("@ID:") and "|PAR|" in line:
+                parts = line.split("|")
+                return parts[5].strip() if len(parts) > 5 else ""
+    return ""
+
+
 def list_corpus(group, limit_files=None):
     """列出某组(PWA/Control)的 .cha 文件路径。语料缺失时返回空列表。"""
     group_dir = CORPUS_PATH / group

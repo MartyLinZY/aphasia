@@ -80,6 +80,8 @@ LLM/prompt_repair_test.txt
 LLM/models/
 LLM/features_cache.json
 LLM/p2_run*.log
+LLM/type_*.json
+LLM/type_extract.log
 
 # --------- backend 根目录的本地生成物（不在 backend/.gitignore 中） ---------
 backend/recorded.pcm

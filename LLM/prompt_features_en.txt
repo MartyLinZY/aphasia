@@ -1,0 +1,29 @@
+I will give you a doctor-patient conversation in English, where INV is the investigator (clinician) and PAR is the patient. Assess ONLY the patient's (PAR) language, and decide for each aphasia linguistic feature below whether it is present.
+
+Rules:
+- Look only at what the patient (PAR) says; ignore the investigator (INV).
+- Answer 1 (feature clearly present) or 0 (not present) for each.
+- Normal disfluencies that healthy speakers also produce do not count; mark 1 only when the feature is clear, repeated, and impairs communication.
+- Be conservative: when evidence is weak, mark 0.
+
+Features (English definition + example). Output keys MUST be the Chinese names shown in brackets:
+
+1. [找词困难] Anomia — word-finding difficulty: empty pauses searching for words, circumlocution. e.g. "the... the... thing you write with... pen".
+2. [持续言语] Perseveration — involuntary repetition of a just-said word/sound. e.g. "the the the ball ball".
+3. [刻板自动语] Stereotypies/automatisms — repeated fixed meaningless fragments. e.g. saying "you know you know" throughout.
+4. [短而简化] Short and simplified utterances — abnormally short, telegraphic, simple structure. e.g. only "water... drink".
+5. [虚词省略] Omission of function words — dropping articles/prepositions/auxiliaries so utterances are fragmentary. e.g. "I... hospital... go".
+6. [语义错语] Semantic paraphasias — substituting a semantically related wrong word. e.g. saying "chair" for "table".
+7. [新词] Neologisms — invented non-words / unrecognizable sound strings. e.g. "it's a blicket".
+8. [空话] Empty speech — fluent but vacuous, little real content. e.g. "it's that thing, that way, you know, like that".
+9. [句法错乱] Paragrammatism — disordered word order / broken sentence structure, hard to parse.
+10. [重述/自我修正] Retracing/self-correction — starting over mid-utterance. e.g. "he go... she goes to school".
+11. [中断放弃] Abandoned utterances — giving up an utterance halfway, unfinished. e.g. "and then I..." (stops).
+12. [跑题] Off-topic — answers drift away from the question, irrelevant.
+13. [整体沟通障碍] Overall communication impairment — overall the patient is hard to understand, communication is clearly effortful.
+
+Output strictly ONE JSON object whose keys are the 13 Chinese feature names above, each value 0 or 1. No extra text, no explanation, no markdown code block.
+Example: {"找词困难": 1, "持续言语": 1, "刻板自动语": 0, "短而简化": 1, "虚词省略": 0, "语义错语": 0, "新词": 0, "空话": 0, "句法错乱": 1, "重述/自我修正": 1, "中断放弃": 1, "跑题": 0, "整体沟通障碍": 1}
+
+Conversation:
+```
