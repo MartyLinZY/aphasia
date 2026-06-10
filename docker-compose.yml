@@ -1,0 +1,81 @@
+# 失语症康复系统 — 全栈一键启动
+#   cp .env.example .env   # 填入 5 类外部 API 密钥
+#   docker compose up --build
+# 前端 http://localhost:8088  后端 http://localhost:8080
+#
+# 变量从同目录 .env 自动读取；下方 environment 显式覆盖容器间的连接地址/凭据，
+# 即使 .env 里 MONGO_PASSWORD 留空也能用默认 123456 把两端对齐。
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpass}
+      MONGO_USERNAME: ${MONGO_USERNAME:-zsb}
+      MONGO_PASSWORD: ${MONGO_PASSWORD:-123456}
+    volumes:
+      - mongo-data:/data/db
+      - ./docker/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  llm:
+    build: ./LLM
+    restart: unless-stopped
+    env_file: .env          # SILICONFLOW_API_KEY 等
+    environment:
+      LLM_PATH: /app/
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env          # 5 类外部 API 密钥 + JWT_SECRET 等
+    environment:
+      MONGO_HOST: mongo
+      MONGO_USERNAME: ${MONGO_USERNAME:-zsb}
+      MONGO_PASSWORD: ${MONGO_PASSWORD:-123456}
+      REDIS_HOST: redis
+      LLM_SERVICE_URL: http://llm:8001
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      llm:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # 浏览器直连后端，故用宿主机暴露的地址（非容器名）
+        BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
+        BACKEND_HOST: ${BACKEND_HOST:-localhost}
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:

@@ -6,9 +6,32 @@
 |---|---|---|
 | `frontend/` | Flutter（Provider 状态管理） | dev server 随机端口 |
 | `backend/` | Spring Boot 3.5.14 / Java 17 + MongoDB + Redis | `8080` |
-| `LLM/` | Python FastAPI 微服务（诊断 / 修复 / 困惑度） | `8001` |
+| `LLM/` | Python FastAPI 微服务（特征诊断 / 修复） | `8001` |
 
-三件套**跨进程通信**：前端 HTTP 调后端，后端 OkHttp 调 LLM 微服务。开发时同一台机器跑三个独立进程。
+三件套**跨进程通信**：前端 HTTP 调后端，后端 OkHttp 调 LLM 微服务。
+
+---
+
+## 🐳 Docker 一键启动（推荐）
+
+装好 **Docker + Docker Compose** 后，三条命令把全栈（MongoDB + Redis + 后端 + LLM + 前端）跑起来：
+
+```bash
+cp .env.example .env        # 填入 5 类外部 API 密钥（见下方表，全部需自行申请）
+docker compose up --build   # 首次构建较久（含 Maven / Flutter Web 构建）
+```
+
+- 前端：<http://localhost:8088>　后端：<http://localhost:8080>
+- MongoDB 用户（`zsb`/`LrNew`）由 `docker/mongo-init.sh` 首次自动创建，无需手动初始化。
+- 容器间地址自动注入（`MONGO_HOST=mongo` / `REDIS_HOST=redis` / `LLM_SERVICE_URL=http://llm:8001`），`.env` 里这些不用填。
+- **仍需填 5 类外部密钥**（SiliconFlow / 讯飞 / 百度 / Qwen），否则诊断/语音/翻译会报错——这是第三方付费服务，绕不开。
+
+```bash
+docker compose down         # 停服务（保留 Mongo 数据卷）
+docker compose down -v      # 停 + 清空 Mongo 数据（重置）
+```
+
+> 不想用 Docker、要本地起裸进程开发，走下面的「一次性环境准备」。
 
 ---
 

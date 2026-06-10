@@ -1,0 +1,15 @@
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.idea/
+.git/
+android/
+ios/
+macos/
+windows/
+linux/
+test/
+Dockerfile
+.dockerignore
+*.log
