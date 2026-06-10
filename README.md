@@ -22,7 +22,7 @@ docker compose up --build   # 首次构建较久（含 Maven / Flutter Web 构�
 ```
 
 - 前端：<http://localhost:8088>　后端：<http://localhost:8080>
-- MongoDB 用户（`zsb`/`LrNew`）由 `docker/mongo-init.sh` 首次自动创建，无需手动初始化。
+- MongoDB 走无认证（mongo 端口不对外暴露，仅 docker 网络内可达），无需手动建用户；生产环境请自行加认证。
 - 容器间地址自动注入（`MONGO_HOST=mongo` / `REDIS_HOST=redis` / `LLM_SERVICE_URL=http://llm:8001`），`.env` 里这些不用填。
 - **仍需填 5 类外部密钥**（SiliconFlow / 讯飞 / 百度 / Qwen），否则诊断/语音/翻译会报错——这是第三方付费服务，绕不开。
 

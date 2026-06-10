@@ -3,20 +3,16 @@
 #   docker compose up --build
 # 前端 http://localhost:8088  后端 http://localhost:8080
 #
-# 变量从同目录 .env 自动读取；下方 environment 显式覆盖容器间的连接地址/凭据，
-# 即使 .env 里 MONGO_PASSWORD 留空也能用默认 123456 把两端对齐。
+# 变量从同目录 .env 自动读取；下方 environment 显式注入容器间的连接地址
+# （MONGO_HOST/REDIS_HOST/LLM_SERVICE_URL 用服务名，覆盖应用里的 localhost 默认）。
 services:
   mongo:
     image: mongo:7
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpass}
-      MONGO_USERNAME: ${MONGO_USERNAME:-zsb}
-      MONGO_PASSWORD: ${MONGO_PASSWORD:-123456}
+    # 无认证：与后端 MongoDBConfig 的实际连接方式一致（应用本就无凭据连接）。
+    # mongo 端口不对宿主暴露，仅 docker 网络内可达，dev/demo 足够；生产请加认证。
     volumes:
       - mongo-data:/data/db
-      - ./docker/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -50,8 +46,6 @@ services:
     env_file: .env          # 5 类外部 API 密钥 + JWT_SECRET 等
     environment:
       MONGO_HOST: mongo
-      MONGO_USERNAME: ${MONGO_USERNAME:-zsb}
-      MONGO_PASSWORD: ${MONGO_PASSWORD:-123456}
       REDIS_HOST: redis
       LLM_SERVICE_URL: http://llm:8001
     ports:
