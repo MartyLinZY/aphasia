@@ -494,18 +494,28 @@ class _CommandQuestionAnswerAreaState extends State<CommandQuestionAnswerArea>
   }
 
   Widget _buildDragFeedback(StackableItemSlot slot) {
-    assert(slot.items.isNotEmpty);
+    // 用运行时守卫而非 assert：assert 在 release/web 构建里被剥离，空 slot 时
+    // slot.items.last 会抛 "Bad state: No element"，让指令题整页渲染崩溃、每帧重抛。
+    // Draggable 的 feedback 会被预构建（即使该 slot 当前没有可拖物），故必须容空。
+    if (slot.items.isEmpty) return const SizedBox.shrink();
     final item = slot.items.last;
 
-    return Center(
-      child: item.itemImageUrl != null
-          ? Image.network(
-              item.itemImageUrl!,
-              fit: BoxFit.contain,
-            )
-          : Image.asset(
-              item.itemImageAssetPath!,
-              fit: BoxFit.contain,
-            ));
+    // 必须约束尺寸：Draggable 的 feedback 处于无约束环境，Image 会按源图原始像素渲染，
+    // 导致大分辨率图（香烟 925px、书本 730px）拖动预览巨大、小图（梳子 169px）正常。
+    // 固定到一个合理方框，BoxFit.contain 保持比例，各物品预览大小一致。
+    return SizedBox(
+      width: 90,
+      height: 75,
+      child: Center(
+        child: item.itemImageUrl != null
+            ? Image.network(
+                item.itemImageUrl!,
+                fit: BoxFit.contain,
+              )
+            : Image.asset(
+                item.itemImageAssetPath!,
+                fit: BoxFit.contain,
+              )),
+    );
   }
 }
