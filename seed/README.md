@@ -8,7 +8,9 @@
 | 文件 | 作用 |
 |---|---|
 | `exam.json` | 演示套题「演示用综合失语测评套题」。源头是 commit `7f8a12c` 删除的 `my_app.dart` 内嵌测试套题，经精选编排（曾以 `demo-data/demo_seed.mongo.js` 直插脚本形式存在，2026-06-11 已合并到这里、统一走 API）。**7 题 + 3 大项**覆盖全部 5 种题型（书写 1 / 选择 2 / 指令 1 / 场景寻物 1 / 录音 2），含 2 条按各大项分数段判失语的诊断规则。 |
-| `seed.py` | 种子生成器本体（标准库 urllib，无额外依赖）：建账号 → 建套题骨架 → 逐题写入 → 发布。 |
+| `exam_reliable.json` | 纯后端可靠 4 题（选择/指令/场景寻物），全本地判分、离线可演。 |
+| `exam_recovery.json` | 康复版（与 exam.json 同题，`recovery:true`）。做完进「康复记录」tab（显示得分，不显诊断）。 |
+| `seed.py` | 种子生成器本体（标准库 urllib，无额外依赖）：建账号 → 建套题骨架 → 逐题写入 → 发布。可选 argv[1] 指定套题文件。 |
 | `seed.sh` | `seed.py` 的瘦封装（`exec python3 seed.py`），方便 `./seed/seed.sh` 直接跑。 |
 | `restore.sh` | Mongo 首启动自动恢复钩子（配合下面的"交付包"步骤）。 |
 
@@ -59,10 +61,13 @@ docker compose up -d            # 至少把 mongo + backend 起来
 `mongo-data` 为空 → 首启动自动 `mongorestore` → 账号/题库/引用全在；之后再 `up` 已有数据，init 钩子自动跳过。
 
 > **稳定的演示套题 ID**（dump 里的 ObjectId 固定，换机恢复后不变）：
-> 完整 7 题 `6a2abd9795070345cef23e7a`、纯后端可靠 4 题 `6a2abd9795070345cef23e82`。
+> - 测评·完整 7 题 `6a2abd9795070345cef23e7a`
+> - 测评·纯后端可靠 4 题 `6a2abd9795070345cef23e82`
+> - 康复·综合训练 7 题 `6a2ac4eac40849fdf6803909`（搜索时类型选「康复」）
+>
 > 演示账号：医生 `13800000002` / 患者 `13800000001`，密码 `demo1234`。
 
-**要更新种子内容时**（改了 exam.json/诊断规则等）：先 `docker compose down -v` 清库 → `up` → `./seed/seed.sh exam.json` + `./seed/seed.sh exam_reliable.json` → 重新导出覆盖 dump：
+**要更新种子内容时**（改了 exam.json/诊断规则等）：先 `docker compose down -v` 清库 → `up` → 依次 `./seed/seed.sh exam.json`、`./seed/seed.sh exam_reliable.json`、`./seed/seed.sh exam_recovery.json` →（可选）`mongosh LrNew --eval "db.examResult.deleteMany({})"` 清测试结果 → 重新导出覆盖 dump：
 ```bash
 docker compose exec mongo sh -c 'rm -rf /tmp/seed-dump && mongodump --db LrNew --out /tmp/seed-dump --quiet'
 rm -rf seed/mongodump && mkdir -p seed/mongodump

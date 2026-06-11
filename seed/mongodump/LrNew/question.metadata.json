@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"515e35880f6d449ba8374f912ca7476c","collectionName":"question","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"ownerId":{"$numberInt":"1"}},"name":"ownerId_1"}],"uuid":"7e94b65f47e44ddaa0462426c2a928ae","collectionName":"question","type":"collection"}
