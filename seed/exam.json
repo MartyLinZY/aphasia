@@ -1,0 +1,800 @@
+{
+  "name": "演示用综合失语测评套题",
+  "description": "用于演示题目编排、作答、评分与结果展示；覆盖书写、选择、指令、录音与场景寻物题。",
+  "recovery": false,
+  "published": false,
+  "categories": [
+    {
+      "description": "命名与理解",
+      "subCategories": [
+        {
+          "description": "物品命名与选择",
+          "questions": [
+            {
+              "alias": "书写题：叉子命名",
+              "questionText": "写出刚刚展示的图片中的物体名称",
+              "audioUrl": "http://localhost:8080/prompts/q1_write_fork.mp3",
+              "imageUrl": "assets/images/for_question_setting/fork.jpg",
+              "omitImageAfterSeconds": 5,
+              "typeName": "WritingQuestion",
+              "evalRule": {
+                "enableFuzzyEvaluation": true,
+                "keyword": "叉子",
+                "fullScore": 10,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 10,
+                    "ranges": [
+                      {
+                        "lowBound": 2,
+                        "highBound": 2
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 8,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 6,
+                    "ranges": [
+                      {
+                        "lowBound": 2,
+                        "highBound": 2
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 4,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "这是吃饭时会用到的餐具。",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 0,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalWritingQuestionByMatchRate"
+              },
+              "id": null
+            },
+            {
+              "alias": "选择题：选出梳子",
+              "questionText": "选出梳子",
+              "audioUrl": "http://localhost:8080/prompts/q2_choice_comb.mp3",
+              "imageUrl": null,
+              "omitImageAfterSeconds": 20,
+              "typeName": "ChoiceQuestion",
+              "evalRule": {
+                "enforceOrder": false,
+                "fullScore": 10,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 10,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 5,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "再想想，梳头发的梳子是哪一个？",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 9,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalChoiceQuestionByCorrectChoiceCount",
+                "choices": [
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/comb.png",
+                    "text": "梳子"
+                  },
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/type4_flower.jpg",
+                    "text": "花"
+                  },
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/cup.jpg",
+                    "text": "杯子"
+                  }
+                ],
+                "correctChoices": [
+                  0
+                ]
+              },
+              "id": null
+            },
+            {
+              "alias": "选择题：选出球",
+              "questionText": "球是哪一个？",
+              "audioUrl": "http://localhost:8080/prompts/q3_choice_ball.mp3",
+              "imageUrl": null,
+              "omitImageAfterSeconds": 20,
+              "typeName": "ChoiceQuestion",
+              "evalRule": {
+                "enforceOrder": false,
+                "fullScore": 6,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 6,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 3,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "再想一想，球是哪一个？",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 1,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalChoiceQuestionByCorrectChoiceCount",
+                "choices": [
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/ball.jpg",
+                    "text": "球"
+                  },
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/type4_cup.jpg",
+                    "text": "杯子"
+                  },
+                  {
+                    "imageUrl": null,
+                    "imageAssetPath": "assets/images/for_question_setting/bicycle.jpg",
+                    "text": "自行车"
+                  }
+                ],
+                "correctChoices": [
+                  0
+                ]
+              },
+              "id": null
+            }
+          ],
+          "terminateRules": [],
+          "evalRules": [
+            {
+              "typeName": "EvalSubCategoryByQuestionScoreSum"
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "typeName": "EvalBySubCategoryScoreSum"
+        }
+      ]
+    },
+    {
+      "description": "听理解与操作",
+      "subCategories": [
+        {
+          "description": "指令执行",
+          "questions": [
+            {
+              "alias": "指令题：梳子与书本",
+              "questionText": "先指一下梳子，再拿起梳子放在书本上",
+              "audioUrl": "http://localhost:8080/prompts/q4_cmd_comb_book.mp3",
+              "imageUrl": "assets/images/for_question_setting/comb.png",
+              "omitImageAfterSeconds": 5,
+              "typeName": "CommandQuestion",
+              "evalRule": {
+                "fullScore": 6,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 6,
+                    "ranges": [
+                      {
+                        "lowBound": 6,
+                        "highBound": 6
+                      },
+                      {
+                        "lowBound": 0,
+                        "highBound": 10
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 5,
+                    "ranges": [
+                      {
+                        "lowBound": 6,
+                        "highBound": 6
+                      },
+                      {
+                        "lowBound": 11,
+                        "highBound": 20
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 4,
+                    "ranges": [
+                      {
+                        "lowBound": 4,
+                        "highBound": 5
+                      },
+                      {
+                        "lowBound": 0,
+                        "highBound": 20
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 3,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 7
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 3,
+                    "ranges": [
+                      {
+                        "lowBound": 6,
+                        "highBound": 6
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 2,
+                    "ranges": [
+                      {
+                        "lowBound": 4,
+                        "highBound": 5
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 1,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 3
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "指一下梳子，然后把梳子放在书本上。",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 3,
+                    "adjustValue": 3,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalCommandQuestionByCorrectActionCount",
+                "slots": [
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": "香烟",
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": "assets/images/for_question_setting/cigarettes.jpg"
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": "书本",
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": "assets/images/for_question_setting/book.png"
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": "梳子",
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": "assets/images/for_question_setting/comb.png"
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  },
+                  {
+                    "itemName": null,
+                    "itemImageUrl": null,
+                    "itemImageAssetPath": null
+                  }
+                ],
+                "actions": [
+                  {
+                    "sourceSlotIndex": 7,
+                    "firstAction": "touch",
+                    "targetSlotIndex": null,
+                    "secondAction": null
+                  },
+                  {
+                    "sourceSlotIndex": 7,
+                    "firstAction": "take",
+                    "targetSlotIndex": 3,
+                    "secondAction": "putDown"
+                  }
+                ],
+                "invalidActionPunishment": 0,
+                "detailMode": true,
+                "commandText": "先指一下梳子，再拿起梳子放在书本上"
+              },
+              "id": null
+            }
+          ],
+          "terminateRules": [],
+          "evalRules": [
+            {
+              "typeName": "EvalSubCategoryByQuestionScoreSum"
+            }
+          ]
+        },
+        {
+          "description": "场景寻物",
+          "questions": [
+            {
+              "alias": "场景寻物题：找风筝",
+              "questionText": "请指出风筝在哪里",
+              "audioUrl": "http://localhost:8080/prompts/q5_find_kite.mp3",
+              "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
+              "omitImageAfterSeconds": 20,
+              "typeName": "ItemFindingQuestion",
+              "evalRule": {
+                "fullScore": 6,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 6,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 3,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "再想一想，连着线的风筝在哪里？",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 5,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalItemFoundQuestion",
+                "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
+                "coordinates": [
+                  [
+                    0.766,
+                    0.131
+                  ],
+                  [
+                    0.908,
+                    0.131
+                  ],
+                  [
+                    0.908,
+                    0.301
+                  ],
+                  [
+                    0.766,
+                    0.301
+                  ]
+                ]
+              },
+              "id": null
+            }
+          ],
+          "terminateRules": [],
+          "evalRules": [
+            {
+              "typeName": "EvalSubCategoryByQuestionScoreSum"
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "typeName": "EvalBySubCategoryScoreSum"
+        }
+      ]
+    },
+    {
+      "description": "口语表达",
+      "subCategories": [
+        {
+          "description": "命名与图片描述",
+          "questions": [
+            {
+              "alias": "录音题：照相机命名",
+              "questionText": "这是什么？",
+              "audioUrl": "http://localhost:8080/prompts/q6_audio_camera.mp3",
+              "imageUrl": "assets/images/for_question_setting/camera.jpg",
+              "omitImageAfterSeconds": -1,
+              "typeName": "AudioQuestion",
+              "evalRule": {
+                "enableFuzzyEvaluation": true,
+                "keywords": [
+                  "照相机",
+                  "拍照的",
+                  "拍照",
+                  "录像机",
+                  "相机"
+                ],
+                "enforceOrder": false,
+                "fullScore": 10,
+                "timeLimit": 20,
+                "defaultScore": 0,
+                "conditions": [
+                  {
+                    "score": 10,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": false
+                  },
+                  {
+                    "score": 5,
+                    "ranges": [
+                      {
+                        "lowBound": 1,
+                        "highBound": 1
+                      }
+                    ],
+                    "isHinted": true
+                  },
+                  {
+                    "score": 0,
+                    "ranges": [
+                      {
+                        "lowBound": 0,
+                        "highBound": 0
+                      }
+                    ],
+                    "isHinted": true
+                  }
+                ],
+                "hintRules": [
+                  {
+                    "hintText": "这是照相用的东西。",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 9,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalAudioQuestionByKeywordsMatchesCount"
+              },
+              "id": null
+            },
+            {
+              "alias": "录音题：图片描述",
+              "questionText": "请描述一下图里的内容",
+              "audioUrl": "http://localhost:8080/prompts/q7_audio_describe.mp3",
+              "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
+              "omitImageAfterSeconds": -1,
+              "typeName": "AudioQuestion",
+              "evalRule": {
+                "fullScore": 10,
+                "timeLimit": 30,
+                "defaultScore": 0,
+                "conditions": [],
+                "hintRules": [
+                  {
+                    "hintText": "可以说说野餐、风筝、人、房子和树。",
+                    "hintAudioUrl": null,
+                    "hintImageUrl": null,
+                    "hintImageAssetPath": null,
+                    "scoreLowBound": 0,
+                    "scoreHighBound": 5,
+                    "adjustValue": 0,
+                    "scoreAdjustType": 1
+                  }
+                ],
+                "typeName": "EvalAudioQuestionByFluency"
+              },
+              "id": null
+            }
+          ],
+          "terminateRules": [],
+          "evalRules": [
+            {
+              "typeName": "EvalSubCategoryByQuestionScoreSum"
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "typeName": "EvalBySubCategoryScoreSum"
+        }
+      ]
+    }
+  ],
+  "diagnosisRules": [
+    {
+      "typeName": "DiagnoseByScoreRange",
+      "categoryIndices": [
+        0,
+        1,
+        2
+      ],
+      "ranges": [
+        {
+          "min": 0.0,
+          "max": 10.0
+        },
+        {
+          "min": 0.0,
+          "max": 12.0
+        },
+        {
+          "min": 0.0,
+          "max": 20.0
+        }
+      ],
+      "aphasiaType": "建议进一步完成标准量表评估"
+    },
+    {
+      "typeName": "DiagnoseByScoreRange",
+      "categoryIndices": [
+        0,
+        1,
+        2
+      ],
+      "ranges": [
+        {
+          "min": 11.0,
+          "max": 20.0
+        },
+        {
+          "min": 0.0,
+          "max": 12.0
+        },
+        {
+          "min": 0.0,
+          "max": 20.0
+        }
+      ],
+      "aphasiaType": "演示结果：轻-中度语言障碍"
+    },
+    {
+      "typeName": "DiagnoseByScoreRange",
+      "categoryIndices": [
+        0,
+        1,
+        2
+      ],
+      "ranges": [
+        {
+          "min": 21.0,
+          "max": 26.0
+        },
+        {
+          "min": 0.0,
+          "max": 12.0
+        },
+        {
+          "min": 0.0,
+          "max": 20.0
+        }
+      ],
+      "aphasiaType": "演示结果：语言能力表现较好"
+    }
+  ],
+  "rules": [],
+  "id": null
+}

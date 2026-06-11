@@ -13,6 +13,10 @@ services:
     # mongo 端口不对宿主暴露，仅 docker 网络内可达，dev/demo 足够；生产请加认证。
     volumes:
       - mongo-data:/data/db
+      # 演示种子：首启动（mongo-data 为空）自动 mongorestore，灌入 2 账号 + 2 套题。
+      # 之后再 up 已有数据，init 钩子自动跳过。详见 seed/README.md。
+      - ./seed/mongodump:/seed-dump:ro
+      - ./seed/restore.sh:/docker-entrypoint-initdb.d/restore.sh:ro
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -64,7 +68,9 @@ services:
       args:
         # 浏览器直连后端，故用宿主机暴露的地址（非容器名）
         BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
-        BACKEND_HOST: ${BACKEND_HOST:-localhost}
+        # 必须带端口：multipart 请求（录音/手写）走 Uri.http(BACKEND_HOST, path)，
+        # 少了 :8080 会打到 80 端口 → ERR_CONNECTION_REFUSED（录音题识别失败）。
+        BACKEND_HOST: ${BACKEND_HOST:-localhost:8080}
     restart: unless-stopped
     ports:
       - "8088:80"

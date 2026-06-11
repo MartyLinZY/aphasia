@@ -1,0 +1,30 @@
+{
+  "书写题：叉子命名": {
+    "name": "q1_write_fork",
+    "text": "写出刚刚展示的图片中的物体名称"
+  },
+  "选择题：选出梳子": {
+    "name": "q2_choice_comb",
+    "text": "选出梳子"
+  },
+  "选择题：选出球": {
+    "name": "q3_choice_ball",
+    "text": "球是哪一个？"
+  },
+  "指令题：梳子与书本": {
+    "name": "q4_cmd_comb_book",
+    "text": "先指一下梳子，再拿起梳子放在书本上"
+  },
+  "场景寻物题：找风筝": {
+    "name": "q5_find_kite",
+    "text": "请指出风筝在哪里"
+  },
+  "录音题：照相机命名": {
+    "name": "q6_audio_camera",
+    "text": "这是什么？"
+  },
+  "录音题：图片描述": {
+    "name": "q7_audio_describe",
+    "text": "请描述一下图里的内容"
+  }
+}
