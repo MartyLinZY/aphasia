@@ -37,7 +37,7 @@ docker compose down -v      # 停 + 清空 Mongo 数据（重置）
 
 ## 🎬 演示流程（换机即演示）
 
-演示数据**已打包**进 `seed/mongodump/`，`docker compose up` 后 mongo 首启动会**自动恢复**（2 账号 + 2 套题），零手动步骤。**无需手动建题。**
+演示数据**已打包**进 `seed/mongodump/`，`docker compose up` 后 mongo 首启动会**自动恢复**（2 账号 + 3 套题，含 1 康复套题），零手动步骤。**无需手动建题。**
 
 ### 0. 起栈（数据自动就位）
 
@@ -46,7 +46,9 @@ cp .env.example .env             # 填好 5 类外部 API key
 docker compose up --build        # mongo 首启动自动 mongorestore 演示数据
 ```
 
-> 想自己重灌/改种子：`docker compose down -v` 清库后 `./seed/seed.sh exam.json && ./seed/seed.sh exam_reliable.json`，再重新导出 dump（见 `seed/README.md` 用法 B）。
+> 想自己重灌/改种子：`docker compose down -v` 清库后依次
+> `./seed/seed.sh exam.json`、`./seed/seed.sh exam_reliable.json`、`./seed/seed.sh exam_recovery.json`，
+> 再重新导出 dump（见 `seed/README.md` 用法 B）。
 
 **演示账号 + 稳定套题 ID**（dump 里固定，换机不变）：
 
@@ -347,7 +349,7 @@ flutter run \
 # 后端 JUnit（约 330 项）
 cd backend && ./mvnw test
 
-# 前端 widget + unit test（约 95 项）
+# 前端 widget + unit test（约 97 项）
 cd frontend && flutter test
 flutter analyze   # 静态检查
 

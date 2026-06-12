@@ -53,7 +53,7 @@ docker compose up -d            # 至少把 mongo + backend 起来
 
 **dump 已生成、compose 已挂好**——目标机 `docker compose up` 后库里**自动就有**演示数据，零手动步骤。
 
-- `seed/mongodump/LrNew/` 已含 dump（2 账号 + 2 套题 + 题目，干净无测试结果）；
+- `seed/mongodump/LrNew/` 已含 dump（2 账号 + 3 套题〔含 1 康复〕 + 题目，干净无测试结果）；
 - `docker-compose.yml` 的 `mongo` 已挂载 dump + `restore.sh` 到 `/docker-entrypoint-initdb.d/`；
 - 题目提示语音（讯飞 TTS）烤在**后端镜像** `static/prompts/` 里，随镜像走，不依赖 dump。
 

@@ -13,7 +13,7 @@ services:
     # mongo 端口不对宿主暴露，仅 docker 网络内可达，dev/demo 足够；生产请加认证。
     volumes:
       - mongo-data:/data/db
-      # 演示种子：首启动（mongo-data 为空）自动 mongorestore，灌入 2 账号 + 2 套题。
+      # 演示种子：首启动（mongo-data 为空）自动 mongorestore，灌入 2 账号 + 3 套题（含 1 康复）。
       # 之后再 up 已有数据，init 钩子自动跳过。详见 seed/README.md。
       - ./seed/mongodump:/seed-dump:ro
       - ./seed/restore.sh:/docker-entrypoint-initdb.d/restore.sh:ro
