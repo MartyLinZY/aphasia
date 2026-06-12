@@ -25,7 +25,9 @@ void main() {
     expect(qDecoded.audioUrl, "test.mp3");
     expect(qDecoded.imageUrl, "test.png");
     expect(qDecoded.alias, null);
-    expect(qDecoded.typeName, qDecoded.runtimeType.toString());
+    // 断言显式串而非 runtimeType.toString()：dart2js release 会把 runtimeType 混淆，
+    // typeName 必须是 fromJson switch 认得的固定串（这条断言因此能在 --platform chrome 下成立）。
+    expect(qDecoded.typeName, "AudioQuestion");
     expect(qDecoded.evalRule!.typeName, q.evalRule!.typeName);
 
     q = ChoiceQuestion(evalRule: EvalChoiceQuestionByCorrectChoiceCount());
@@ -68,7 +70,8 @@ void main() {
   test("Question models.mermaid to json map Test", () {
     Question q = AudioQuestion(id: "1", alias: "2", questionText: "123", audioUrl: "3", imageUrl: "4", evalRule: EvalAudioQuestionByKeywordMatch(keyword: "测试"));
     var map = q.toJson();
-    expect(map['typeName'], q.runtimeType.toString());
+    // 显式串：见上，保证 dart2js 下 typeName 不是混淆名。
+    expect(map['typeName'], "AudioQuestion");
     expect(map['id'], "1");
     expect(map['alias'], "2");
     expect(map['questionText'], "123");
@@ -77,18 +80,18 @@ void main() {
 
     q = ChoiceQuestion(id: "1", alias: "2", questionText: "123", audioUrl: "3", imageUrl: "4", evalRule: EvalChoiceQuestionByCorrectChoiceCount());
     map = q.toJson();
-    expect(map['typeName'], q.runtimeType.toString());
+    expect(map['typeName'], "ChoiceQuestion");
 
     q = CommandQuestion(id: "1", alias: "2", questionText: "123", audioUrl: "3", imageUrl: "4", evalRule: EvalCommandQuestionByCorrectActionCount()..slots[0].itemName = "阿萨的");
     map = q.toJson();
-    expect(map['typeName'], q.runtimeType.toString());
+    expect(map['typeName'], "CommandQuestion");
 
     q = WritingQuestion(id: "1", alias: "2", questionText: "123", audioUrl: "3", imageUrl: "4", evalRule: EvalWritingQuestionByCorrectKeywordCount());
     map = q.toJson();
-    expect(map['typeName'], q.runtimeType.toString());
+    expect(map['typeName'], "WritingQuestion");
 
     q = ItemFindingQuestion(id: "1", alias: "2", questionText: "123", audioUrl: "3", imageUrl: "4", evalRule: EvalItemFoundQuestion());
     map = q.toJson();
-    expect(map['typeName'], q.runtimeType.toString());
+    expect(map['typeName'], "ItemFindingQuestion");
   });
 }
