@@ -68,7 +68,9 @@ class _HistoryPageState extends State<HistoryPage> with UseCommonStyles {
                         size: 24,
                         color: Colors.grey
                       ),
-                      extended: constraints.maxWidth >= 800,
+                      // 恒 false：72px 固定窄栏放不下标签；按屏宽判 extended 会在宽屏下
+                      // 进扩展模式被夹窄、标签竖排撑高目的地，使 hover 椭圆偏上错位。
+                      extended: false,
                       minExtendedWidth: 175,
                       destinations: _navItems.map((item) => 
                         NavigationRailDestination(
