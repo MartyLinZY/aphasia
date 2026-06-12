@@ -13,8 +13,6 @@ import 'package:aphasia_recovery/widgets/ui/do_exam/writing_question.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../utils/io/file.dart';
-
 part 'question.g.dart';
 
 abstract class Question {

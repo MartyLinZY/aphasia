@@ -1248,7 +1248,7 @@ class CommandActions {
   }
 
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode => Object.hash(sourceSlotIndex, firstAction, targetSlotIndex, secondAction);
 }
 
 /// 指令题 - 正确动作个数或动作拆分后
