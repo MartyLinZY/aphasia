@@ -1,0 +1,81 @@
+# 失语症康复系统 — 全栈一键启动
+#   cp .env.example .env   # 填入 5 类外部 API 密钥
+#   docker compose up --build
+# 前端 http://localhost:8088  后端 http://localhost:8080
+#
+# 变量从同目录 .env 自动读取；下方 environment 显式注入容器间的连接地址
+# （MONGO_HOST/REDIS_HOST/LLM_SERVICE_URL 用服务名，覆盖应用里的 localhost 默认）。
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    # 无认证：与后端 MongoDBConfig 的实际连接方式一致（应用本就无凭据连接）。
+    # mongo 端口不对宿主暴露，仅 docker 网络内可达，dev/demo 足够；生产请加认证。
+    volumes:
+      - mongo-data:/data/db
+      # 演示种子：首启动（mongo-data 为空）自动 mongorestore，灌入 2 账号 + 3 套题（含 1 康复）。
+      # 之后再 up 已有数据，init 钩子自动跳过。详见 seed/README.md。
+      - ./seed/mongodump:/seed-dump:ro
+      - ./seed/restore.sh:/docker-entrypoint-initdb.d/restore.sh:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  llm:
+    build: ./LLM
+    restart: unless-stopped
+    env_file: .env          # SILICONFLOW_API_KEY 等
+    environment:
+      LLM_PATH: /app/
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env          # 5 类外部 API 密钥 + JWT_SECRET 等
+    environment:
+      MONGO_HOST: mongo
+      REDIS_HOST: redis
+      LLM_SERVICE_URL: http://llm:8001
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      llm:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # 浏览器直连后端，故用宿主机暴露的地址（非容器名）
+        BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
+        # 必须带端口：multipart 请求（录音/手写）走 Uri.http(BACKEND_HOST, path)，
+        # 少了 :8080 会打到 80 端口 → ERR_CONNECTION_REFUSED（录音题识别失败）。
+        BACKEND_HOST: ${BACKEND_HOST:-localhost:8080}
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:

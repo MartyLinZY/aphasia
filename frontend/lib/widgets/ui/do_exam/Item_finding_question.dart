@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 
-import 'package:aphasia_recovery/utils/algorithm.dart';
 import 'package:flutter/material.dart';
 
 import '../../../mixin/widgets_mixin.dart';
 import '../../../models/question/question.dart';
 import '../../../models/result/results.dart';
 import '../../../models/rules.dart';
-import '../../../utils/common_widget_function.dart';
 import '../../../utils/io/assets.dart';
 
 class ItemFindingQuestionAnswerArea extends StatefulWidget {
@@ -267,101 +264,59 @@ class _ItemFindingQuestionAnswerAreaState
 
   Widget _buildInteractiveImage(
       BuildContext context, CommonStyles? commonStyles) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        buildUrlOrAssetsImage(context,
-          imageUrl: currQuestion.imageUrl!,
-          commonStyles: commonStyles),
-        // Positioned.fill(
-        //   child: Listener(
-        //     onPointerDown: _handleImageTap,
-        //   ),
-        // ),
-        Positioned.fill(
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Listener(
-              onPointerDown: _handleImageTap,
-              behavior: HitTestBehavior.opaque, // 允许整个区域接收点击
+    // 用 LayoutBuilder 拿到图片区尺寸，并用 BoxFit.fill 让图填满该区域：
+    // 这样「点击坐标 / 标记 / 判分多边形」都在同一个「框归一化 [0,1]」空间，不再错位。
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double w = constraints.maxWidth;
+        final double h = constraints.maxHeight;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            isImageUrlAssets(currQuestion.imageUrl)
+                ? Image.asset(currQuestion.imageUrl!, fit: BoxFit.fill)
+                : Image.network(currQuestion.imageUrl!, fit: BoxFit.fill),
+            Positioned.fill(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Listener(
+                  behavior: HitTestBehavior.opaque, // 允许整个区域接收点击
+                  // event.localPosition 相对该 Listener（即图片区），除以区尺寸即归一化
+                  onPointerDown: (e) => _handleImageTap(e.localPosition, w, h),
+                ),
+              ),
             ),
-          ),
-        ),
-        if (clickPosition != null) _buildPositionMarker(commonStyles),
-      ],
+            if (clickPosition != null) _buildPositionMarker(commonStyles),
+          ],
+        );
+      },
     );
   }
 
-  void _handleImageTap(PointerDownEvent event) {
-    // final RenderBox box = context.findRenderObject() as RenderBox;
-    // final Offset localOffset = box.globalToLocal(event.position);
-    // final Size imageSize = box.size; // 改用实际渲染尺寸
-
-    // setState(() {
-    //   clickPosition = [
-    //     localOffset.dx.clamp(0.0, imageSize.width),
-    //     localOffset.dy.clamp(0.0, imageSize.height)
-    //   ];
-
-    //   // 强制启动答题计时
-    //   if (!answerStart) {
-    //     trySetAnswerTime(result, timeLimitCountDown!.timePassed);
-    //     answerStart = true;
-    //     timeLimitCountDown!.start(); // 确保倒计时已启动
-    //   }
-    // });
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    final Offset rawOffset = box.globalToLocal(event.position);
-    
-    // 获取图片实际显示区域
-    final image = buildUrlOrAssetsImage(context, 
-      imageUrl: currQuestion.imageUrl!,
-      commonStyles: widget.commonStyles
-    ) as Image; // 添加类型转换
-    
-    image.image.resolve(ImageConfiguration.empty).addListener(
-      ImageStreamListener((info, _) {
-        final imageWidth = info.image.width.toDouble();
-        final imageHeight = info.image.height.toDouble();
-        final renderWidth = box.size.width;
-        final renderHeight = box.size.height;
-
-        // 计算缩放比例
-        final scaleX = renderWidth / imageWidth;
-        final scaleY = renderHeight / imageHeight;
-        final scale = scaleX < scaleY ? scaleX : scaleY;
-
-        // 计算实际显示区域
-        final displayedWidth = imageWidth * scale;
-        final displayedHeight = imageHeight * scale;
-        final offsetX = (renderWidth - displayedWidth) / 2;
-        final offsetY = (renderHeight - displayedHeight) / 2;
-
-        // 转换坐标
-        final adjustedX = (rawOffset.dx - offsetX) / scale;
-        final adjustedY = (rawOffset.dy - offsetY) / scale;
-
-        setState(() {
-          clickPosition = [
-            adjustedX.clamp(0.0, imageWidth),
-            adjustedY.clamp(0.0, imageHeight)
-          ];
-          
-          if (!answerStart) {
-            trySetAnswerTime(result, timeLimitCountDown!.timePassed);
-            answerStart = true;
-            timeLimitCountDown!.start();
-          }
-        });
-      })
-    );
+  void _handleImageTap(Offset local, double width, double height) {
+    setState(() {
+      // 框归一化 [0,1]：与 BoxFit.fill 的图片、Align 标记、判分多边形坐标空间一致，
+      // 点哪儿标记就落哪儿。之前用图片像素 + letterbox 偏移换算 → 标记与点击错位。
+      clickPosition = [
+        (local.dx / width).clamp(0.0, 1.0),
+        (local.dy / height).clamp(0.0, 1.0),
+      ];
+      if (!answerStart) {
+        trySetAnswerTime(result, timeLimitCountDown!.timePassed);
+        answerStart = true;
+        timeLimitCountDown!.start();
+      }
+    });
   }
 
   Widget _buildPositionMarker(CommonStyles? commonStyles) {
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
-      left: clickPosition!.first - _markerSize / 2,
-      top: clickPosition!.last - _markerSize / 2,
+    // clickPosition 现为归一化 [0,1]；用 Align 按归一化定位（alignment 范围 [-1,1]，
+    // 故 *2-1），无需知道渲染像素尺寸。之前按像素 left/top 定位，归一化后会跑到角落。
+    return Align(
+      alignment: Alignment(
+        clickPosition!.first * 2 - 1,
+        clickPosition!.last * 2 - 1,
+      ),
       child: Container(
         width: _markerSize,
         height: _markerSize,
@@ -376,131 +331,6 @@ class _ItemFindingQuestionAnswerAreaState
           ]),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 2),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildItemFindingArea(BuildContext context,
-      {CommonStyles? commonStyles, required ItemFindingQuestion question}) {
-    final imageCompleter = Completer<ui.Image>();
-    Image questionImage;
-    if (isImageUrlAssets(currQuestion.imageUrl)) {
-      questionImage = Image(
-        image: AssetImage(currQuestion.imageUrl!),
-        fit: BoxFit.contain,
-      );
-    } else {
-      questionImage = Image(
-        image: NetworkImage(currQuestion.imageUrl!),
-        fit: BoxFit.contain,
-      );
-    }
-
-    questionImage.image
-        .resolve(const ImageConfiguration())
-        .addListener(ImageStreamListener((imageInfo, _) {
-      imageCompleter.complete(imageInfo.image);
-    }));
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FutureBuilder<ui.Image>(
-              future: imageCompleter.future,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  toast(context, msg: "图片加载失败，请重试。", btnText: "确认");
-                  return Center(
-                    child: Text(
-                      "加载中，请稍候",
-                      style: commonStyles?.hintTextStyle,
-                    ),
-                  );
-                } else if (!snapshot.hasData) {
-                  return Center(
-                    child: Text(
-                      "加载中，请稍候",
-                      style: commonStyles?.hintTextStyle,
-                    ),
-                  );
-                }
-
-                final image = snapshot.data!;
-                final mediaSize = MediaQuery.of(context).size;
-                double maxWidth = mediaSize.width * 0.7;
-                double maxHeight = mediaSize.height * 0.7;
-                double boxWidth;
-                double boxHeight;
-                if (image.height * (maxWidth / image.width) <= maxHeight) {
-                  boxWidth = maxWidth;
-                  boxHeight = image.height * (maxWidth / image.width);
-                } else {
-                  boxWidth = image.width * (maxHeight / image.height);
-                  boxHeight = maxHeight;
-                }
-                return Container(
-                  width: boxWidth,
-                  height: boxHeight,
-                  decoration: BoxDecoration(border: Border.all(width: 1.0)),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Listener(
-                        onPointerDown: (details) {
-                          final RenderBox box =
-                              context.findRenderObject() as RenderBox;
-                          // find the coordinate
-                          final Offset localOffset =
-                              box.globalToLocal(details.position);
-                          final posX = localOffset.dx;
-                          final posY = localOffset.dy;
-                          setState(() {
-                            // debugPrint("click at: $posX;$posY");
-                            clickPosition = normalizePosition(
-                                posX, posY, boxWidth, boxHeight);
-                            if (!answerStart) {
-                              trySetAnswerTime(
-                                  result, timeLimitCountDown!.timePassed);
-                              answerStart = true;
-                            }
-                          });
-                        },
-                        child: questionImage,
-                      ),
-                      ...(clickPosition == null
-                          ? []
-                          : [
-                              Positioned(
-                                left: clickPosition!.first * boxWidth - 9,
-                                top: clickPosition!.last * boxHeight - 9,
-                                width: 18,
-                                height: 18,
-                                // child: Text("${(e.first * 1000).roundToDouble() / 1000};${(e.last * 1000).roundToDouble() / 1000}",)
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.black, width: 2),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                      child: Icon(
-                                    Icons.circle_rounded,
-                                    color: Colors.green,
-                                    size: 12.0,
-                                  )),
-                                ),
-                              )
-                            ]),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
         ),
       ),
     );

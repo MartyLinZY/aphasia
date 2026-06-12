@@ -8,6 +8,19 @@ class HttpConstants {
     'BACKEND_HOST',
     defaultValue: 'localhost:8080',
   );
+
+  /// 把相对媒体路径（如 `/prompts/x.mp3`）拼成完整 URL（用当前 BACKEND_URL）；
+  /// 已是 http(s):// 的绝对地址原样返回。种子里的题干/提示音存相对路径即可跨端正确：
+  /// web/Docker=localhost、Android 模拟器=10.0.2.2、真机=局域网 IP，不再写死 localhost。
+  static String resolveMedia(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    final String base = backendBaseUrl.endsWith('/')
+        ? backendBaseUrl.substring(0, backendBaseUrl.length - 1)
+        : backendBaseUrl;
+    return url.startsWith('/') ? '$base$url' : '$base/$url';
+  }
 }
 
 class AppSettings {

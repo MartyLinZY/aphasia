@@ -77,7 +77,10 @@ class _HomePageState extends State<HomePage> with UseCommonStyles {
                                 size: 24,
                                 color: Colors.grey,
                               ),
-                              extended: constraints.maxWidth >= 1200,
+                              // 恒 false：导航栏宽度固定 72px，放不下标签。原先按整屏宽
+                              // 判 extended，宽屏下会进扩展模式但被 72px 夹住，标签竖排撑高
+                              // 每个目的地、把图标顶下去，导致 hover 椭圆/指示器偏上错位。
+                              extended: false,
                               destinations: _navItems
                                   .map((item) => NavigationRailDestination(
                                 icon: Icon(item.icon),

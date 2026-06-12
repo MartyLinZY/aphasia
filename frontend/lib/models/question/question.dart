@@ -13,8 +13,6 @@ import 'package:aphasia_recovery/widgets/ui/do_exam/writing_question.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../utils/io/file.dart';
-
 part 'question.g.dart';
 
 abstract class Question {
@@ -63,7 +61,22 @@ abstract class Question {
       this.evalRule})
       : _id = id,
         omitImageAfterSeconds = maxOmitTime  {
-    typeName = runtimeType.toString();
+    // 不能用 runtimeType.toString()：dart2js release 会混淆类名（如 "minified:Fj"），
+    // 医生在 web 新建题目存库后，回读时 Question.fromJson 的 switch 命中 default → UnimplementedError。
+    // 用 is 判断（类型检查不受混淆影响）写死，与 results.dart QuestionResult 同款修法。
+    if (this is AudioQuestion) {
+      typeName = "AudioQuestion";
+    } else if (this is ChoiceQuestion) {
+      typeName = "ChoiceQuestion";
+    } else if (this is CommandQuestion) {
+      typeName = "CommandQuestion";
+    } else if (this is WritingQuestion) {
+      typeName = "WritingQuestion";
+    } else if (this is ItemFindingQuestion) {
+      typeName = "ItemFindingQuestion";
+    } else {
+      typeName = runtimeType.toString();
+    }
     if (omitImageAfterSeconds != null) {
       this.omitImageAfterSeconds = omitImageAfterSeconds;
     }

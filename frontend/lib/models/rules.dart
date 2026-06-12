@@ -24,7 +24,13 @@ abstract class DiagnosisRule {
   List<int> categoryIndices = [];
 
   DiagnosisRule() {
-    typeName = runtimeType.toString();
+    // dart2js release 混淆 runtimeType → 存库 typeName 坏掉、回读 fromJson 命中 default 报错。
+    // 用 is 判别写死（不受混淆影响），与 results.dart 同款修法。
+    if (this is DiagnoseByScoreRange) {
+      typeName = "DiagnoseByScoreRange";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   factory DiagnosisRule.fromJson(Map<String, dynamic> jsonMap) {
@@ -163,7 +169,12 @@ abstract class ExamEvalRule {
   late String typeName;
 
   ExamEvalRule({required this.resultDimensionName}) {
-    typeName = runtimeType.toString();
+    // 见上：用 is 判别写死，规避 dart2js 类名混淆。
+    if (this is ExamEvalByCategoryScoreSum) {
+      typeName = "ExamEvalByCategoryScoreSum";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   ExamResult evaluate(ExamResult result);
@@ -225,7 +236,12 @@ class ExamEvalByCategoryScoreSum extends ExamEvalRule {
 abstract class ExamCategoryEvalRule {
   late String typeName;
   ExamCategoryEvalRule() {
-    typeName = runtimeType.toString();
+    // 见上：用 is 判别写死，规避 dart2js 类名混淆。
+    if (this is EvalBySubCategoryScoreSum) {
+      typeName = "EvalBySubCategoryScoreSum";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   factory ExamCategoryEvalRule.fromJson(Map<String, dynamic> jsonMap) {
@@ -289,7 +305,13 @@ class EvalBySubCategoryScoreSum extends ExamCategoryEvalRule {
 abstract class ExamSubCategoryEvalRule {
   late String typeName;
   ExamSubCategoryEvalRule() {
-    typeName = runtimeType.toString();
+    // 见上：用 is 判别写死，规避 dart2js 类名混淆。
+    // 注意 TerminateRule 是 implements（非 extends）本类，其构造不走这里、各自在 TerminateRule 构造里赋名。
+    if (this is EvalSubCategoryByQuestionScoreSum) {
+      typeName = "EvalSubCategoryByQuestionScoreSum";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   factory ExamSubCategoryEvalRule.fromJson(Map<String, dynamic> jsonMap) {
@@ -363,7 +385,12 @@ abstract class TerminateRule implements ExamSubCategoryEvalRule {
   late String typeName;
 
   TerminateRule({required this.reason, required this.equivalentScore}) {
-    typeName = runtimeType.toString();
+    // 见上：用 is 判别写死，规避 dart2js 类名混淆。
+    if (this is ContinuousWrongAnswerTerminate) {
+      typeName = "ContinuousWrongAnswerTerminate";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   factory TerminateRule.fromJson(Map<String, dynamic> jsonMap) {
@@ -596,7 +623,28 @@ abstract class QuestionEvalRule {
 
   QuestionEvalRule({this.timeLimit = 20, this.fullScore = 10, double defaultScore = 0})
     : _defaultScore = defaultScore {
-    typeName = runtimeType.toString();
+    // 见上：用 is 判别写死，规避 dart2js 类名混淆。9 个子类全是 QuestionEvalRule 直接子类、互不继承，顺序无关。
+    if (this is EvalAudioQuestionByKeywordsMatchesCount) {
+      typeName = "EvalAudioQuestionByKeywordsMatchesCount";
+    } else if (this is EvalAudioQuestionByKeywordMatch) {
+      typeName = "EvalAudioQuestionByKeywordMatch";
+    } else if (this is EvalAudioQuestionByFluency) {
+      typeName = "EvalAudioQuestionByFluency";
+    } else if (this is EvalAudioQuestionBySimilarity) {
+      typeName = "EvalAudioQuestionBySimilarity";
+    } else if (this is EvalCommandQuestionByCorrectActionCount) {
+      typeName = "EvalCommandQuestionByCorrectActionCount";
+    } else if (this is EvalChoiceQuestionByCorrectChoiceCount) {
+      typeName = "EvalChoiceQuestionByCorrectChoiceCount";
+    } else if (this is EvalWritingQuestionByCorrectKeywordCount) {
+      typeName = "EvalWritingQuestionByCorrectKeywordCount";
+    } else if (this is EvalWritingQuestionByMatchRate) {
+      typeName = "EvalWritingQuestionByMatchRate";
+    } else if (this is EvalItemFoundQuestion) {
+      typeName = "EvalItemFoundQuestion";
+    } else {
+      typeName = runtimeType.toString();
+    }
   }
 
   factory QuestionEvalRule.fromJson(Map<String, dynamic> jsonMap) {
@@ -1200,7 +1248,7 @@ class CommandActions {
   }
 
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode => Object.hash(sourceSlotIndex, firstAction, targetSlotIndex, secondAction);
 }
 
 /// 指令题 - 正确动作个数或动作拆分后

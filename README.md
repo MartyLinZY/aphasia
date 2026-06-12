@@ -6,9 +6,150 @@
 |---|---|---|
 | `frontend/` | Flutter（Provider 状态管理） | dev server 随机端口 |
 | `backend/` | Spring Boot 3.5.14 / Java 17 + MongoDB + Redis | `8080` |
-| `LLM/` | Python FastAPI 微服务（诊断 / 修复 / 困惑度） | `8001` |
+| `LLM/` | Python FastAPI 微服务（特征诊断 / 修复） | `8001` |
 
-三件套**跨进程通信**：前端 HTTP 调后端，后端 OkHttp 调 LLM 微服务。开发时同一台机器跑三个独立进程。
+三件套**跨进程通信**：前端 HTTP 调后端，后端 OkHttp 调 LLM 微服务。
+
+---
+
+## 🐳 Docker 一键启动（推荐）
+
+装好 **Docker + Docker Compose** 后，三条命令把全栈（MongoDB + Redis + 后端 + LLM + 前端）跑起来：
+
+```bash
+cp .env.example .env        # 填入 5 类外部 API 密钥（见下方表，全部需自行申请）
+docker compose up --build   # 首次构建较久（含 Maven / Flutter Web 构建）
+```
+
+- 前端：<http://localhost:8088>　后端：<http://localhost:8080>
+- MongoDB 走无认证（mongo 端口不对外暴露，仅 docker 网络内可达），无需手动建用户；生产环境请自行加认证。
+- 容器间地址自动注入（`MONGO_HOST=mongo` / `REDIS_HOST=redis` / `LLM_SERVICE_URL=http://llm:8001`），`.env` 里这些不用填。
+- **仍需填 5 类外部密钥**（SiliconFlow / 讯飞 / 百度 / Qwen），否则诊断/语音/翻译会报错——这是第三方付费服务，绕不开。
+
+```bash
+docker compose down         # 停服务（保留 Mongo 数据卷）
+docker compose down -v      # 停 + 清空 Mongo 数据（重置）
+```
+
+> 不想用 Docker、要本地起裸进程开发，走下面的「一次性环境准备」。
+
+---
+
+## 🎬 演示流程（换机即演示）
+
+演示数据**已打包**进 `seed/mongodump/`，`docker compose up` 后 mongo 首启动会**自动恢复**（2 账号 + 3 套题，含 1 康复套题），零手动步骤。**无需手动建题。**
+
+### 0. 起栈（数据自动就位）
+
+```bash
+cp .env.example .env             # 填好 5 类外部 API key
+docker compose up --build        # mongo 首启动自动 mongorestore 演示数据
+```
+
+> 想自己重灌/改种子：`docker compose down -v` 清库后依次
+> `./seed/seed.sh exam.json`、`./seed/seed.sh exam_reliable.json`、`./seed/seed.sh exam_recovery.json`，
+> 再重新导出 dump（见 `seed/README.md` 用法 B）。
+
+**演示账号 + 稳定套题 ID**（dump 里固定，换机不变）：
+
+| 角色 | 登录（手机号/邮箱框填） | 密码 |
+|---|---|---|
+| 患者 | `13800000001` | `demo1234` |
+| 医生 | `13800000002` | `demo1234` |
+
+| 套题 | 类型 | 搜索用 examId |
+|---|---|---|
+| 完整 7 题（全题型） | 测评 | `6a2abd9795070345cef23e7a` |
+| 纯后端可靠 4 题 | 测评 | `6a2abd9795070345cef23e82` |
+| 综合训练 7 题 | **康复** | `6a2ac4eac40849fdf6803909` |
+
+> 测评套题搜索时类型选「测评」，做完进「我的 → 测评记录」（显示**诊断**）；
+> 康复套题搜索时选「康复」，做完进「我的 → 康复记录」（显示**得分**）。两条线分开存取。
+
+> ⚠️ **登录名必须是手机号或邮箱**：前端登录表单有客户端校验（`^1[3-9]\d{9}$` 或邮箱正则），
+> `demo_doctor` 这类随意字符串会被前端直接拦下，登不进去（后端其实不挑）。
+
+打开 <http://localhost:8088> 开始。底部 3 个 tab 随角色变：
+**搜索/套题管理** · **人工智能服务** · **我的（历史）**。
+
+### 1. 患者答题主线（核心）
+
+1. 用 `13800000001 / demo1234` 登录。
+2. tab **「搜索」** → 填上面的 examId（如 `6a2abd9795070345cef23e82`）→ 类型选 **「测评」**（**别选康复**）→ **「开始训练」**。
+3. 按顺序答 **7 题**，覆盖全部 5 种题型：
+
+   | # | 题型 | 作答方式 | 判分依赖 |
+   |---|---|---|---|
+   | 1 | 书写·叉子 | 手写"叉子" | 百度 OCR ⚠️ |
+   | 2 | 选择·梳子 | 点梳子图 | 纯后端 ✅ |
+   | 3 | 选择·球 | 点球图 | 纯后端 ✅ |
+   | 4 | 指令·梳子书本 | 先点梳子→放到书本 | 纯后端 ✅ |
+   | 5 | 场景寻物·风筝 | 图上点风筝（右上） | 纯后端 ✅ |
+   | 6 | 录音·照相机 | 录音说"照相机" | 讯飞/Qwen ⚠️ |
+   | 7 | 录音·图片描述 | 录音描述野餐图 | 讯飞/Qwen ⚠️ |
+
+4. 答完最后一题 → 自动跳 **结果页**：各题分、各大项分 + 按诊断规则给出的失语判定。
+5. tab **「我的」** → 看到这次历史记录，可回看。
+
+### 2. 医生端套题管理
+
+1. 用 `13800000002 / demo1234` 登录。
+2. tab0 = **「套题管理」** → 列表里有「演示用综合失语测评套题」。
+3. 点进去演示：三层结构（大项→子项→题目）、7 题编排、评分规则、**诊断规则**、发布开关。
+   也可现场新建一套 → 加题 → 发布，演示"医生造题"全过程。
+
+### 3. AI 服务：对话诊断 + 语句修复
+
+> 都是医生权限（role 2），用 **医生账号**，进 tab **「人工智能服务」**。
+> 下面两段是从 **JiangLin 普通话失语语料**（`JiangLin/PWA` 患者 / `JiangLin/Control` 健康）抽取清理的**真实**看图描述（窗户故事），均经多次复测、判定稳定。
+
+**① 对话诊断（`/diagnose2`）** —— 粘贴样本提交 → 返回 是否失语 / 严重度 / 加权分 / 13 个语言学特征 + 证据特征。
+
+- **失语患者样本**（稳定判 **中度失语**，score≈4，证据：短而简化 / 虚词省略 / 找词困难 / 刻板自动语 / 空话 …）：
+  ```
+  好。讲故事。第一个这个图是这个人。这里有嘛。这个人这个没有人呢。这个讲眼观七路眼观七路耳听八方。没有人，这个在。这个球在这边，在家呐。这个人。诶没有了。
+  ```
+- **健康对照样本**（稳定判 **未患病**，score 0）：
+  ```
+  这个是个小孩踢球。踢到了人家的玻璃上，把玻璃打碎了。球踢到别人屋里去了。大人看见很生气，把球拿走了。
+  ```
+
+  > 诊断走 LLM 抽特征，同一文本可能有**轻微波动**（建议直接用上面两段）；二元判定阈值仍在迭代，**13 维特征向量 + 证据**是主要看点。
+
+**② 语句修复（`/repair`）** —— 把上面那段**失语患者样本**粘进来 → 修复成通顺连贯的句子，直观演示"乱→通"。实测输出：
+
+> 好的，我来讲这个故事。第一张图上有一个人，但周围没有其他人。这个场景可以用"眼观六路、耳听八方"来形容。现在球在这个人的家里，这个人独自在家。以上就是这个故事的内容。
+
+### 外部服务依赖与网络
+
+题目**图片随前端走、不依赖网络**，部分**作答判分要连第三方**（key 配齐即可，2026-06-11 已逐个实测全部连通）：
+
+| 环节 | 依赖 | 实测 |
+|---|---|---|
+| 选择(2/3)/场景寻物(5)/指令(4)、分型报告、结果保存 | 纯后端，无外部依赖 | ✅ |
+| `/diagnose2`、`/repair` | SiliconFlow | ✅ ~2–5s |
+| 书写题(1)→手写识别 | 百度 OCR | ✅ ~0.1s |
+| 录音题(6)→关键词识别 | 讯飞 ASR | ✅ ~1.4s |
+| 录音题(7)→流畅度 | Qwen-Audio | ✅ ~1.4s |
+
+> **关于偶发的「评分中，请稍候」卡住**：上述外部调用本身都通。但后端对**百度的两个端点**
+> （`handwrite_recognize`、`text_similarity`）**没设超时**（讯飞有 60s、Qwen 快速返回）。
+> 所以**只有当代理节点临时失效 / 百度暂时不可达时**，书写题可能卡在"评分中"转圈；
+> 网络恢复后重答即可。若要彻底消除这个偶发，给百度调用补 `setConnectTimeout/ReadTimeout`
+> 并重建后端镜像（健壮性收尾项，非必需）。
+>
+> 若演示机用 **Clash/Surge 等 TUN/fake-ip 代理**：容器里这些域名会解析成 `198.18.x.x`，
+> 但只要代理节点正常，流量会被正确转发出去（实测百度/讯飞/Qwen 均通）。万一某项不通，
+> 可把 `*.baidubce.com`、`*.xfyun.cn`、`dashscope.aliyuncs.com` 在代理里设直连，或换可用节点。
+
+### 重置 / 重复演示
+
+```bash
+docker compose down             # 停服务，数据留在 mongo-data 卷（重启不丢，可反复演）
+docker compose down -v          # 连数据一起清空，下次要重新 ./seed/seed.sh
+```
+
+> 注意：`seed.sh` 每跑一次会**新建**一套套题（不会去重），重复跑会留多套。要干净状态就先 `down -v`。
 
 ---
 
@@ -134,10 +275,71 @@ set -a; source ../.env; set +a    # Spring Boot 不会自动读 .env，必须先
 cd frontend
 flutter run \
   --dart-define=BACKEND_URL=http://localhost:8080 \
-  --dart-define=BACKEND_HOST=localhost
+  --dart-define=BACKEND_HOST=localhost:8080
 ```
 
-选目标：Chrome / Edge / 安卓真机 / 安卓模拟器 / Windows 等。iOS/macOS 需要额外配 `audio_record/platform/` 下平台分支，未充分测试。
+> ⚠️ `BACKEND_HOST` **必须带端口 `:8080`**：录音/手写题走 multipart 请求 `Uri.http(BACKEND_HOST, path)`，
+> 少了端口会打到 80 端口 → `ERR_CONNECTION_REFUSED`（普通请求走带端口的 `BACKEND_URL`，不受影响）。
+
+选目标：Chrome / Edge / macOS / 安卓真机 / 安卓模拟器 / Windows / Linux 等。
+**各原生端的构建命令、后端地址、明文 HTTP 配置见下方「多平台运行（原生端）」。**
+
+---
+
+## 多平台运行（原生端）
+
+前端是 **Flutter 单一代码库**，除 web 外还能编到 **macOS / iOS / Android / Windows / Linux**。
+录音用 `record` 联邦插件（`record_android` / `record_darwin` / `record_linux` / `record_windows` / `record_web` 全部到位），
+**六平台都支持录音**，没有桌面端缺插件的问题。后端仍是同一套 Docker 栈（`docker compose up`）；
+原生端只是把"前端"从浏览器换成原生 app，连同一个 `8080` 后端。
+
+| 平台 | 构建 / 运行 | 后端地址（两个 `--dart-define` 都要） | 明文 HTTP | 状态 |
+|---|---|---|---|---|
+| Web | `flutter run -d chrome` 或 Docker | `localhost:8080` | 浏览器不限 | ✅ 实测 |
+| macOS | `flutter run -d macos` / `flutter build macos` | `localhost:8080` | 无限制（已配 `network.client` + 麦克风 entitlement） | ✅ 构建+启动实测 |
+| **Android 模拟器** | `flutter run -d emulator`（需 Android SDK） | **`10.0.2.2:8080`**（安卓特有的宿主 localhost 映射） | 已配 `usesCleartextTraffic` | ✅ **构建+登录+连后端实测** |
+| Android 真机 | 同上 | `<电脑局域网 IP>:8080` | 已配 `usesCleartextTraffic` | 🟡 需局域网地址 |
+| iOS 模拟器 | `flutter run -d <sim>`（需 Xcode + iOS runtime） | `localhost:8080`（模拟器共享 Mac 网络） | 已配 ATS 例外 | ✅ 构建+启动+登录页渲染实测（GUI 登录需手点） |
+| iOS 真机 | 同上 + Xcode 签名 | `<Mac 局域网 IP>:8080` | 已配 ATS 例外 | 🟡 需签名 |
+| Windows | 在 Windows + Visual Studio 上 `flutter build windows` | `localhost:8080` | 无限制 | 🟢 插件就绪，需 Windows 机 |
+| Linux | 在 Linux + 工具链上 `flutter build linux` | `localhost:8080` | 无限制 | 🟢 插件就绪，需 Linux 机 |
+
+**两个跨端关键点：**
+
+1. **后端地址因端而异**——同机的 web/macOS/iOS 模拟器用 `localhost:8080`；**Android 模拟器必须用 `10.0.2.2:8080`**；
+   **真机一律用"运行后端那台电脑的局域网 IP"**（手机/平板上的 `localhost` 指设备自己）。改时两个 dart-define 一起改：
+   ```bash
+   flutter run -d <device> \
+     --dart-define=BACKEND_URL=http://10.0.2.2:8080 \
+     --dart-define=BACKEND_HOST=10.0.2.2:8080
+   ```
+2. **移动端明文 HTTP 已放行**——iOS `ios/Runner/Info.plist` 加了 `NSAppTransportSecurity → NSAllowsArbitraryLoads`，
+   Android `android/app/src/main/AndroidManifest.xml` 加了 `android:usesCleartextTraffic="true"`；否则 iOS/Android 默认拦 `http://` 后端。
+   **后端若改走 HTTPS，这两项可移除。**
+
+### Android 构建说明（已实测）
+
+2026-06-12 在 Android 模拟器（Pixel 6 / Android 15 / arm64）上实测：`flutter run` 构建 + 安装 + 启动 + 用
+医生账号登录 → 经 `10.0.2.2:8080` 连后端拉到套题列表，全程通过。为此把陈旧的 Android Gradle 配置对齐到当前 Flutter：
+
+- `android/settings.gradle`：旧的命令式 `apply from: app_plugin_loader.gradle` → 声明式 `plugins {}` 块
+  （`dev.flutter.flutter-plugin-loader` + **AGP 8.11.1** + **Kotlin 2.2.20**）；
+- `android/build.gradle`：移除旧 `buildscript`（AGP/Kotlin 版本改由 settings 管）；
+- `gradle-wrapper.properties`：Gradle **8.9 → 8.14**（AGP 8.11 要求）；`app/build.gradle`：JDK **8 → 17**；
+- `file_picker` **6.2.1 → 11.0.2**：旧版用了 Flutter 已移除的 v1 embedding（`PluginRegistry.Registrar`）导致 Android 编译失败；
+  v11 改为静态方法（`FilePicker.pickFiles()`，已同步改 `lib/utils/io/file.dart`）。
+
+> 首次 Android 构建会自动下载 Gradle 8.14 + AGP/Kotlin 插件 + NDK（约 1.5GB，十几分钟）。
+
+### iOS 模拟器构建说明（已实测）
+
+2026-06-12 在 iPhone 17 模拟器（iOS 26.5）上实测：`pod install` + `xcodebuild` + 启动 + 登录页渲染全部通过，
+**iOS 侧无需任何代码改动**（file_picker 11 的 pod 直接可用），唯一移动端配置是 `Info.plist` 的 ATS 例外。
+模拟器构建**不需要签名**（只真机要），后端用 `localhost:8080`（模拟器共享 Mac 网络）。
+
+- 前置：Xcode 26 默认不带 iOS 模拟器运行时，先 `xcodebuild -downloadPlatform iOS`（约 8.5GB）；
+- GUI 登录交互未自动验证（iOS 模拟器无 `adb` 式命令行点击，AppleScript UI 自动化又受"辅助功能"权限限制）——
+  在模拟器里手点登录即可，同后端在 Android 上登录已实测通过。
 
 ---
 
@@ -147,7 +349,7 @@ flutter run \
 # 后端 JUnit（约 330 项）
 cd backend && ./mvnw test
 
-# 前端 widget + unit test（约 95 项）
+# 前端 widget + unit test（约 97 项）
 cd frontend && flutter test
 flutter analyze   # 静态检查
 

@@ -9,9 +9,13 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 允许程序改变网络连接状态 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!-- 允许明文 HTTP：通过 http:// 访问局域网内后端（演示/内网部署，非公网 HTTPS）。
+         Android 9+ 默认拦明文，故显式放行。模拟器用 10.0.2.2:8080、真机用 Mac 局域网 IP。
+         改为 HTTPS 后端后可移除本属性。 -->
     <application
         android:label="aphasia_recovery"
         android:name="${applicationName}"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

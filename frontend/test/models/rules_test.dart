@@ -174,6 +174,51 @@ void main () {
     expect(evalRule.hintRules.length, evalRuleDecoded.hintRules.length);
   });
 
+  // 以下 3 个录音规则此前没有显式 round-trip 覆盖。补上以锁住「typeName 写死串 ↔
+  // QuestionEvalRule.fromJson 的 switch case」对齐——这是 web dart2js 混淆名修复
+  // （rules.dart 用 is 判别写死 typeName 取代 runtimeType.toString()）的回归护栏：
+  // 串若拼错，fromJson 命中 default 抛 UnimplementedError，这里当场红。
+  test("EvalAudioQuestionByKeywordMatch json test", () {
+    var evalRule = EvalAudioQuestionByKeywordMatch(keyword: "测试");
+    evalRule.defaultScore = 9;
+    evalRule.conditions.add(EvalCondition(score: 10)..addRange(0, 1));
+
+    var jsonStr = jsonEncode(evalRule.toJson());
+    debugPrint(jsonStr);
+    var decoded =
+        QuestionEvalRule.fromJson(jsonDecode(jsonStr)) as EvalAudioQuestionByKeywordMatch;
+    expect(decoded.typeName, "EvalAudioQuestionByKeywordMatch");
+    expect(decoded.keyword, "测试");
+    expect(decoded.defaultScore, 9);
+  });
+
+  test("EvalAudioQuestionByFluency json test", () {
+    var evalRule = EvalAudioQuestionByFluency();
+    evalRule.defaultScore = 9;
+
+    var jsonStr = jsonEncode(evalRule.toJson());
+    debugPrint(jsonStr);
+    var decoded =
+        QuestionEvalRule.fromJson(jsonDecode(jsonStr)) as EvalAudioQuestionByFluency;
+    expect(decoded.typeName, "EvalAudioQuestionByFluency");
+    expect(decoded.defaultScore, 9);
+  });
+
+  test("EvalAudioQuestionBySimilarity json test", () {
+    var evalRule =
+        EvalAudioQuestionBySimilarity(answerText: "测试答案", fullScoreThreshold: 0.7);
+    evalRule.defaultScore = 9;
+
+    var jsonStr = jsonEncode(evalRule.toJson());
+    debugPrint(jsonStr);
+    var decoded =
+        QuestionEvalRule.fromJson(jsonDecode(jsonStr)) as EvalAudioQuestionBySimilarity;
+    expect(decoded.typeName, "EvalAudioQuestionBySimilarity");
+    expect(decoded.answerText, "测试答案");
+    expect(decoded.fullScoreThreshold, 0.7);
+    expect(decoded.defaultScore, 9);
+  });
+
   test("EvalCommandQuestionByCorrectActionCount json test", () {
     var evalRule = EvalCommandQuestionByCorrectActionCount(slotCount: 20);
     evalRule.defaultScore = 9;
@@ -358,7 +403,9 @@ void main () {
     try {
       evalRule.defaultScore = 11;
     } on ArgumentError catch (e) {
-      expect(e.message, "11.0 > ${evalRule.fullScore}, defaultScore 必须小于等于 fullScore");
+      // 不精确匹配数字前缀：Web/JS 只有一种数字类型，整数值 double 打印成 "11"/"10"
+      // 而非 VM 的 "11.0"/"10.0"，精确匹配会在 --platform chrome 下假阳性。只校验稳定语义。
+      expect(e.message, contains("defaultScore 必须小于等于 fullScore"));
     }
 
     evalRule.defaultScore = 9;

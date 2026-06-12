@@ -159,7 +159,22 @@ abstract class QuestionResult {
       ExtraResults? extraResults,
       this.answerTime,
       this.isHinted = false}) {
-    typeName = runtimeType.toString();
+    // 不能用 runtimeType.toString()：dart2js release 会混淆类名（如 "minified:Kt"），
+    // 导致存到后端的 typeName 不是 "ChoiceQuestionResult" 等，回读时 QuestionResult.fromJson
+    // 的 switch 命中 default → 抛"无效的结果类型"。用 is 判断（类型检查不受混淆影响）写死。
+    if (this is AudioQuestionResult) {
+      typeName = "AudioQuestionResult";
+    } else if (this is ChoiceQuestionResult) {
+      typeName = "ChoiceQuestionResult";
+    } else if (this is CommandQuestionResult) {
+      typeName = "CommandQuestionResult";
+    } else if (this is WritingQuestionResult) {
+      typeName = "WritingQuestionResult";
+    } else if (this is ItemFindingQuestionResult) {
+      typeName = "ItemFindingQuestionResult";
+    } else {
+      typeName = runtimeType.toString();
+    }
     if (extraResults != null) {
       this.extraResults = extraResults;
     }

@@ -271,6 +271,7 @@ class _AudioQuestionAnswerAreaState extends State<ChoiceQuestionAnswerArea>
     final choiceQuestion = question as ChoiceQuestion;
     final evalRule = choiceQuestion.evalRule as EvalChoiceQuestionByCorrectChoiceCount;
     final choiceCount = evalRule.choices.length;
+    if (choiceCount >= 1 && choiceCount <= 3) return choiceCount; // 1~3 个选项放同一行
     if (choiceCount <= 4) return 2;
     if (choiceCount <= 9) return 3;
     if (choiceCount <= 12) return 4;

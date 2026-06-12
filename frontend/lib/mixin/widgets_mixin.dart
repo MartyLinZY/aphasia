@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/utils/common_widget_function.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -470,7 +471,7 @@ mixin QuestionAnswerArea {
 
     // 初始化音频
     if (currQuestion.audioUrl != null) {
-      player!.setup(currQuestion.audioUrl!, onComplete: () {
+      player!.setup(HttpConstants.resolveMedia(currQuestion.audioUrl!), onComplete: () {
         setState(() {
           tryStartTimeLimitCounter(currQuestion);
         });
@@ -532,7 +533,18 @@ mixin QuestionAnswerArea {
   void setState(void Function() fn);
 
   Future<void> doEvalQuestion({required Question question, required QuestionResult result, required void Function(QuestionResult) goToNextQuestion}) async {
-    await question.evalRule!.evaluate(result);
+    try {
+      await question.evalRule!.evaluate(result);
+    } catch (e, st) {
+      // 评分调用失败（如手写 OCR / 语音 ASR 第三方报错、网络异常）时，
+      // 不能让 evaluating（"评分中"）永久停住卡死整套答题：按默认分兜底、
+      // 结果里留痕，并直接进入下一题，保证流程能走完。
+      debugPrint("题目评分失败，按默认分处理：$e\n$st");
+      result.finalScore ??= question.evalRule!.defaultScore;
+      result.extraResults["评分异常"] = "识别/评分失败，已按默认分处理：$e";
+      goToNextQuestion(result);
+      return;
+    }
 
     // debugPrint(result.toJson().toString());
     if (!hinting) {
@@ -578,7 +590,7 @@ mixin QuestionAnswerArea {
     }
 
     if (hintingRule?.hintAudioUrl != null) {
-      player!.setup(hintingRule!.hintAudioUrl!, onComplete: () {
+      player!.setup(HttpConstants.resolveMedia(hintingRule!.hintAudioUrl!), onComplete: () {
         tryStartTimeLimitCounter(currQuestion);
       });
 

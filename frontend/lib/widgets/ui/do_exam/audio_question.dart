@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:aphasia_recovery/enum/system.dart';
+import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/mixin/widgets_mixin.dart';
 import 'package:aphasia_recovery/models/question/question.dart';
 import 'package:aphasia_recovery/models/result/results.dart';
@@ -161,7 +162,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
 
     // 初始化音频
     if (currQuestion.audioUrl != null) {
-      player.setup(currQuestion.audioUrl!, onComplete: () {
+      player.setup(HttpConstants.resolveMedia(currQuestion.audioUrl!), onComplete: () {
         setState(() {
           _startTimeLimitCounter();
         });
@@ -327,7 +328,7 @@ class _AudioQuestionAnswerAreaState extends State<AudioQuestionAnswerArea>
       displayText = hintingRule?.hintText;
     }
     if (hintingRule?.hintAudioUrl != null) {
-      player.setup(hintingRule!.hintAudioUrl!, onComplete: () {
+      player.setup(HttpConstants.resolveMedia(hintingRule!.hintAudioUrl!), onComplete: () {
         timeLimitCountDown?.start();
       });
 

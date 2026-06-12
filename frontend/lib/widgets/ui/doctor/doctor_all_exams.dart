@@ -85,7 +85,9 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
               child: Row(
                 children: [
                   Expanded(
-                    flex: 1,
+                    // 列表栏 flex 2、详情栏 flex 3（原 1:3 → 2:3）：窄屏（手机横屏）下列表栏太挤、
+                    // 套题名放不下；详情栏因此变窄，已把卡内标题/按钮改为可省略/可换行（见下）以防溢出。
+                    flex: 2,
                     child: Container(
                       constraints: const BoxConstraints(minWidth: 250),
                       child: Material(
@@ -107,7 +109,9 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
                               );
                             }),
                             SizedBox(
-                              height: 32,
+                              // 48 而非 32：原高度小于按钮内容（图标18 + 上下内边距各10 + 文字），
+                              // 把"新建"二字纵向裁掉了。
+                              height: 48,
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 16),
                                 child: Align(
@@ -186,59 +190,60 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
                                                     BorderRadius.circular(
                                                         _cardRadius)),
                                             hoverColor: _listHoverColor,
-                                            title: Row(
-                                              children: [
-                                                Icon(
-                                                  exams[index].recovery
-                                                      ? Icons.healing
-                                                      : Icons.assignment,
-                                                  size: 20,
-                                                  color:
-                                                      selectedExamIndex == index
-                                                          ? theme.colorScheme
-                                                              .onPrimary
-                                                          : Colors.grey[600],
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Expanded(
-                                                  child: Text(
-                                                    exams[index].name,
-                                                    style: bodyStyle.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          selectedExamIndex ==
-                                                                  index
-                                                              ? theme
-                                                                  .colorScheme
-                                                                  .onPrimary
-                                                              : Colors
-                                                                  .grey[800],
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (exams[index].published)
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green
-                                                          .withValues(alpha: 0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                    ),
-                                                    child: Text(
-                                                      "已发布",
-                                                      style: bodyStyle.copyWith(
-                                                          color: Colors.green,
-                                                          fontSize: 12),
+                                            leading: Icon(
+                                              exams[index].recovery
+                                                  ? Icons.healing
+                                                  : Icons.assignment,
+                                              size: 20,
+                                              color: selectedExamIndex == index
+                                                  ? theme.colorScheme.onPrimary
+                                                  : Colors.grey[600],
+                                            ),
+                                            title: Text(
+                                              exams[index].name,
+                                              // 名字独占 title（图标在 leading、徽标在 subtitle，不再同行抢宽度）。
+                                              // 最多两行省略，窄屏（手机横屏左栏）也能读全大部分；原先三者挤一行，
+                                              // 窄屏下名字宽度≈0 → 逐字竖排/消失 + 4.5px 溢出。
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: bodyStyle.copyWith(
+                                                fontWeight: FontWeight.w500,
+                                                color: selectedExamIndex == index
+                                                    ? theme.colorScheme.onPrimary
+                                                    : Colors.grey[800],
+                                              ),
+                                            ),
+                                            subtitle: exams[index].published
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 4),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.green
+                                                            .withValues(
+                                                                alpha: 0.1),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4),
+                                                      ),
+                                                      child: Text(
+                                                        "已发布",
+                                                        style:
+                                                            bodyStyle.copyWith(
+                                                                color:
+                                                                    Colors.green,
+                                                                fontSize: 12),
+                                                      ),
                                                     ),
                                                   )
-                                              ],
-                                            ),
+                                                : null,
                                           );
                                         },
                                       ),
@@ -257,9 +262,18 @@ class _DoctorAllExamsListPageState extends State<DoctorAllExamsListPage>
                         child: Center(
                           child: Builder(builder: (context) {
                             if (selectedExamIndex == null) {
-                              return Text(
-                                "点击左侧套题查看详情",
-                                style: hintTextStyle,
+                              // FittedBox 缩放：窄屏（手机横屏详情栏）下大号字会折成两行很难看，
+                              // scaleDown 让它自动缩成一行；宽屏不放大、保持原字号。
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "点击左侧套题查看详情",
+                                    style: hintTextStyle,
+                                  ),
+                                ),
                               );
                             } else if (selectedExamIndex! >= exams.length) {
                               // should not happen
@@ -605,9 +619,15 @@ class ExamDetailCard extends StatelessWidget {
                     color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 16),
-                  Text(
-                    exam.name,
-                    style: theme.textTheme.titleLarge!.copyWith(fontSize: 24),
+                  Flexible(
+                    child: Text(
+                      exam.name,
+                      // 详情栏变窄后标题不再硬撑溢出，过长省略。
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          theme.textTheme.titleLarge!.copyWith(fontSize: 24),
+                    ),
                   ),
                 ],
               ),
@@ -622,9 +642,11 @@ class ExamDetailCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              // Wrap 而非 Row：详情栏变窄时按钮自动换行，避免横向溢出（原 Row 在窄屏挤爆）。
+              Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   if (!exam.published) // 新增发布状态判断
                     _buildActionButton(
@@ -642,21 +664,18 @@ class ExamDetailCard extends StatelessWidget {
                                           )))
                               .then((value) => _parentState.setState(() {}));
                         }),
-                    const SizedBox(width: 16),
                   _buildActionButton(
                       icon: Icons.delete,
                       label: "删除",
                       color: theme.colorScheme.error,
                       onPressed: () => _showDeleteConfirmationDialog(context)),
-                  if (!exam.published) ...[
-                    const SizedBox(width: 12),
+                  if (!exam.published)
                     _buildActionButton(
                       icon: Icons.publish,
                       label: "发布",
                       color: Colors.green,
                       onPressed: () => _publishExam(context),
                     ),
-                  ]
                 ],
               ),
               const SizedBox(height: 32),

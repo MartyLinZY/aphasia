@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_drawing_board/flutter_drawing_board.dart';
@@ -69,7 +70,7 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
       return;
     }
 
-    _screenshotController.capture().then((Uint8List? handWriteData) {
+    _exportWriting().then((Uint8List? handWriteData) {
       doCommonFinishStep(result);
 
       if (handWriteData != null) {
@@ -81,6 +82,34 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
         toast(context, msg: "获取手写结果失败，请联系开发者", btnText: "确认");
       }
     });
+  }
+
+  /// 导出手写笔迹为 PNG 字节，并合成到白底。
+  /// 原 `_screenshotController.capture()` 在 Flutter web 上截不到画板 CustomPaint
+  /// 笔迹（得到空白白图 → 百度手写 OCR 返回空 → 必得 0 分）。改用画板原生
+  /// `getImageData()`（走画板自身渲染，跨平台可靠）；它给的是透明底笔迹，
+  /// 再合成到白底，保证 OCR（为黑字白底设计）能识别。
+  Future<Uint8List?> _exportWriting() async {
+    final ByteData? data = await _drawingController.getImageData();
+    if (data == null) return null;
+    final ui.Codec codec =
+        await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final ui.Image strokes = (await codec.getNextFrame()).image;
+
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(recorder);
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, strokes.width.toDouble(), strokes.height.toDouble()),
+        Paint()..color = Colors.white);
+    canvas.drawImage(strokes, Offset.zero, Paint());
+    final ui.Image flattened =
+        await recorder.endRecording().toImage(strokes.width, strokes.height);
+    final ByteData? png =
+        await flattened.toByteData(format: ui.ImageByteFormat.png);
+    // 释放 ui.Image 底层资源，避免多次作答/重试时内存增长。
+    strokes.dispose();
+    flattened.dispose();
+    return png?.buffer.asUint8List();
   }
 
   void evalQuestion(
