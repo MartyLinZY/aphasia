@@ -28,16 +28,15 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<!-- 锁定横屏：本 app UI 为横屏设计（Android 端用 manifest 的 screenOrientation=landscape 锁定），
+	     iOS 这里只列横屏两个方向，与 Android 对齐，避免竖屏布局拥挤。 -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
@@ -46,6 +45,13 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-    <string>Some message to describe why you need this permission</string>
+	<string>需要使用麦克风录制您的语音作答，用于失语症康复评估。</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- 允许明文 HTTP：本应用通过 http:// 访问局域网内的后端服务（演示/内网部署，
+		     非公网 HTTPS）。模拟器用 localhost、真机用 Mac 局域网 IP。改为 HTTPS 后端后可移除。 -->
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

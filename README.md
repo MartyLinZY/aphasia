@@ -273,10 +273,71 @@ set -a; source ../.env; set +a    # Spring Boot 不会自动读 .env，必须先
 cd frontend
 flutter run \
   --dart-define=BACKEND_URL=http://localhost:8080 \
-  --dart-define=BACKEND_HOST=localhost
+  --dart-define=BACKEND_HOST=localhost:8080
 ```
 
-选目标：Chrome / Edge / 安卓真机 / 安卓模拟器 / Windows 等。iOS/macOS 需要额外配 `audio_record/platform/` 下平台分支，未充分测试。
+> ⚠️ `BACKEND_HOST` **必须带端口 `:8080`**：录音/手写题走 multipart 请求 `Uri.http(BACKEND_HOST, path)`，
+> 少了端口会打到 80 端口 → `ERR_CONNECTION_REFUSED`（普通请求走带端口的 `BACKEND_URL`，不受影响）。
+
+选目标：Chrome / Edge / macOS / 安卓真机 / 安卓模拟器 / Windows / Linux 等。
+**各原生端的构建命令、后端地址、明文 HTTP 配置见下方「多平台运行（原生端）」。**
+
+---
+
+## 多平台运行（原生端）
+
+前端是 **Flutter 单一代码库**，除 web 外还能编到 **macOS / iOS / Android / Windows / Linux**。
+录音用 `record` 联邦插件（`record_android` / `record_darwin` / `record_linux` / `record_windows` / `record_web` 全部到位），
+**六平台都支持录音**，没有桌面端缺插件的问题。后端仍是同一套 Docker 栈（`docker compose up`）；
+原生端只是把"前端"从浏览器换成原生 app，连同一个 `8080` 后端。
+
+| 平台 | 构建 / 运行 | 后端地址（两个 `--dart-define` 都要） | 明文 HTTP | 状态 |
+|---|---|---|---|---|
+| Web | `flutter run -d chrome` 或 Docker | `localhost:8080` | 浏览器不限 | ✅ 实测 |
+| macOS | `flutter run -d macos` / `flutter build macos` | `localhost:8080` | 无限制（已配 `network.client` + 麦克风 entitlement） | ✅ 构建+启动实测 |
+| **Android 模拟器** | `flutter run -d emulator`（需 Android SDK） | **`10.0.2.2:8080`**（安卓特有的宿主 localhost 映射） | 已配 `usesCleartextTraffic` | ✅ **构建+登录+连后端实测** |
+| Android 真机 | 同上 | `<电脑局域网 IP>:8080` | 已配 `usesCleartextTraffic` | 🟡 需局域网地址 |
+| iOS 模拟器 | `flutter run -d <sim>`（需 Xcode + iOS runtime） | `localhost:8080`（模拟器共享 Mac 网络） | 已配 ATS 例外 | ✅ 构建+启动+登录页渲染实测（GUI 登录需手点） |
+| iOS 真机 | 同上 + Xcode 签名 | `<Mac 局域网 IP>:8080` | 已配 ATS 例外 | 🟡 需签名 |
+| Windows | 在 Windows + Visual Studio 上 `flutter build windows` | `localhost:8080` | 无限制 | 🟢 插件就绪，需 Windows 机 |
+| Linux | 在 Linux + 工具链上 `flutter build linux` | `localhost:8080` | 无限制 | 🟢 插件就绪，需 Linux 机 |
+
+**两个跨端关键点：**
+
+1. **后端地址因端而异**——同机的 web/macOS/iOS 模拟器用 `localhost:8080`；**Android 模拟器必须用 `10.0.2.2:8080`**；
+   **真机一律用"运行后端那台电脑的局域网 IP"**（手机/平板上的 `localhost` 指设备自己）。改时两个 dart-define 一起改：
+   ```bash
+   flutter run -d <device> \
+     --dart-define=BACKEND_URL=http://10.0.2.2:8080 \
+     --dart-define=BACKEND_HOST=10.0.2.2:8080
+   ```
+2. **移动端明文 HTTP 已放行**——iOS `ios/Runner/Info.plist` 加了 `NSAppTransportSecurity → NSAllowsArbitraryLoads`，
+   Android `android/app/src/main/AndroidManifest.xml` 加了 `android:usesCleartextTraffic="true"`；否则 iOS/Android 默认拦 `http://` 后端。
+   **后端若改走 HTTPS，这两项可移除。**
+
+### Android 构建说明（已实测）
+
+2026-06-12 在 Android 模拟器（Pixel 6 / Android 15 / arm64）上实测：`flutter run` 构建 + 安装 + 启动 + 用
+医生账号登录 → 经 `10.0.2.2:8080` 连后端拉到套题列表，全程通过。为此把陈旧的 Android Gradle 配置对齐到当前 Flutter：
+
+- `android/settings.gradle`：旧的命令式 `apply from: app_plugin_loader.gradle` → 声明式 `plugins {}` 块
+  （`dev.flutter.flutter-plugin-loader` + **AGP 8.11.1** + **Kotlin 2.2.20**）；
+- `android/build.gradle`：移除旧 `buildscript`（AGP/Kotlin 版本改由 settings 管）；
+- `gradle-wrapper.properties`：Gradle **8.9 → 8.14**（AGP 8.11 要求）；`app/build.gradle`：JDK **8 → 17**；
+- `file_picker` **6.2.1 → 11.0.2**：旧版用了 Flutter 已移除的 v1 embedding（`PluginRegistry.Registrar`）导致 Android 编译失败；
+  v11 改为静态方法（`FilePicker.pickFiles()`，已同步改 `lib/utils/io/file.dart`）。
+
+> 首次 Android 构建会自动下载 Gradle 8.14 + AGP/Kotlin 插件 + NDK（约 1.5GB，十几分钟）。
+
+### iOS 模拟器构建说明（已实测）
+
+2026-06-12 在 iPhone 17 模拟器（iOS 26.5）上实测：`pod install` + `xcodebuild` + 启动 + 登录页渲染全部通过，
+**iOS 侧无需任何代码改动**（file_picker 11 的 pod 直接可用），唯一移动端配置是 `Info.plist` 的 ATS 例外。
+模拟器构建**不需要签名**（只真机要），后端用 `localhost:8080`（模拟器共享 Mac 网络）。
+
+- 前置：Xcode 26 默认不带 iOS 模拟器运行时，先 `xcodebuild -downloadPlatform iOS`（约 8.5GB）；
+- GUI 登录交互未自动验证（iOS 模拟器无 `adb` 式命令行点击，AppleScript UI 自动化又受"辅助功能"权限限制）——
+  在模拟器里手点登录即可，同后端在 Android 上登录已实测通过。
 
 ---
 

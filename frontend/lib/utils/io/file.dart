@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 
 
 Future<WrappedFile?> pickFile(FileType type) async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
+  // file_picker 11 破坏性变更：FilePicker 改为静态方法（原 FilePicker.platform.pickFiles）。
+  FilePickerResult? result = await FilePicker.pickFiles(
       type: type
   );
 
