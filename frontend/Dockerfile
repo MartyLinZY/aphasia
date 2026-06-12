@@ -3,7 +3,8 @@
 # 默认 localhost:8080 对应 compose 里 backend 对宿主机暴露的端口。
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG BACKEND_URL=http://localhost:8080
-ARG BACKEND_HOST=localhost
+# 必须带端口：录音/手写的 multipart 走 Uri.http(BACKEND_HOST)，少端口会打到 :80 → ERR_CONNECTION_REFUSED。
+ARG BACKEND_HOST=localhost:8080
 WORKDIR /app
 # cirruslabs 镜像里 flutter 属另一用户，避免 git "dubious ownership"
 RUN git config --global --add safe.directory /app

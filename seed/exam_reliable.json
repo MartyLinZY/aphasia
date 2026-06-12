@@ -13,7 +13,7 @@
             {
               "alias": "选择题：选出梳子",
               "questionText": "选出梳子",
-              "audioUrl": "http://localhost:8080/prompts/q2_choice_comb.mp3",
+              "audioUrl": "/prompts/q2_choice_comb.mp3",
               "imageUrl": null,
               "omitImageAfterSeconds": 20,
               "typeName": "ChoiceQuestion",
@@ -103,7 +103,7 @@
             {
               "alias": "选择题：选出球",
               "questionText": "球是哪一个？",
-              "audioUrl": "http://localhost:8080/prompts/q3_choice_ball.mp3",
+              "audioUrl": "/prompts/q3_choice_ball.mp3",
               "imageUrl": null,
               "omitImageAfterSeconds": 20,
               "typeName": "ChoiceQuestion",
@@ -214,7 +214,7 @@
             {
               "alias": "指令题：梳子与书本",
               "questionText": "先指一下梳子，再拿起梳子放在书本上",
-              "audioUrl": "http://localhost:8080/prompts/q4_cmd_comb_book.mp3",
+              "audioUrl": "/prompts/q4_cmd_comb_book.mp3",
               "imageUrl": "assets/images/for_question_setting/comb.png",
               "omitImageAfterSeconds": 5,
               "typeName": "CommandQuestion",
@@ -405,7 +405,7 @@
             {
               "alias": "场景寻物题：找风筝",
               "questionText": "请指出风筝在哪里",
-              "audioUrl": "http://localhost:8080/prompts/q5_find_kite.mp3",
+              "audioUrl": "/prompts/q5_find_kite.mp3",
               "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
               "omitImageAfterSeconds": 20,
               "typeName": "ItemFindingQuestion",

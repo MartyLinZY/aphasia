@@ -51,8 +51,8 @@ def _req(method, path, body=None, headers=None):
 
 
 def register_or_login(identity, password, role):
-    # 先登录后注册：user 表无 identity 唯一索引，register-first 会每次新建重复账号
-    # （两套题还会挂到不同的重复 doctor uid → 医生只看得到一套）。login-first 复用已有账号、uid 一致。
+    # 先登录后注册：后端 DatabaseInitializer 给 user.identity 建了唯一索引，register-first
+    # 在账号已存在时会失败/冲突。login-first 让脚本幂等、复用同一 uid，避免演示数据分散到多个账号。
     try:
         r = _req("POST", "/api/auth", None,
                  {"identity": identity, "password": password})

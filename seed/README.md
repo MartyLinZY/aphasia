@@ -56,6 +56,9 @@ docker compose up -d            # 至少把 mongo + backend 起来
 - `seed/mongodump/LrNew/` 已含 dump（2 账号 + 3 套题〔含 1 康复〕 + 题目，干净无测试结果）；
 - `docker-compose.yml` 的 `mongo` 已挂载 dump + `restore.sh` 到 `/docker-entrypoint-initdb.d/`；
 - 题目提示语音（讯飞 TTS）烤在**后端镜像** `static/prompts/` 里，随镜像走，不依赖 dump。
+  题目 `audioUrl` 存**相对路径** `/prompts/qN_*.mp3`，前端播放时用 `HttpConstants.resolveMedia` 拼当前
+  `BACKEND_URL`（web/Docker=localhost、Android 模拟器=10.0.2.2、真机=局域网 IP）——**别写死 `http://localhost:8080`**，
+  否则原生端 localhost 指设备自身、提示音放不出（重做提示音时遵循此约定）。
 
 **换机步骤**：把整个 `aphasia/`（含 `seed/mongodump/`）拷过去 → 填好 `.env` 的 5 类 key → `docker compose up --build`。
 `mongo-data` 为空 → 首启动自动 `mongorestore` → 账号/题库/引用全在；之后再 `up` 已有数据，init 钩子自动跳过。

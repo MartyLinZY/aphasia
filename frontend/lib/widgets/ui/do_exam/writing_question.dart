@@ -106,6 +106,9 @@ class _WritingQuestionAnswerAreaState extends State<WritingQuestionAnswerArea>
         await recorder.endRecording().toImage(strokes.width, strokes.height);
     final ByteData? png =
         await flattened.toByteData(format: ui.ImageByteFormat.png);
+    // 释放 ui.Image 底层资源，避免多次作答/重试时内存增长。
+    strokes.dispose();
+    flattened.dispose();
     return png?.buffer.asUint8List();
   }
 

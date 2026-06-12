@@ -13,7 +13,7 @@
             {
               "alias": "书写题：叉子命名",
               "questionText": "写出刚刚展示的图片中的物体名称",
-              "audioUrl": "http://localhost:8080/prompts/q1_write_fork.mp3",
+              "audioUrl": "/prompts/q1_write_fork.mp3",
               "imageUrl": "assets/images/for_question_setting/fork.jpg",
               "omitImageAfterSeconds": 5,
               "typeName": "WritingQuestion",
@@ -104,7 +104,7 @@
             {
               "alias": "选择题：选出梳子",
               "questionText": "选出梳子",
-              "audioUrl": "http://localhost:8080/prompts/q2_choice_comb.mp3",
+              "audioUrl": "/prompts/q2_choice_comb.mp3",
               "imageUrl": null,
               "omitImageAfterSeconds": 20,
               "typeName": "ChoiceQuestion",
@@ -194,7 +194,7 @@
             {
               "alias": "选择题：选出球",
               "questionText": "球是哪一个？",
-              "audioUrl": "http://localhost:8080/prompts/q3_choice_ball.mp3",
+              "audioUrl": "/prompts/q3_choice_ball.mp3",
               "imageUrl": null,
               "omitImageAfterSeconds": 20,
               "typeName": "ChoiceQuestion",
@@ -305,7 +305,7 @@
             {
               "alias": "指令题：梳子与书本",
               "questionText": "先指一下梳子，再拿起梳子放在书本上",
-              "audioUrl": "http://localhost:8080/prompts/q4_cmd_comb_book.mp3",
+              "audioUrl": "/prompts/q4_cmd_comb_book.mp3",
               "imageUrl": "assets/images/for_question_setting/comb.png",
               "omitImageAfterSeconds": 5,
               "typeName": "CommandQuestion",
@@ -496,7 +496,7 @@
             {
               "alias": "场景寻物题：找风筝",
               "questionText": "请指出风筝在哪里",
-              "audioUrl": "http://localhost:8080/prompts/q5_find_kite.mp3",
+              "audioUrl": "/prompts/q5_find_kite.mp3",
               "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
               "omitImageAfterSeconds": 20,
               "typeName": "ItemFindingQuestion",
@@ -605,7 +605,7 @@
             {
               "alias": "录音题：照相机命名",
               "questionText": "这是什么？",
-              "audioUrl": "http://localhost:8080/prompts/q6_audio_camera.mp3",
+              "audioUrl": "/prompts/q6_audio_camera.mp3",
               "imageUrl": "assets/images/for_question_setting/camera.jpg",
               "omitImageAfterSeconds": -1,
               "typeName": "AudioQuestion",
@@ -683,7 +683,7 @@
             {
               "alias": "录音题：图片描述",
               "questionText": "请描述一下图里的内容",
-              "audioUrl": "http://localhost:8080/prompts/q7_audio_describe.mp3",
+              "audioUrl": "/prompts/q7_audio_describe.mp3",
               "imageUrl": "assets/images/for_question_setting/type2_view.jpg",
               "omitImageAfterSeconds": -1,
               "typeName": "AudioQuestion",

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:aphasia_recovery/settings.dart';
 import 'package:aphasia_recovery/utils/common_widget_function.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -470,7 +471,7 @@ mixin QuestionAnswerArea {
 
     // 初始化音频
     if (currQuestion.audioUrl != null) {
-      player!.setup(currQuestion.audioUrl!, onComplete: () {
+      player!.setup(HttpConstants.resolveMedia(currQuestion.audioUrl!), onComplete: () {
         setState(() {
           tryStartTimeLimitCounter(currQuestion);
         });
@@ -589,7 +590,7 @@ mixin QuestionAnswerArea {
     }
 
     if (hintingRule?.hintAudioUrl != null) {
-      player!.setup(hintingRule!.hintAudioUrl!, onComplete: () {
+      player!.setup(HttpConstants.resolveMedia(hintingRule!.hintAudioUrl!), onComplete: () {
         tryStartTimeLimitCounter(currQuestion);
       });
 
